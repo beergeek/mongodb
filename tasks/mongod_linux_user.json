@@ -1,0 +1,21 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "A short description of this task",
+  "parameters": {
+    "primary": {
+      "description": "Which node is primary",
+      "type": "String[1]"
+    },
+    "username": {
+      "description": "Operating system user to create, if it does not exist",
+      "type": "String[1]"
+    },
+    "password": {
+      "description": "Operating system user password to set",
+      "type": "String[1]",
+      "sensitive": true
+    }
+  },
+  "private": true
+}

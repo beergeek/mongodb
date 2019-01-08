@@ -1,0 +1,17 @@
+{
+  "mongodb_service_user": "mongodb",
+  "primary": "13.54.69.154",
+  "admin_user": "admin",
+  "admin_password": "password",
+  "username": "mongodb",
+  "password": "password",
+  "config_file": "/var/mongodb/app0.conf",
+  "db_path": "/var/mongodb/app0/db",
+  "log_file": "/var/mongodb/app0/app0.log",
+  "base_path": "/var/mongodb",
+  "repset": "app0-rep0",
+  "keyfile_path": "/var/mongodb/pki/keyfile",
+  "bindnic": "eth0",
+  "port": "27017",
+  "rs_nodes": "192.168.0.5,192.168.0.11,192.168.0.22"
+}

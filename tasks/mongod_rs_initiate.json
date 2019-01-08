@@ -1,0 +1,19 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "A short description of this task",
+  "parameters": {
+    "nodes": {
+      "description": "Nodes in replica set, in order, as a single string",
+      "type": "String[1]"
+    },
+    "repset": {
+      "description": "Name for replication set",
+      "type": "String[1]"
+    },
+    "port": {
+      "description": "Port to bind to",
+      "type": "String[1]"
+    }
+  }
+}

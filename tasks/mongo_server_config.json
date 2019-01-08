@@ -1,0 +1,56 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "A short description of this task",
+  "parameters": {
+    "mongodb_service_user": {
+      "description": "User that the mongodb service will run as",
+      "type": "String[1]"
+    },
+    "config_file": {
+      "description": "config file path and name",
+      "type": "String[1]"
+    },
+    "db_path": {
+      "description": "Path to DB files",
+      "type": "String[1]"
+    },
+    "log_file": {
+      "description": "Path and file name to log file",
+      "type": "String[1]"
+    },
+    "base_path": {
+      "description": "Base path to MongoDB",
+      "type": "String[1]"
+    },
+    "repset": {
+      "description": "Name for replication set",
+      "type": "String[1]"
+    },
+    "keyfile": {
+      "description": "keyfile content",
+      "type": "String[1]",
+      "sensitive": true
+    },
+    "keyfile_path": {
+      "description": "File path and name to keyfile",
+      "type": "String[1]"
+    },
+    "bindnic": {
+      "description": "NIC for listening",
+      "type": "String[1]"
+    },
+    "port": {
+      "description": "Port to bind to",
+      "type": "String[1]"
+    },
+    "sharding": {
+      "description": "Sharding parameter type, if required",
+      "type": "Optional[String[1]]"
+    },
+    "extra_config": {
+      "description": "Extra config required",
+      "type": "Optional[String[1]]"
+    }
+  }
+}

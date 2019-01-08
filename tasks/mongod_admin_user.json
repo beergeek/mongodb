@@ -1,0 +1,20 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "A short description of this task",
+  "parameters": {
+    "user": {
+      "description": "Admin user for the replication set",
+      "type": "String[1]"
+    },
+    "passwd": {
+      "description": "Password for Admin user",
+      "type": "String[1]",
+      "sensitive": true
+    },
+    "port": {
+      "description": "Port to bind to",
+      "type": "String[1]"
+    }
+  }
+}

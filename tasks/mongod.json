@@ -1,0 +1,24 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "A task to implement mongod in a replica set",
+  "parameters": {
+    "primary": {
+      "description": "Which node is primary",
+      "type": "String[1]"
+    },
+    "username": {
+      "description": "Operating system user to create, if it does not exist",
+      "type": "String[1]"
+    },
+    "password": {
+      "description": "Operating system user password to set",
+      "type": "String[1]",
+      "sensitive": true
+    }
+  },
+  "implmentations": [
+    {"name": "mongod_linux", "requirements": ["shell"]},
+    {"name": "mongod_windows", "requirements": ["powershell"]}
+  ]
+}
