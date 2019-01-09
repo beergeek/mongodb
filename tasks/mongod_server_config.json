@@ -29,16 +29,24 @@
     },
     "keyfile": {
       "description": "keyfile content",
-      "type": "String[1]",
+      "type": "Optional[String[1]]",
       "sensitive": true
+    },
+    "x509_path": {
+      "description": "Path and name of x509 PEM file",
+      "type": "Optional[String[1]]"
+    },
+    "ca_path": {
+      "description": "Path and name of CA PEM file",
+      "type": "Optional[String[1]]"
     },
     "keyfile_path": {
       "description": "File path and name to keyfile",
-      "type": "String[1]"
+      "type": "Optional[String[1]]"
     },
     "bindnic": {
       "description": "NIC for listening",
-      "type": "String[1]"
+      "type": "Optional[String[1]]"
     },
     "port": {
       "description": "Port to bind to",

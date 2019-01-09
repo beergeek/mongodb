@@ -1,0 +1,18 @@
+{
+  "nodes": "13.210.0.110,3.104.66.90,13.211.233.203",
+  "mongodb_service_user": "mongod",
+  "primary": "13.210.0.110",
+  "admin_user": "admin",
+  "admin_password": "password",
+  "config_file": "/var/mongodb/app0.conf",
+  "repo_file_path": "/Users/brettgray/Documents/Dev/Puppet/mongodb/files/el_7_4.1.repo",
+  "db_path": "/var/mongodb/app0/db",
+  "log_file": "/var/mongodb/app0/app0.log",
+  "base_path": "/var/mongodb/app0",
+  "repset": "cnf0-rep0",
+  "x509_path": "/var/mongodb/pki/app0.pem",
+  "ca_path": "/var/mongodb/pki/ca.pem",
+  "port": "27018",
+  "rs_nodes": "server3.mongodb.local,server4.mongodb.local,server5.mongodb.local",
+  "sharding": "configsvr"
+}

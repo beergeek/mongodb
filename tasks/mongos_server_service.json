@@ -3,10 +3,9 @@
   "supports_noop": false,
   "description": "A short description of this task",
   "parameters": {
-    "username": {
-      "description": "Operating system user to create, if it does not exist",
+    "config_file": {
+      "description": "config file path and name",
       "type": "String[1]"
     }
-  },
-  "private": true
+  }
 }

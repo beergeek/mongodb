@@ -15,6 +15,14 @@
     "port": {
       "description": "Port to bind to",
       "type": "String[1]"
+    },
+    "x509_path": {
+      "description": "Path and name of x509 PEM file",
+      "type": "Optional[String[1]]"
+    },
+    "ca_path": {
+      "description": "Path and name of CA PEM file",
+      "type": "Optional[String[1]]"
     }
   }
 }
