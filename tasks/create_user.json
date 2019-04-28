@@ -1,0 +1,44 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "A short description of this task",
+  "parameters": {
+    "name": {
+      "description": "Name of new user",
+      "type": "String[1]"
+    },
+    "password": {
+      "description": "Password of user",
+      "type": "String[1]",
+      "sensitive": true
+    },
+    "path": {
+      "description": "The LDAP path the user will belong within, e.g. CN=Users,DC=MONGODB,DC=LOCAL",
+      "type": "String[1]"
+    },
+    "given_name": {
+      "description": "Optional given name for user, defaults to 'name' value",
+      "type": "Optional[String[1]"
+    },
+    "password_never_expires": {
+      "description": "Boolean value to determine if password expires, defaults to `false`",
+      "type": "Boolean[false]"
+    },
+    "change_password_at_logon": {
+      "description": "Determines if the user must change the password at initial logon, defaults to `true`",
+      "type": "Boolean[true]"
+    },
+    "cannot_change_password": {
+      "description": "Determines if the user can change the password, defaults to `true`",
+      "type": "Boolean[true]"
+    },
+    "kerberos_encryption": {
+      "description": "The Kerberos encryption types allowed. Optional",
+      "type": "Optional[String[1]]"
+    },
+    "groups": {
+      "description": "An array of groups that the user belongs to",
+      "type": "Optional[Array[String[1]]]"
+    }
+  }
+}

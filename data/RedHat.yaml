@@ -1,0 +1,49 @@
+---
+
+variables:
+  - &base_path '/data'
+  - &db_base_path '/data/db'
+  - &log_path '/data/logs'
+  - &pki_path '/data/pki'
+  - &pem_path "/data/pki/%{facts.networking.fqdn}.pem"
+  - &cluster_pem_path '/data/pki/cluser_auth.pem'
+  - &ca_path '/data/pki/ca.cert'
+  - &svc_keytab_path '/data/pki/svc_keytab'
+  - &keyfile_path '/data/pki/mongodb_keyfile'
+
+# mongodb::supporting
+mongodb::supporting::base_path: *base_path
+mongodb::supporting::cluster_auth_file_path: *cluster_pem_path
+mongodb::supporting::pki_dir: *pki_path
+mongodb::supporting::ca_file_path: *ca_path
+mongodb::supporting::pem_file_path: *pem_path
+mongodb::supporting::server_keytab_path: *svc_keytab_path
+mongodb::supporting::keyfile_path: *keyfile_path
+
+# mongodb::install
+mongodb::install::base_path: *base_path
+mongodb::install::db_base_path: *db_base_path
+mongodb::install::log_path: *log_path
+mongodb::install::pki_path: *pki_path
+
+# mongodb::config
+mongodb::config::base_path: *base_path
+mongodb::config::db_base_path: *db_base_path
+mongodb::config::log_path: *log_path
+mongodb::config::pki_path: *pki_path
+mongodb::config::conf_path: '/etc'
+mongodb::config::pid_path: '/var/run/mongodb'
+
+# mongodb::user
+mongodb::user::home_dir: '/var/lib/mongodb'
+
+# MMS
+mongodb::ops_manager::mms_source: 'https://s3.amazonaws.com/mongodb-mms-build-onprem/ed64653d5fe3f780e2f1fac0e0f2463448c66a93/mongodb-mms-4.0.10.50461.20190403T1841Z-1.x86_64.rpm'
+mongodb::ops_manager::config_file_path: '/opt/mongodb/mms/conf/conf-mms.properties'
+mongodb::ops_manager::gen_key_file_path: '/etc/mongodb-mms/gen.key' 
+mongodb::ops_manager::mms_provider: 'rpm'
+mongodb::ops_manager::mms_package_name: 'mongodb-mms'
+
+# BIC
+mongodb::bi_connecter::client_keytab_path: '/var/lib/mongosql/client_keytab'
+mongodb::bi_connecter::svc_keytab_path: '/var/lib/mongosql/svc_keytab'

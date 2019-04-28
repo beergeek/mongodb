@@ -6,6 +6,10 @@
     "config_file": {
       "description": "config file path and name",
       "type": "String[1]"
+    },
+    "run_as_service": {
+      "description": "If to use service or run as command",
+      "type": "Boolean"
     }
   }
 }

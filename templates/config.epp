@@ -1,0 +1,43 @@
+replication:
+  replSetName: <%= $repset %>
+security:
+  authorization: enabled
+<% if $keyfile { -%>
+  keyFile: <%= $keyfile %>
+<% } -%>
+<% if $member_auth != 'none' { -%>
+  clusterAuthMode: <%= $member_auth %>
+<% } -%>
+net:
+  bindIp: <%= $bindip %>
+  port: <%= $port %>
+<% if $ssl_mode != 'none' { -%>
+  ssl:
+    mode: <%= $ssl_mode %>
+    PEMKeyFile: <%= $pem_file %>
+    CAFile: <%= $ca_file %>
+  <% if $cluster_pem_file { -%>
+    clusterFile: <%= $cluster_pem_file %>
+  <% } -%>
+<% } -%>
+
+systemLog:
+  destination: file
+  path: <%= $logpath %>/<%= $log_filename %>
+  logAppend: true
+processManagement:
+  fork: true
+<% if $pid_file { -%>
+  pidFilePath: <%= $pid_file %>
+<% } -%>
+storage:
+  dbPath: <%= $dbpath %>
+  directoryPerDB: true
+  wiredTiger:
+    engineConfig:
+      directoryForIndexes: true
+<% if $wiredtiger_cache_gb { -%>
+      cacheSizeGB: <%= $wiredtiger_cache_gb %>
+<% } -%>
+setParameter:
+  authenticationMechanisms: <%= $auth_list %>

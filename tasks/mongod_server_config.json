@@ -27,11 +27,6 @@
       "description": "Name for replication set",
       "type": "String[1]"
     },
-    "keyfile": {
-      "description": "keyfile content",
-      "type": "Optional[String[1]]",
-      "sensitive": true
-    },
     "x509_path": {
       "description": "Path and name of x509 PEM file",
       "type": "Optional[String[1]]"
@@ -55,6 +50,14 @@
     "sharding": {
       "description": "Sharding parameter type, if required",
       "type": "Optional[String[1]]"
+    },
+    "use_keyfile": {
+      "description": "Boolean to determine if keyfile is used for auth. Overriden by `use_x509` parameter",
+      "type": "Boolean"
+    },
+    "use_x509": {
+      "description": "Boolean to determine if x509 certs are used for auth. Overrides `use_keyfile` parameter",
+      "type": "Boolean"
     },
     "extra_config": {
       "description": "Extra config required",

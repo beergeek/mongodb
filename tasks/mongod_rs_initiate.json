@@ -22,6 +22,10 @@
     "ca_path": {
       "description": "Path and name of CA PEM file",
       "type": "Optional[String[1]]"
+    },
+    "sharding": {
+      "description": "Sharding parameter type, if required",
+      "type": "Optional[String[1]]"
     }
   }
 }

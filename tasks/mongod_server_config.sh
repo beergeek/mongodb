@@ -1,25 +1,34 @@
 #!/bin/sh
 
+base_path=$PT_base_path
+bindnic=$PT_bindnic
+ca_path=$PT_ca_path
 config_file=$PT_config_file
 dbpath=$PT_db_path
-logfile=$PT_log_file
-base_path=$PT_base_path
-sharding=$PT_sharding
-repset=$PT_repset
-keyfile=$PT_keyfile
-keyfile_path=$PT_keyfile_path
-x509_path=$PT_x509_path
-ca_path=$PT_ca_path
-bindnic=$PT_bindnic
-port=$PT_port
-mongodb_user=$PT_mongodb_service_user
 extra_config=$PT_extra_config
+keyfile_path=$PT_keyfile_path
+logfile=$PT_log_file
+mongodb_user=$PT_mongodb_service_user
+port=$PT_port
+repset=$PT_repset
+sharding=$PT_sharding
+x509_path=$PT_x509_path
 
-mkdir -p "$base_path"
-mkdir -p "$dbpath"
-chown -R $mongodb_user $base_path
-chown -R $mongodb_user $dbpath
+# create directorys with correct ownership
+mkdir -p $base_path
+mkdir -p $dbpath
+chown -R $mongodb_user:$mongodb_user $base_path
+chown -R $mongodb_user:$mongodb_user $dbpath
 
+# SELinux!
+semanage fcontext -a -t mongod_var_lib_t $dbpath.*
+semanage fcontext -a -t mongod_log_t $(dirname $logfile).*
+chcon -Rv -u system_u -t mongod_var_lib_t $dbpath
+chcon -Rv -u system_u -t mongod_log_t $(dirname $logfile)
+restorecon -R -v $dbpath
+restorecon -R -v $(dirname $logfile)
+
+# determine if using IP address via NIC setting or revert to node hostname
 if [ ! -z "${bindnic}" ] && [ "${bindnic}" != 'null' ]; then
   bindip=`ifconfig ${bindnic} | grep 'inet ' | awk '{print $2}'`
 else
@@ -28,23 +37,34 @@ fi
 
 # add common base to config file
 cat <<EOF > $config_file
+processManagement:
+  pidFilePath: /var/run/mongodb/mongod.pid
+  fork: true
 replication:
   replSetName: $repset
 systemLog:
   destination: file
   path: $logfile
   logAppend: true
-processManagement:
-  fork: true
 storage:
   dbPath: $dbpath
+  directoryPerDB: true
+  wiredTiger:
+    engineConfig:
+      directoryForIndexes: true
 net:
   bindIp: localhost,$bindip
   port: $port
 EOF
 
+# determine of a NIC is presented, if not use hostname
 if [ ! -z "${x509_path}" ] && [ $x509_path != 'null' ]; then
-cat <<EOF >> $config_file
+  # confirm there is a path for the CA cert as well
+  if [ -z "${ca_path}" ] || [ $ca_path == 'null' ]; then
+    echo "ERROR: require `ca_path` and `x509_path` for this setting"
+    exit 1
+  fi
+  cat <<EOF >> $config_file
   ssl:
     mode: requireSSL
     PEMKeyFile: $x509_path
@@ -54,7 +74,13 @@ security:
   clusterAuthMode: x509
 EOF
 elif [ ! -z "${keyfile}" ] && [ $keyfile != 'null' ]; then
-cat <<EOF >> $config_file
+  # confirm there is a path for the keyfile as well
+  if [ -z "${keyfile_path}" ] || [ $keyfile_path == 'null' ]; then
+    echo "ERROR: require `keyfile_path` for this setting"
+    exit 1
+  fi
+  # create config for keyfile
+  cat <<EOF >> $config_file
 security:
   authorization: enabled
   keyFile: $keyfile_path

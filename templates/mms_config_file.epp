@@ -1,0 +1,19 @@
+# Managed by Puppet
+mms.centralUrl=<%= $central_url %>
+mms.https.CAFile=<%= $https_ca_cert_path %>
+mms.https.PEMKeyFile=<%= $https_pem_file_path %>
+mms.https.ClientCertificateMode=<%= $client_cert_mode %>
+mongo.mongoUri=<%= $appsdb_uri %>
+mongo.encryptedCredentials=true
+mongo.ssl=<%= $ops_manager_ssl %>
+mongodb.ssl.CAFile=<%= $ca_cert_path %>
+mongodb.ssl.PEMKeyFile=<%= $pem_file_path %>
+mongodb.ssl.PEMKeyFilePassword=<%= $pem_file_passwd %>
+mms.ignoreInitialUiSetup=true
+mms.emailDaoClass=<%= $email_type %>
+mms.fromEmailAddr=<%= $from_email_addr %>
+mms.replyToEmailAddr=<%= $reply_email_addr %>
+mms.adminEmailAddr=<%= $admin_email_addr %>
+mms.mail.transport=<%= $email_transport %>
+mms.mail.hostname=<%= $email_hostname %>
+mms.mail.port=<%= $email_port %>

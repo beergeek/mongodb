@@ -1,22 +1,94 @@
+# Plan to setup initial config for installation and operation of MongoDB on RHEL 7
+#
+# @summary A Plan to setup various OS-level features and security for `mongod` and `mongos`.
+#
+# @param nodes An Array of the IP addresses or hostnames of the nodes to configure
+# @param app_name The name of the application the server certificate will be used for. The certificate
+#   will be rename to `${app_name}.pem` under the '/var/mongodb/pki' directory.
+# @param ca_path Full path and file name of the CA cert on the remote node for x509 auth.
+# @param ca_filename File name of CA cert on local node within the the `$certs_dir`.
+# @param certs_dir Full path of the directory where all the x509 certificates reside for the nodes.
+#   Certs are placed in '/var/mongodb/pki'.
+# @param node_common_name The common name for each node that a number will be appended to, e.g. 'server'
+#   will become server0, server1... etc etc
+# @param node_domain_node The domain for each server, e.g. 'mongodb.local'.
+# @param use_keyfile Boolean to determine if keyfile is used. Is overriden by `use_x509`.
+#   The keyfile is common to all nodes and in the format `${certs_dir}/${node_common_name}.key`.
+# @param use_x509 Boolean to determine if x509 certs are used. Overrides `use_keyfile`.
+#   Format of certificate path and name is `${certs_dir}/${node_common_name}${index}.pem`.
+# @param host_file Optional file path of the host file to uploaed.
+# @param mongodb_service_user Name of the system user to create, with home directory, for the `mongod` or mongos` service.
+#
 plan mongodb::setup_linux (
-  Array[String[1]] $nodes_public_ip,
-  String[1]        $certs_dir,
-  String[1]        $host_file,
-  String[1]        $mongodb_service_user = 'mongod',
+  Array[String[1]]    $nodes,
+  String[1]           $app_name,
+  String[1]           $node_domain_node,
+  String[1]           $tuned_config_file,
+  Boolean             $use_keyfile          = false,
+  Boolean             $use_x509             = true,
+  Integer             $server_count_offset  = 0,
+  Optional[String[1]] $ca_path              = '/data/pki/ca.pem',
+  Optional[String[1]] $ca_filename          = undef,
+  Optional[String[1]] $host_file            = undef,
+  Optional[String[1]] $keyfile_file         = undef,
+  String[1]           $node_certs_dir       = '/certs',
+  String[1]           $local_certs_dir      = '/data/pki',
+  String[1]           $mongodb_service_user = 'mongod',
+  String[1]           $node_common_name     = 'mongod',
 ) {
-  ## Setup MongoDB user to run service
-  run_task('mongodb::mongod_linux_user', $nodes_public_ip, username => $mongodb_service_user, '_run_as' => 'root')
-  run_command("echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCuzXKQA/xsgKrE3GnsGEIBJCMBrryoOtrBukJVv/0w10FLdqT2USNRPsclk3ywUKRL/LMsB9oR10liKOcmeQ3Ddyeh2HFihoZxJmIywWUQPY7YNz6sZ4R368LY8Vnkj939Kuy7uEVrD36/RYP3oeA1zCwoSrqsmdmiWTgO9P/nZQF4tT68znaTb8gw0rutEm3pa2uDzPuyH5qDkaI0NJ49tlcXMcIu8TlFfQmyxeJCmK+8ja+9W271EGvOSE6eO7oidtrnya7iOuMb08ssEsRF+pvUftB3bTnoGCMCWz/DPs52DKFg8IaG00vagHrD59JJMNK8DEgLUiouh5tiVcMv ec2-user@ip-192-168-0-4.ap-southeast-2.compute.internal' >> /home/ec2-user/.ssh/authorized_keys", $nodes_public_ip)
-  upload_file($host_file, '/etc/hosts', $nodes_public_ip, '_run_as' => 'root')
-  run_command('mkdir -p /var/mongodb/pki', $nodes_public_ip, '_run_as' => 'root')
-  upload_file("${certs_dir}/ca.cert.pem","/var/mongodb/pki/ca.pem", $nodes_public_ip, '_run_as' => 'root') 
-  $nodes_public_ip.each |Integer $index, String $value| {
-    run_command("sudo sh -c \"echo 'hostname=server${index}.mongodb.local' > /etc/sysconfig/network\"", $value)
-    run_command("hostname server${index}.mongodb.local", $value, '_run_as' => 'root')
-    upload_file("${certs_dir}/server${index}.pem", "/var/mongodb/pki/app0.pem", $value, '_run_as' => 'root')
-    run_command("chown ${mongodb_service_user} /var/mongodb/pki/app0.pem", $value, '_run_as' => 'root')
-    run_command("chown 0400 /var/mongodb/pki/app0.pem", $value, '_run_as' => 'root')
-    run_command("hostname", $value, '_run_as' => 'root')
+
+  # Check we are on the right operating system
+  run_task('mongodb::check_el', $nodes)
+
+  # SELinux
+  # run_command('setenforce permissive', $nodes, '_run_as' => 'root')
+  # run_command('sed -i "s/SELINUX=.*/SELINUX=permissive/" /etc/selinux/config', $nodes, '_run_as' => 'root')
+
+  # Install tuned
+  run_command('yum install -y tuned', $nodes, '_run_as' => 'root')
+  run_command('mkdir -p /etc/tuned/mongodb', $nodes, '_run_as' => 'root')
+  run_command('systemctl start tuned', $nodes, '_run_as' => 'root')
+  run_command('systemctl enable tuned', $nodes, '_run_as' => 'root')
+  upload_file($tuned_config_file, '/etc/tuned/mongodb/tuned.conf', $nodes, '_run_as' => 'root')
+  run_command('tuned-adm profile mongodb', $nodes, '_run_as' => 'root')
+
+  # Setup MongoDB user to run service
+  run_task('mongodb::mongodb_linux_user', $nodes, username => $mongodb_service_user, '_run_as' => 'root')
+
+  # Upload hosts file if provided
+  if $host_file and $host_file != 'null' {
+    upload_file($host_file, '/etc/hosts', $nodes, '_run_as' => 'root')
+  }
+
+  # Create PKI directory for certificates
+  run_command("mkdir -p ${node_certs_dir}", $nodes, '_run_as' => 'root')
+
+  if $ca_path and $ca_path != 'null' and $ca_filename and $ca_filename != 'null' {
+    # Upload the CA cert
+    upload_file("${local_certs_dir}/${ca_filename}","${ca_path}", $nodes, '_run_as' => 'root')
+  }
+
+  # Iterate through each node and configure unique items
+  $nodes.each |Integer $index, String $value| {
+    notice("Setting specific to ${value}")
+    $_index = $index + $server_count_offset
+    # Set hostname
+    run_command("echo 'hostname=${node_common_name}${_index}.${node_domain_node}' | sudo tee /etc/sysconfig/network", $value, '_run_as' => 'root')
+    run_command("hostnamectl set-hostname --static ${node_common_name}${_index}.${node_domain_node}", $value, '_run_as' => 'root')
+
+    if $use_x509 {
+      # Upload server certificate to /var/mongodb/pki, then change ownership and permissions
+      upload_file("${local_certs_dir}/${node_common_name}${_index}.pem", "${node_certs_dir}/${app_name}.pem", $value, '_run_as' => 'root')
+      run_command("chown ${mongodb_service_user} ${node_certs_dir}/${app_name}.pem", $value, '_run_as' => 'root')
+      run_command("chown 0400 ${node_certs_dir}/${app_name}.pem", $value, '_run_as' => 'root')
+    } elsif $use_keyfile {
+      # Upload keyfile to /var/mongodb/pki, then change ownership and permissions
+      upload_file("${certs_dir}/${node_common_name}.key", "${node_certs_dir}/${app_name}.key", $value, '_run_as' => 'root')
+      run_command("chown ${mongodb_service_user} ${node_certs_dir}/${app_name}.key", $value, '_run_as' => 'root')
+      run_command("chown 0400 ${node_certs_dir}/${app_name}.key", $value, '_run_as' => 'root')
+    }
+
+    run_command("echo `hostname`", $value, '_run_as' => 'root')
   }
 
 }
