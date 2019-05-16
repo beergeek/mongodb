@@ -11,7 +11,6 @@ logfile=$PT_log_file
 mongodb_user=$PT_mongodb_service_user
 port=$PT_port
 repset=$PT_repset
-sharding=$PT_sharding
 x509_path=$PT_x509_path
 
 # create directorys with correct ownership
@@ -89,14 +88,6 @@ else
 cat <<EOF >> $config_file
 security:
   authorization: enabled
-EOF
-fi
-
-# add sharding to config file if supplied
-if [ ! -z "${sharding}" ] && [ $sharding != 'null' ]; then
-  cat <<EOF >> $config_file
-sharding:
-  clusterRole: $sharding
 EOF
 fi
 

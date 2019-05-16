@@ -12,15 +12,5 @@ class mongodb::bi_connecter (
   Optional[Sensitive[String[1]]] $bic_schema_user_passwd,
   Optional[Stdlib::Absolutepath] $client_keytab_path,
   Optional[Stdlib::Absolutepath] $svc_keytab_path,
-  Optional[String[1]]            $client_keytab_content,
-  Optional[String[1]]            $svc_keytab_content,
 ) {
-
-  if $client_keytab_content {
-    file { $client_keytab_path:
-      ensure  => file,
-      mode    => '0400',
-      content => $client_keytab_content,
-    }
-  }
 }

@@ -1,6 +1,10 @@
-# A description of what this class does
+# A class to manage the MongoDB YUM repo.
 #
-# @summary A short summary of the purpose of this class
+# @summary A class to manage the MongoDB YUM repo.
+#
+# @param gpgcheck Boolean to determine if GPG check is performed.
+# @param baseurl The base URL for the repo.
+# @param gpgkey The absolute path or source of the GPG key.
 #
 # @example
 #   include mongodb::repos
@@ -12,7 +16,7 @@ class mongodb::repos (
 
   case $facts['os']['family'] {
     'RedHat': {
-      yumrepo { "mongodb-enterprise":
+      yumrepo { 'mongodb-enterprise':
         ensure   => present,
         baseurl  => $baseurl,
         descr    => 'MongoDB Enterprise Repository',

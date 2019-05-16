@@ -6,15 +6,28 @@
 #   do use a `lookup` for some per operating system defaults).
 #
 # @param keyfile The absolute path of the member authentication keyfile, if using keyfile for cluster authentication.
+# @param wiredtiger_cache_gb The size of the WiredTiger Cache in Gigabytes.
 # @param member_auth What, if any, cluster authentication is selected. Possible options: `x509`, `keyfile`, or `none`.
 # @param repsetname Name of the replica set. Defaults to `$title` of resource.
 # @param svc_user The name of the user the mongod instance will run as. Used to modify the 
 #   unit file for the service if using SystemD.
 # @param conf_file Absolute path where the mongod instance config file should be created.
+# @param bindip The FQDN to use in addition to use with localhost for the service to listen.
+# @param port The port number for the service.
+# @param log_filename Name of the log file.
+# @param auth_list The authentication mechanisms.
 # @param base_path The base path of where database, logs and certs will be stored.
 #   These can be changed individually if desired.
-# @param db_base_path Absolute path of where logs files will be stored.
-# @param 
+# @param db_base_path Absolute path of where database directory will be located.
+# @param db_data_path The absolute path for the database files.
+# @param log_path The absolute path of the where log files will be stored.
+# @param pid_file The absolute path of the PID file. Changes in the service and config files.
+# @param pki_pathThe absolute path of the where SSL certs, keytabs and keyfiles will be stored.
+# @param member_auth The cluster auth type. Options are `none`, keyFile`, or `x509`.
+# @param ssl_mode The SSL mode. Options are `requireSSL`, `preferSSL`, or `none`.
+# @param cluster_pem_file The absolute path of the cluster auth file, if different to PEM file.
+# @param ca_file The absolute path for the CA cert file.
+#
 define mongodb::config (
   Optional[Stdlib::Absolutepath]        $keyfile             = undef,
   Optional[String]                      $wiredtiger_cache_gb = undef,
@@ -73,14 +86,14 @@ define mongodb::config (
     }
   } else {
     File {
-      owner   => $svc_user,
-      group   => $svc_user,
+      owner => $svc_user,
+      group => $svc_user,
     }
   }
 
   file { $db_data_path:
-    ensure  => directory,
-    mode    => '0755',
+    ensure => directory,
+    mode   => '0755',
   }
 
   file { $conf_file:
@@ -117,7 +130,7 @@ define mongodb::config (
         'pid_path'  => dirname($pid_file),
         'conf_file' => $conf_file,
       }),
-      notify        => Exec["restart_systemd_daemon-${repsetname}"],
+      notify  => Exec["restart_systemd_daemon-${repsetname}"],
     }
 
     exec { "restart_systemd_daemon-${repsetname}":

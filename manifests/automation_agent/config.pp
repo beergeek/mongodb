@@ -1,6 +1,7 @@
-# @summary A short summary of the purpose of this class
+# Class to configure the automation agent
 #
-# A description of what this class does
+# @summary Class to configure the automation agent
+# @api private
 #
 # @example
 #   include mongodb::automation_agent::config
@@ -22,11 +23,11 @@ class mongodb::automation_agent::config (
   }
 
   file { 'aa_config':
-    ensure  => file,
-    path    => $conf_file,
-    owner   => 'mongod',
-    group   => 'mongod',
-    mode    => '0600',
+    ensure => file,
+    path   => $conf_file,
+    owner  => 'mongod',
+    group  => 'mongod',
+    mode   => '0600',
   }
 
   file_line { 'aa_group_id':

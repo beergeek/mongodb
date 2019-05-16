@@ -3,7 +3,7 @@
   "supports_noop": false,
   "description": "A short description of this task",
   "parameters": {
-    "nodes": {
+    "rs_nodes": {
       "description": "Nodes in replica set, in order, as a single string",
       "type": "String[1]"
     },
@@ -21,10 +21,6 @@
     },
     "ca_path": {
       "description": "Path and name of CA PEM file",
-      "type": "Optional[String[1]]"
-    },
-    "sharding": {
-      "description": "Sharding parameter type, if required",
       "type": "Optional[String[1]]"
     }
   }

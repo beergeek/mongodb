@@ -1,6 +1,7 @@
-# @summary A short summary of the purpose of this class
+# Class to manage automation agent service
 #
-# A description of what this class does
+# @summary Class to manage automation agent service
+# @api private
 #
 # @example
 #   include mongodb::automation_agent::service

@@ -1,6 +1,7 @@
 # A class to install the Ops Manager Automation Agent on nodes
 #
 # @summary A class to install the Ops Manager Automation Agent on nodes
+# @api private
 #
 # @example
 #   include mongodb::server::install
@@ -34,7 +35,7 @@ class mongodb::automation_agent::install(
   archive { $_pkg_file:
     ensure           => present,
     extract          => false,
-    source           => "${_auto_agent_pkg_source_uri}",
+    source           => $_auto_agent_pkg_source_uri,
     creates          => $_creates,
     download_options => ['--insecure'],
     before           => Package['mongodb-mms-automation-agent-manager'],

@@ -1,6 +1,9 @@
-# A description of what this class does
+# Defined type to manage mongod service
 #
-# @summary A short summary of the purpose of this class
+# @summary Defined type to manage mongod service.
+#
+# @param ensure What state to have the service in. `running` or `stopped`.
+# @param service_name Name of the service to manage.
 #
 # @example
 #   include mongodb::service

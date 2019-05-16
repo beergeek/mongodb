@@ -1,14 +1,42 @@
-# A description of what this class does
+# Class to manage the ancillary supporting resources for an instance of mongodb.
 #
 # @summary Class to manage the ancillary supporting resources for an
-#   instance of mongodb
+#   instance of mongodb.
 #
 # @param gen_key_file_content Content of the `keyFile` for encryption-at-rest.
 # @param appsdb_uri Connection string for the application backing database for
 #   Ops Manager.
 # @param central_url URL that will be used by agents to connect to Ops Manager.
 #   This overrides the value in the UI/Database!
-# @
+# @param email_hostname The hostname of the email server.
+# @param admin_email_addr The email address used for the admin user.
+# @param from_email_addr The email address to use as the 'from' address.
+# @param reply_email_addr The email address to use as the 'reply' address.
+# @param email_transport Email transport mechanism. Optionals are `smtp` or `smtps`.
+# @param email_type Type of email system to use. Options are `com.xgen.svc.core.dao.email.AwsEmailDao` or
+#   `com.xgen.svc.core.dao.email.JavaEmailDao`. Use `com.xgen.svc.core.dao.email.JavaEmailDao` for SMTP.
+# @param email_port Port number for the email server.
+# @param manage_group Boolean to determine if the service group is managed.
+# @param manage_user Boolean to determine if the service user is managed.
+# @param ops_manager_ssl Boolean to determine if SSL is used for communications.
+# @param config_file_path The absolute path for the configuration file.
+# @param gen_key_file_path The absolute path for the 'gen.key'.
+# @param mms_source URL or source of Ops Manager install package, does not include the Ops Manager package name.
+# @param group Service group name.
+# @param mms_package_name Name of the Ops Manager installer package.
+# @param user Name of the service user.
+# @param pem_file_passwd Password for the PEM file, if needed.
+# @param manage_ca Boolean to determine if the CA cert file is managed.
+# @param manage_pem Boolean to determine if the SSL PEM file is managed.
+# @param client_cert_mode Mode that SSL is in for clients. Options are `none`, `agents_only`, or `required`.
+# @param ca_cert_path The absolute path for the CA file.
+# @param pem_file_path The absolute path for the SSL PEM file.
+# @param ca_cert_content The content of the CA file used for mongod communication, if to managed.
+# @param pem_file_content The content of the SSL PEM file used for mongod communication, if to managed.
+# @param https_ca_cert_path The absolute path for the CA cert for the HTTPS service.
+# @param https_pem_file_path The absolute path for the PEM file for the HTTPS service.
+# @param https_ca_cert_content The content of the CA cert for the HTTPS service, if managed.
+# @param https_pem_file_content The content of the PEM file for the HTTPS service, if managed.
 #
 # @example
 #   include mongodb::ops_manager
@@ -29,11 +57,23 @@ class mongodb::ops_manager (
       'com.xgen.svc.core.dao.email.JavaEmailDao'] $email_type,
   String[1]                                       $email_port,
 
+  # Using Hiera in-module
+  Boolean                                         $manage_group,
+  Boolean                                         $manage_user,
+  Boolean                                         $ops_manager_ssl,
+  Stdlib::Absolutepath                            $config_file_path,
+  Stdlib::Absolutepath                            $gen_key_file_path,
+  Stdlib::Filesource                              $mms_source,
+  String[1]                                       $group,
+  String[1]                                       $mms_package_name,
+  String[1]                                       $user,
+
   # For SSL no default
   Optional[Sensitive[String[1]]]                  $pem_file_passwd,
   # For SSL in Hiera in-module
   Boolean                                         $manage_ca,
   Boolean                                         $manage_pem,
+  Enum['none','agents_only','required']           $client_cert_mode,
   Optional[Stdlib::Absolutepath]                  $ca_cert_path,
   Optional[Stdlib::Absolutepath]                  $pem_file_path,
   Optional[String[1]]                             $ca_cert_content,
@@ -42,26 +82,31 @@ class mongodb::ops_manager (
   Optional[Stdlib::Absolutepath]                  $https_pem_file_path    = $pem_file_path,
   Optional[String[1]]                             $https_ca_cert_content  = $ca_cert_content,
   Sensitive[Optional[String[1]]]                  $https_pem_file_content = $pem_file_content,
-  Enum['none','agents_only','required']           $client_cert_mode,
-
-
-
-  # Using Hiera in-module
-  Boolean                                         $manage_group,
-  Boolean                                         $manage_user,
-  Boolean                                         $ops_manager_ssl,
-  Enum['rpm','msi']                               $mms_provider,
-  Stdlib::Absolutepath                            $config_file_path,
-  Stdlib::Absolutepath                            $gen_key_file_path,
-  Stdlib::Filesource                              $mms_source,
-  String[1]                                       $group,
-  String[1]                                       $mms_package_name,
-  String[1]                                       $user,
 ) {
+
+  unless is_email_address($admin_email_addr) {
+    fail('`admin_email_addr` must be a valid email address!')
+  }
+
+  unless is_email_address($from_email_addr) {
+    fail('`from_email_addr` must be a valid email address!')
+  }
+
+  unless is_email_address($reply_email_addr) {
+    fail('`reply_email_addr` must be a valid email address!')
+  }
 
   File {
     owner  => $user,
     group  => $group,
+  }
+
+  if $facts['os']['family'] == 'windows' {
+    $mms_provider = 'msi'
+  } elsif $facts['os']['family'] == 'RedHat' {
+    $mms_provider = 'rpm'
+  } else {
+    fail('Need a supported OS')
   }
 
   if $facts['kernal'] != 'windows'{

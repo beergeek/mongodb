@@ -1,21 +1,21 @@
 require 'spec_helper'
 
 describe 'mongodb::supporting' do
-  context "on RedHat 7" do
+  context 'on RedHat 7' do
     let :facts do
       {
-        os: {'family' => 'RedHat', 'release' => {'major' => '7'}},
+        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
       }
     end
 
     it { is_expected.to compile }
   end
 
-  context "on RedHat 7 with content" do
+  context 'on RedHat 7 with content' do
     let :facts do
       {
-        os: {'family' => 'RedHat', 'release' => {'major' => '7'}},
-        networking: {'fqdn' => 'mongod0.mongodb.local'},
+        os:         { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
+        networking: { 'fqdn' => 'mongod0.mongodb.local' },
       }
     end
     let :params do
@@ -40,7 +40,7 @@ describe 'mongodb::supporting' do
     }
 
     it {
-      is_expected.to_not contain_acl('C:\data\pki\cluser_auth.pem')
+      is_expected.not_to contain_acl('C:\data\pki\cluser_auth.pem')
     }
 
     it {
@@ -53,7 +53,7 @@ describe 'mongodb::supporting' do
     }
 
     it {
-      is_expected.to_not contain_acl('C:\data\pki\mongod0.mongodb.local.pem')
+      is_expected.not_to contain_acl('C:\data\pki\mongod0.mongodb.local.pem')
     }
 
     it {
@@ -66,7 +66,7 @@ describe 'mongodb::supporting' do
     }
 
     it {
-      is_expected.to_not contain_acl('C:\data\pki\ca.cert')
+      is_expected.not_to contain_acl('C:\data\pki\ca.cert')
     }
 
     it {
@@ -88,15 +88,15 @@ describe 'mongodb::supporting' do
     }
 
     it {
-      is_expected.to_not contain_acl('C:\data\pki\mongodb_keyfile')
+      is_expected.not_to contain_acl('C:\data\pki\mongodb_keyfile')
     }
   end
 
-  context "on Windows with content" do
+  context 'on Windows with content' do
     let :facts do
       {
-        os: {'family' => 'windows', 'release' => {'major' => '2016'}},
-        networking: {'fqdn' => 'mongod0.mongodb.local'},
+        os:         { 'family' => 'windows', 'release' => { 'major' => '2016' } },
+        networking: { 'fqdn' => 'mongod0.mongodb.local' },
       }
     end
     let :params do
@@ -168,7 +168,7 @@ describe 'mongodb::supporting' do
     }
 
     it {
-      is_expected.to_not contain_file('C:\data\pki\svc_keytab').with(
+      is_expected.not_to contain_file('C:\data\pki\svc_keytab').with(
         'ensure'  => 'file',
         'owner'   => 'mongod',
         'group'   => 'mongod',

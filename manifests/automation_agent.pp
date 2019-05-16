@@ -1,14 +1,28 @@
-# A class to install the Ops Manager Automation Agent on nodes
+# A class to install, configure, and run the Ops Manager Automation Agent on nodes
 #
-# @summary A class to install the Ops Manager Automation Agent on nodes
+# @summary A class to install, configure, and run the Ops Manager Automation Agent on nodes
 #
 # @param ops_manager_fqdn The fully qualified domain name of the Ops Manager.
-#   Used to construct the URL to download the automation agent. Required if
-#   Puppet will construct this URL, not required if full URL given for the
-#   package, e.g. `auto_agent_pkg_source_url`
+#   Used to construct the URL to download the automation agent.
+#
+# @param mms_api_key The API key for the agent.
+# @param mms_group_id The Project ID for the agent.
+# @param url_svc_type If the Ops Manager is `HTTP` or `HTTPS`. Values can be `http` or `https`.
+# @param svc_user The user that automation agent will run as.
+# @param ca_file_path The absolute path for the CA file.
+# @param pem_file_path The absolute path for the SSL PEM file.
+# @param ca_file_content The content of the CA file, if it will be managed.
+# @param pem_file_content The content of the SSL PEM file, if it will be managed.
+# @param enable_ssl Boolean to determine if SSL enabled for the automation agent communications.
 #
 # @example
-#   include mongodb::automation_agent
+#   class { 'mongodb::automation_agent':
+#     mms_api_key      => Sensitive('ertcvybuinkljnicusdyTRGYV GH456'),
+#     mms_group_id     => 'xretRTCTVYTCHVBUYIU2345678',
+#     ops_manager_fqdn => 'ops-manager.mongodb.local',
+#     enable_ssl       => false,
+#   }
+#
 class mongodb::automation_agent (
   # Required
   Sensitive[String[1]]           $mms_api_key,
@@ -35,7 +49,7 @@ class mongodb::automation_agent (
   include mongodb::automation_agent::config
   include mongodb::automation_agent::service
 
-  Class['mongodb::automation_agent::install'] ->
-  Class['mongodb::automation_agent::config'] ~>
-  Class['mongodb::automation_agent::service']
+  Class['mongodb::automation_agent::install']
+  -> Class['mongodb::automation_agent::config']
+  ~> Class['mongodb::automation_agent::service']
 }

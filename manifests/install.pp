@@ -1,8 +1,20 @@
-# A description of what this class does
+# Class to manage the installation of MongoDB.
 #
-# @summary A short summary of the purpose of this class
+# @summary Class to manage the installation of MongoDB.
 #
-# @note As this is a defined type we are not using in-module Hiera for defaults.
+# @param mongodb_version Version of MongoDB to install.
+# @param svc_user User for service and file ownership.
+# @param base_path Absolute path of the base directory where database, logs and PKI reside.
+# @param db_base_path The absolute path where the database will reside.
+#   SELinux will be modified on Linux to accommodate this directory.
+# @param log_path The absolute path where the logs will reside.
+#   SELinux will be modified on Linux to accommodate this directory.
+# @param pki_path The absolute oath where the PKI, keyfiles and keytab will reside.
+#   SELinux will be modified on Linux to accommodate this directory.
+# @param install_shell Boolean to determine if shell is installed.
+# @param install_tools Boolean to determine if tools are installed.
+# @param disable_default_svc Boolean to determine if default service is stopped and disabled.
+# @param win_file_source URL of source for Windows installer.
 #
 # @example
 #   include mongodb::install

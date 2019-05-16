@@ -74,5 +74,8 @@ class mongodb::os ()
         refreshonly => true,
       }
     }
+    default: {
+      fail('Sorry, other operating systems have not been implemented as yet')
+    }
   }
 }

@@ -21,11 +21,11 @@ describe 'mongodb::bi_connecter' do
     it { is_expected.to compile }
 
     it do
-      is_expected.to_not contain_file('/var/lib/mongosql/client_keytab')
+      is_expected.to_not contain_file('/etc/mongosql.conf')
     end
 
     it do
-      is_expected.to_not contain_file('/var/lib/mongosql/svc_keytab')
+      is_expected.to_not contain_file('')
     end
   end
 end
