@@ -64,7 +64,7 @@ Hiera is recommended, utilising Sensitive type where required, to manage certifi
 
 ### Beginning with mongodb
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+To manage an automation agent instance the MMS Group andAPI ID must be known in advance, which means having Ops Manager installed and operational. The credentials for Ops Manager backing databases can be created via the `credentialstool` with Op Manager.
 
 ## Usage
 
@@ -117,6 +117,23 @@ class profile::database_services::mongodb_nodb (
     require profile::kerberos
   }
 
+  # manage directories, certs, keyfiles, keytabs as required.
+  class { 'mongodb::supporting':
+    ca_cert_pem_content      => $ca_cert_pem_content,
+    ca_file_path             => $ca_file_path,
+    cluster_auth_file_path   => $cluster_auth_file_path,
+    cluster_auth_pem_content => $cluster_auth_pem_content,
+    keyfile_content          => $keyfile_content,
+    pem_file_content         => $pem_file_content,
+    pem_file_path            => $pem_file_path,
+    pki_dir                  => $pki_dir,
+    server_keytab_content    => $server_keytab_content,
+    server_keytab_path       => $server_keytab_path,
+    svc_user                 => $svc_user,
+    before                   => Class['mongodb::automation_agent'],
+  }
+
+  # install and manage the MongoDB automation agent
   class { 'mongodb::automation_agent':
     base_data_path   => $base_data_path,
     pki_dir          => $pki_dir,
@@ -131,21 +148,6 @@ class profile::database_services::mongodb_nodb (
     pem_file_path    => $aa_pem_file_path,
     pem_file_content => $aa_pem_file_content,
     ca_file_content  => $aa_ca_cert_content,
-  }
-
-  class { 'mongodb::supporting':
-    ca_cert_pem_content      => $ca_cert_pem_content,
-    ca_file_path             => $ca_file_path,
-    cluster_auth_file_path   => $cluster_auth_file_path,
-    cluster_auth_pem_content => $cluster_auth_pem_content,
-    keyfile_content          => $keyfile_content,
-    pem_file_content         => $pem_file_content,
-    pem_file_path            => $pem_file_path,
-    pki_dir                  => $pki_dir,
-    server_keytab_content    => $server_keytab_content,
-    server_keytab_path       => $server_keytab_path,
-    svc_user                 => $svc_user,
-    before                   => Class['mongodb::automation_agent'],
   }
 }
 
