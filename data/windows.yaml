@@ -14,17 +14,16 @@ variables:
 # mongodb::supporting
 mongodb::supporting::base_path: *base_path
 mongodb::supporting::cluster_auth_file_path: *cluster_pem_path
-mongodb::supporting::pki_dir: *pki_path
+mongodb::supporting::pki_path: *pki_path
 mongodb::supporting::ca_file_path: *ca_path
 mongodb::supporting::pem_file_path: *pem_path
 mongodb::supporting::server_keytab_path: ~
 mongodb::supporting::keyfile_path: *keyfile_path
+mongodb::supporting::base_path: *base_path
+mongodb::supporting::db_base_path: *db_base_path
+mongodb::supporting::log_path: *log_path
 
 # mongodb::install
-mongodb::install::base_path: *base_path
-mongodb::install::db_base_path: *db_base_path
-mongodb::install::log_path: *log_path
-mongodb::install::pki_path: *pki_path
 
 # mongodb::config
 mongodb::config::base_path: *base_path

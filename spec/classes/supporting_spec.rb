@@ -1,15 +1,6 @@
 require 'spec_helper'
 
 describe 'mongodb::supporting' do
-  context 'on RedHat 7' do
-    let :facts do
-      {
-        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
-      }
-    end
-
-    it { is_expected.to compile }
-  end
 
   context 'on RedHat 7 with content' do
     let :facts do
@@ -90,6 +81,105 @@ describe 'mongodb::supporting' do
     it {
       is_expected.not_to contain_acl('C:\data\pki\mongodb_keyfile')
     }
+
+    it {
+      is_expected.to contain_file('/data').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+        'mode'    => '0755',
+        'seltype' => 'mongod_var_lib_t',
+      )
+    }
+
+    it {
+      is_expected.to contain_file('/data/db').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+        'mode'    => '0755',
+        'seltype' => 'mongod_var_lib_t',
+      )
+    }
+
+    it {
+      is_expected.to contain_file('/data/logs').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+        'mode'    => '0755',
+        'seltype' => 'mongod_log_t',
+      )
+    }
+
+    it {
+      is_expected.to contain_file('/data/pki').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+        'mode'    => '0755',
+        'seltype' => 'mongod_var_lib_t',
+      )
+    }
+    
+    it {
+      is_expected.to contain_file('/data/db').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+        'mode'    => '0755',
+        'seltype' => 'mongod_var_lib_t',
+        'seluser' => 'system_u',
+      )
+    }
+
+    it {
+      is_expected.to contain_selinux__fcontext('set-/data/db-context').with(
+        'ensure'    => 'present',
+        'seltype'   => 'mongod_var_lib_t', 
+        'seluser'   => 'system_u', 
+        'pathspec'  => '/data/db.*',
+      ).that_notifies('Exec[selinux-/data/db]')
+    }
+
+    it {
+      is_expected.to contain_exec('selinux-/data/db').with(
+        'command'     => '/sbin/restorecon -R -v /data/db',
+        'refreshonly' => true,
+      )
+    }
+
+    it {
+      is_expected.to contain_selinux__fcontext('set-/data/pki-context').with(
+        'ensure'    => 'present',
+        'seltype'   => 'mongod_var_lib_t', 
+        'seluser'   => 'system_u', 
+        'pathspec'  => '/data/pki.*',
+      ).that_notifies('Exec[selinux-/data/pki]')
+    }
+
+    it {
+      is_expected.to contain_exec('selinux-/data/pki').with(
+        'command'     => '/sbin/restorecon -R -v /data/pki',
+        'refreshonly' => true,
+      )
+    }
+
+    it {
+      is_expected.to contain_selinux__fcontext('set-/data/logs-context').with(
+        'ensure'    => 'present',
+        'seltype'   => 'mongod_log_t', 
+        'seluser'   => 'system_u', 
+        'pathspec'  => '/data/logs.*',
+      ).that_notifies('Exec[selinux-/data/logs]')
+    }
+
+    it {
+      is_expected.to contain_exec('selinux-/data/logs').with(
+        'command'     => '/sbin/restorecon -R -v /data/logs',
+        'refreshonly' => true,
+      )
+    }
   end
 
   context 'on Windows with content' do
@@ -109,6 +199,38 @@ describe 'mongodb::supporting' do
     end
 
     it { is_expected.to compile }
+
+    it {
+      is_expected.to contain_file('C:\data').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+      )
+    }
+
+    it {
+      is_expected.to contain_file('C:\data\db').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+      )
+    }
+
+    it {
+      is_expected.to contain_file('C:\data\logs').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+      )
+    }
+
+    it {
+      is_expected.to contain_file('C:\data\pki').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+      )
+    }
 
     it {
       is_expected.to contain_file('C:\data\pki\cluser_auth.pem').with(

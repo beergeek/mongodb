@@ -10,10 +10,16 @@
 # @param cluster_auth_file_path Absolute path of the cluster auth file, required if managing cluster auth file.
 # @param keyfile_path Absolute path of the encryption-at-rest keyfile, required if managing keyfile.
 # @param pem_file_path Absolute path of the PEM file, required if managing the PEM file.
-# @param pki_dir Absolute path for PKI and keytab files (if common), if management is desired.
 # @param server_keytab_path Absolute path of the keytab file, required if managing keytab file.
 # @param ca_cert_pem_content Content of the CA cert file, if management is desired.
 # @param svc_user User for the service and file ownership.
+# @param base_path Absolute path of the base directory where database, logs and PKI reside.
+# @param db_base_path The absolute path where the database will reside.
+#   SELinux will be modified on Linux to accommodate this directory.
+# @param log_path The absolute path where the logs will reside.
+#   SELinux will be modified on Linux to accommodate this directory.
+# @param pki_path The absolute oath where the PKI, keyfiles and keytab will reside.
+#   SELinux will be modified on Linux to accommodate this directory.
 #
 # @example
 #   include mongodb::supporting
@@ -26,16 +32,75 @@ class mongodb::supporting (
   Optional[Stdlib::Absolutepath] $cluster_auth_file_path,
   Optional[Stdlib::Absolutepath] $keyfile_path,
   Optional[Stdlib::Absolutepath] $pem_file_path,
-  Optional[Stdlib::Absolutepath] $pki_dir,
   Optional[Stdlib::Absolutepath] $server_keytab_path,
   Optional[String[1]]            $ca_cert_pem_content,
+  Stdlib::Absolutepath           $base_path,
+  Stdlib::Absolutepath           $db_base_path,
+  Stdlib::Absolutepath           $log_path,
+  Stdlib::Absolutepath           $pki_path,
   String[1]                      $svc_user,
 ) {
 
   File {
     owner => $svc_user,
     group => $svc_user,
-    mode  => '0400',
+  }
+
+  if $facts['os']['family'] == 'RedHat' {
+    File {
+      mode    => '0755',
+      seltype => 'mongod_var_lib_t',
+      seluser => 'system_u',
+    }
+
+    selinux::fcontext { "set-${db_base_path}-context":
+      ensure   => present,
+      seltype  => 'mongod_var_lib_t',
+      seluser  => 'system_u',
+      pathspec => "${db_base_path}.*",
+      notify   => Exec["selinux-${db_base_path}"],
+    }
+
+    exec { "selinux-${db_base_path}":
+      command     => "/sbin/restorecon -R -v ${db_base_path}",
+      refreshonly => true,
+    }
+
+    selinux::fcontext { "set-${pki_path}-context":
+      ensure   => present,
+      seltype  => 'mongod_var_lib_t',
+      seluser  => 'system_u',
+      pathspec => "${pki_path}.*",
+      notify   => Exec["selinux-${pki_path}"],
+    }
+
+    exec { "selinux-${pki_path}":
+      command     => "/sbin/restorecon -R -v ${pki_path}",
+      refreshonly => true,
+    }
+
+    selinux::fcontext { "set-${log_path}-context":
+      ensure   => present,
+      seltype  => 'mongod_log_t',
+      seluser  => 'system_u',
+      pathspec => "${log_path}.*",
+      notify   => Exec["selinux-${log_path}"],
+    }
+
+    exec { "selinux-${log_path}":
+      command     => "/sbin/restorecon -R -v ${log_path}",
+      refreshonly => true,
+    }
+  }
+
+  file { [ $base_path, $db_base_path, $pki_path ]:
+    ensure  => directory,
+  }
+
+  file { $log_path:
+    ensure  => directory,
+    seltype => 'mongod_log_t',
+    seluser => 'system_u',
   }
 
   if $keyfile_content {
@@ -44,6 +109,7 @@ class mongodb::supporting (
     }
     file { $keyfile_path:
       ensure  => file,
+      mode    => '0400',
       content => $keyfile_content,
     }
 
@@ -67,6 +133,7 @@ class mongodb::supporting (
     }
     file { $server_keytab_path:
       ensure  => file,
+      mode    => '0400',
       content => $server_keytab_content,
     }
   }
@@ -101,6 +168,7 @@ class mongodb::supporting (
     }
     file { $cluster_auth_file_path:
       ensure  => file,
+      mode    => '0400',
       content => $cluster_auth_pem_content,
     }
 
@@ -124,6 +192,7 @@ class mongodb::supporting (
     }
     file { $pem_file_path:
       ensure  => file,
+      mode    => '0400',
       content => $pem_file_content,
     }
 

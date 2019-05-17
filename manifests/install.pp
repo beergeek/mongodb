@@ -3,14 +3,6 @@
 # @summary Class to manage the installation of MongoDB.
 #
 # @param mongodb_version Version of MongoDB to install.
-# @param svc_user User for service and file ownership.
-# @param base_path Absolute path of the base directory where database, logs and PKI reside.
-# @param db_base_path The absolute path where the database will reside.
-#   SELinux will be modified on Linux to accommodate this directory.
-# @param log_path The absolute path where the logs will reside.
-#   SELinux will be modified on Linux to accommodate this directory.
-# @param pki_path The absolute oath where the PKI, keyfiles and keytab will reside.
-#   SELinux will be modified on Linux to accommodate this directory.
 # @param install_shell Boolean to determine if shell is installed.
 # @param install_tools Boolean to determine if tools are installed.
 # @param disable_default_svc Boolean to determine if default service is stopped and disabled.
@@ -21,11 +13,6 @@
 class mongodb::install (
   # Hiera in-module
   String[1]                 $mongodb_version,
-  String[1]                 $svc_user,
-  Stdlib::Absolutepath      $base_path,
-  Stdlib::Absolutepath      $db_base_path,
-  Stdlib::Absolutepath      $log_path,
-  Stdlib::Absolutepath      $pki_path,
 
   # Standard defaults
   Boolean                   $install_shell       = true,
@@ -33,10 +20,6 @@ class mongodb::install (
   Boolean                   $disable_default_svc = true,
   Stdlib::Filesource        $win_file_source     = "https://downloads.mongodb.com/win32/mongodb-win32-x86_64-enterprise-windows-64-${mongodb_version}-signed.msi"
 ) {
-    File {
-      owner   => $svc_user,
-      group   => $svc_user,
-    }
 
   if $facts['os']['family'] == 'windows' {
     $_package_source = "${facts['windows_env']['TEMP']}\\mongodb-enterprise-server.msi"
@@ -59,11 +42,6 @@ class mongodb::install (
 
     $_install_options_array = ['/l*v mdbinstall.log', '/qb', '/i',"SHOULD_INSTALL_COMPASS='0'", $_install_options]
   } else {
-    File {
-      mode    => '0755',
-      seltype => 'mongod_var_lib_t',
-      seluser => 'system_u',
-    }
     require mongodb::repos
 
     if $install_shell {
@@ -82,55 +60,6 @@ class mongodb::install (
 
     $_package_source        = undef
     $_install_options_array = undef
-
-    selinux::fcontext { "set-${db_base_path}-context":
-      ensure   => present,
-      seltype  => 'mongod_var_lib_t',
-      seluser  => 'system_u',
-      pathspec => "${db_base_path}.*",
-      notify   => Exec["selinux-${db_base_path}"],
-    }
-
-    exec { "selinux-${db_base_path}":
-      command     => "/sbin/restorecon -R -v ${db_base_path}",
-      refreshonly => true,
-    }
-
-    selinux::fcontext { "set-${pki_path}-context":
-      ensure   => present,
-      seltype  => 'mongod_var_lib_t',
-      seluser  => 'system_u',
-      pathspec => "${pki_path}.*",
-      notify   => Exec["selinux-${pki_path}"],
-    }
-
-    exec { "selinux-${pki_path}":
-      command     => "/sbin/restorecon -R -v ${pki_path}",
-      refreshonly => true,
-    }
-
-    selinux::fcontext { "set-${log_path}-context":
-      ensure   => present,
-      seltype  => 'mongod_log_t',
-      seluser  => 'system_u',
-      pathspec => "${log_path}.*",
-      notify   => Exec["selinux-${log_path}"],
-    }
-
-    exec { "selinux-${log_path}":
-      command     => "/sbin/restorecon -R -v ${log_path}",
-      refreshonly => true,
-    }
-  }
-
-  file { [ $base_path, $db_base_path, $pki_path ]:
-    ensure  => directory,
-  }
-
-  file { $log_path:
-    ensure  => directory,
-    seltype => 'mongod_log_t',
-    seluser => 'system_u',
   }
 
   package { 'mongodb-enterprise-server':
