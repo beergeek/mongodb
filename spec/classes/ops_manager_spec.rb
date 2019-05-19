@@ -4,12 +4,13 @@ describe 'mongodb::ops_manager' do
   context 'default on RHEL 7' do
     let :facts do
       {
-        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' , 'minor' => '0'} },
+        os: { 'family' => 'RedHat', 'release' => { 'major' => '7', 'minor' => '0' } },
         osfamily: 'RedHat',
         operatingsystem: 'RedHat',
         kernel: 'Linux',
       }
     end
+
     let :params do
       {
         mms_source:           'https://downloads.mongodb.local/mongodb-mms-latest.rpm',

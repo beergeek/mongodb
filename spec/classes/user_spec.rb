@@ -4,11 +4,12 @@ describe 'mongodb::user' do
   context 'default on RHEL 7' do
     let :facts do
       {
-        os:              { 'family' => 'RedHat', 'release' => { 'major' => '7' , 'minor' => '0'} },
+        os:              { 'family' => 'RedHat', 'release' => { 'major' => '7', 'minor' => '0' } },
         osfamily:        'RedHat',
         operatingsystem: 'RedHat',
       }
     end
+
     it { is_expected.to compile }
 
     it {

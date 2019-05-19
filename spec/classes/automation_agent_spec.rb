@@ -1,15 +1,16 @@
 require 'spec_helper'
 
 describe 'mongodb::automation_agent' do
-  context "Default on RHEL7" do
+  context 'Default on RHEL7' do
     let :facts do
-      { 
-      os: {'family' => 'RedHat', 'release' => {'major' => '7'}},
-      operatingsystem: 'RedHat',
-      osfamily: 'RedHat',
+      {
+        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
+        operatingsystem: 'RedHat',
+        osfamily: 'RedHat',
       }
     end
-    let :params do 
+
+    let :params do
       {
         ops_manager_fqdn: 'ops-manager.mongodb.local:8080',
         mms_group_id:     'abcdefghijklmnopqrstuvwxyz',
@@ -17,9 +18,10 @@ describe 'mongodb::automation_agent' do
         pem_file_content: RSpec::Puppet::RawString.new("Sensitive('vftybeisudvfkyj rtysaerfvacjtyDMZHfvfgty')"),
         ca_file_content:  'fueorybvurfdyubxytcibuknliu',
         pem_file_path:    '/etc/mongodb-mms/aa.pem',
-        ca_file_path:     '/etc/mongodb-mms/ca.cert'
+        ca_file_path:     '/etc/mongodb-mms/ca.cert',
       }
     end
+
     it { is_expected.to compile }
 
     it {
@@ -52,7 +54,6 @@ describe 'mongodb::automation_agent' do
         'provider' => 'rpm',
       )
     }
-
 
     it {
       is_expected.to contain_file('aa_config').with(
@@ -144,14 +145,14 @@ describe 'mongodb::automation_agent' do
     }
   end
 
-
-  context "No SSL on RHEL7 with no CA cert content supplied" do
+  context 'No SSL on RHEL7 with no CA cert content supplied' do
     let :facts do
-      { 
-        os: {'family' => 'RedHat', 'release' => {'major' => '7'}},
+      {
+        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
       }
     end
-    let :params do 
+
+    let :params do
       {
         ops_manager_fqdn: 'ops-manager.mongodb.local:8080',
         mms_group_id:     'abcdefghijklmnopqrstuvwxyz',
@@ -161,11 +162,11 @@ describe 'mongodb::automation_agent' do
     end
 
     it {
-      is_expected.to_not contain_file_line('aa_ca_cert_file')
+      is_expected.not_to contain_file_line('aa_ca_cert_file')
     }
 
     it {
-      is_expected.to_not contain_file_line('aa_pem_file')
+      is_expected.not_to contain_file_line('aa_pem_file')
     }
   end
 end

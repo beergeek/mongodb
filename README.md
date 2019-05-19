@@ -150,7 +150,6 @@ class profile::database_services::mongodb_nodb (
     ca_file_content  => $aa_ca_cert_content,
   }
 }
-
 ```
 
 ## Reference
@@ -1789,10 +1788,13 @@ Default value: '/data/pki'
 
 In the Limitations section, list any incompatibilities, known issues, or other warnings.
 
+Mainly tested on RHEL7 at the moment.
+
 ## Development
 
 In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
 
-## Release Notes/Contributors/Etc. **Optional**
+## Release Notes/Contributors/Etc.
 
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
+Contributors:
+* Me!

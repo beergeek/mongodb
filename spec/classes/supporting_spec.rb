@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe 'mongodb::supporting' do
-
   context 'on RedHat 7 with content' do
     let :facts do
       {
@@ -121,7 +120,7 @@ describe 'mongodb::supporting' do
         'seltype' => 'mongod_var_lib_t',
       )
     }
-    
+
     it {
       is_expected.to contain_file('/data/db').with(
         'ensure'  => 'directory',
@@ -136,8 +135,8 @@ describe 'mongodb::supporting' do
     it {
       is_expected.to contain_selinux__fcontext('set-/data/db-context').with(
         'ensure'    => 'present',
-        'seltype'   => 'mongod_var_lib_t', 
-        'seluser'   => 'system_u', 
+        'seltype'   => 'mongod_var_lib_t',
+        'seluser'   => 'system_u',
         'pathspec'  => '/data/db.*',
       ).that_notifies('Exec[selinux-/data/db]')
     }
@@ -152,8 +151,8 @@ describe 'mongodb::supporting' do
     it {
       is_expected.to contain_selinux__fcontext('set-/data/pki-context').with(
         'ensure'    => 'present',
-        'seltype'   => 'mongod_var_lib_t', 
-        'seluser'   => 'system_u', 
+        'seltype'   => 'mongod_var_lib_t',
+        'seluser'   => 'system_u',
         'pathspec'  => '/data/pki.*',
       ).that_notifies('Exec[selinux-/data/pki]')
     }
@@ -168,8 +167,8 @@ describe 'mongodb::supporting' do
     it {
       is_expected.to contain_selinux__fcontext('set-/data/logs-context').with(
         'ensure'    => 'present',
-        'seltype'   => 'mongod_log_t', 
-        'seluser'   => 'system_u', 
+        'seltype'   => 'mongod_log_t',
+        'seluser'   => 'system_u',
         'pathspec'  => '/data/logs.*',
       ).that_notifies('Exec[selinux-/data/logs]')
     }

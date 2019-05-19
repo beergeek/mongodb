@@ -32,8 +32,7 @@ RSpec.configure do |c|
     # by default Puppet runs at warning level
     Puppet.settings[:strict] = :warning
     # Fake assert_private function from stdlib to not fail within this test
-    Puppet::Parser::Functions.newfunction(:assert_private, :type => :rvalue) { |args|
-    }
+    Puppet::Parser::Functions.newfunction(:assert_private, type: :rvalue) { |args| }
   end
   c.filter_run_excluding(bolt: true) unless ENV['GEM_BOLT']
   c.after(:suite) do

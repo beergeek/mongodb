@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe 'mongodb::install' do
-  context "on RedHat 7" do
+  context 'on RedHat 7' do
     let :facts do
       {
-        os: {'family' => 'RedHat', 'release' => {'major' => '7'}},
+        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
         operatingsystemmajrelease: '7',
         osfamily: 'RedHat',
         operatingsystem: 'RedHat',
@@ -39,11 +39,11 @@ describe 'mongodb::install' do
     }
   end
 
-  context "on Windows 2016" do
+  context 'on Windows 2016' do
     let :facts do
       {
-        os:          {'family' => 'windows', 'release' => {'major' => '2016'}},
-        windows_env: {'TEMP' => 'C:\temp'}
+        os:          { 'family' => 'windows', 'release' => { 'major' => '2016' } },
+        windows_env: { 'TEMP' => 'C:\temp' },
       }
     end
 
@@ -52,7 +52,7 @@ describe 'mongodb::install' do
     it {
       is_expected.to contain_file('C:\temp\mongodb-enterprise-server.msi').with(
         'ensure'  => 'file',
-        'source'  => 'https://downloads.mongodb.com/win32/mongodb-win32-x86_64-enterprise-windows-64-4.0.9-signed.msi'
+        'source'  => 'https://downloads.mongodb.com/win32/mongodb-win32-x86_64-enterprise-windows-64-4.0.9-signed.msi',
       ).that_comes_before('Package[mongodb-enterprise-server]')
     }
 

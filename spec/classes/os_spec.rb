@@ -1,12 +1,13 @@
 require 'spec_helper'
 
 describe 'mongodb::os' do
-  context "on RedHat 7" do
+  context 'on RedHat 7' do
     let :facts do
       {
-        os: {'family' => 'RedHat', 'release' => {'major' => '7'}},
+        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
       }
     end
+
     it { is_expected.to compile }
 
     it {
@@ -118,7 +119,7 @@ describe 'mongodb::os' do
       is_expected.to contain_sysctl('vm.zone_reclaim_mode').with(
         'ensure'  => 'present',
         'value'   => '0',
-        'persist' => true
+        'persist' => true,
       )
     }
 
@@ -126,7 +127,7 @@ describe 'mongodb::os' do
       is_expected.to contain_sysctl('vm.swappiness').with(
         'ensure'  => 'present',
         'value'   => '1',
-        'persist' => true
+        'persist' => true,
       )
     }
 
@@ -134,17 +135,17 @@ describe 'mongodb::os' do
       is_expected.to contain_sysctl('net.ipv4.tcp_keepalive_time').with(
         'ensure'  => 'present',
         'value'   => '300',
-        'persist' => true
+        'persist' => true,
       )
     }
 
     it {
       is_expected.to contain_shellvar('GRUB_CMDLINE_LINUX').with(
         'ensure'       => 'present',
-        'target'       => "/etc/default/grub",
-        'value'        => "transparent_hugepage=never",
+        'target'       => '/etc/default/grub',
+        'value'        => 'transparent_hugepage=never',
         'array_append' => true,
-      ).that_notifies("Exec[fix grub]")
+      ).that_notifies('Exec[fix grub]')
     }
 
     it {
@@ -153,6 +154,5 @@ describe 'mongodb::os' do
         'refreshonly' => true,
       )
     }
-
   end
 end
