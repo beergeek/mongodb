@@ -1,0 +1,51 @@
+systemLog:
+  logAppend: <boolean>
+  logRotate: "rename"
+  path: "<%= $log_path %>"
+  quiet: false
+  verbosity: 1
+net:
+  bindIp: <%= $facts['networking']['ip'] %>
+  port: <%= $port %>
+  ssl:
+    mode: "<%= $bic_client_ssl_mode %>"
+    <%- if $bic_client_ssl_mode != 'none' { -%>
+    allowInvalidCertificates: <%= $ssl_client_weak_certs %>
+    PEMKeyFile: "<%= $client_pem_path %>"
+    PEMKeyPassword: "<%= $client_pem_password %>"
+    CAFile: "<%= $client_ca_path %>"
+    <%- } -%>
+security:
+  enabled: true
+  defaultMechanism: <string>
+  defaultSource: <string>
+  gssapi:
+    hostname: "<%= $facts['networking']['hostname'] %>"
+    serviceName: "mongosqld"
+mongodb:
+  versionCompatibility: "4.0"
+  net:
+    uri: <%= $mongodb_connection_string %>
+    ssl:
+      enabled: "<%= $bic_ssl_mode %>"
+      <%- if $bic_ssl_mode != 'none' { -%>
+      allowInvalidCertificates: <%= $ssl_weak_certs %>
+      PEMKeyFile: "<%= $ca_path %>"
+      CAFile: "<%= $pem_path %>"
+      <%- } -%>
+    auth:
+      username: "<%= $bic_schema_user %>"
+      <%- if $bic_schema_user_passwd { -%>
+      password: "<%= $bic_schema_user_passwd %>"
+      <%- } -%>
+      source: "admin"
+      mechanism: "<%= $auth_mechanism %>"
+      gssapiServiceName: "mongosql"
+processManagement:
+  service:
+    name: "mongosqld"
+    displayName: "mongosqld"
+    description: "BI Connector SQL proxy server"
+schema:
+  sample:
+    namespaces: "<%= $bic_sample_database %>"

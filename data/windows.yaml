@@ -44,5 +44,7 @@ mongodb::ops_manager::mms_provider: 'msi'
 mongodb::ops_manager::mms_package_name: ''
 
 # BIC
-mongodb::bi_connecter::client_keytab_path: 'C:\'
-mongodb::bi_connecter::svc_keytab_path: 'C:\'
+mongodb::bi_connecter::bic_source_url: 'https://info-mongodb-com.s3.amazonaws.com/mongodb-bi/v2/mongodb-bi-windows-x86_64-win2016-v2.10.0.zip'
+mongodb::bi_connecter::bic_svc_user: 'mongosql'
+mongodb::bi_connecter::bic_svc_user_home: 'C:\Program Files\mongosql'
+mongodb::bi_connecter::log_path: 'C:\Program Files\mongosql\logs\mongosql.log'

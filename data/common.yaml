@@ -58,5 +58,15 @@ mongodb::ops_manager::client_cert_mode: 'agents_only'
 
 # BIC
 mongodb::bi_connecter::bic_schema_user_passwd: ~
-mongodb::bi_connecter::client_keytab_content: ~
-mongodb::bi_connecter::svc_keytab_content: ~
+mongodb::bi_connecter::bic_schema_user_keytab_content: ~
+mongodb::bi_connecter::bic_svc_keytab_content: ~
+mongodb::bi_connecter::bic_schema_user_kerberos: false
+mongodb::bi_connecter::bic_svc_kerberos: false
+mongodb::bi_connecter::bic_ssl_mode: 'none'
+mongodb::bi_connecter::bic_client_ssl_mode: 'none'
+mongodb::bi_connecter::port: '3307'
+mongodb::bi_connecter::pem_password: ~
+mongodb::bi_connecter::ca_path: ~
+mongodb::bi_connecter::pem_path: ~
+mongodb::bi_connecter::ssl_weak_certs: false
+mongodb::bi_connecter::ssl_client_weak_certs: false

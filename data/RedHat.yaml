@@ -44,5 +44,9 @@ mongodb::ops_manager::mms_provider: 'rpm'
 mongodb::ops_manager::mms_package_name: 'mongodb-mms'
 
 # BIC
-mongodb::bi_connecter::client_keytab_path: '/var/lib/mongosql/client_keytab'
-mongodb::bi_connecter::svc_keytab_path: '/var/lib/mongosql/svc_keytab'
+mongodb::bi_connecter::bic_schema_user_keytab_path: '/var/lib/mongosql/client.keytab'
+mongodb::bi_connecter::bic_svc_keytab_path: '/var/lib/mongosql/svc.keytab'
+mongodb::bi_connecter::bic_source_url: 'https://info-mongodb-com.s3.amazonaws.com/mongodb-bi/v2/mongodb-bi-linux-x86_64-rhel70-v2.10.0.tgz'
+mongodb::bi_connecter::bic_svc_user: 'mongosql'
+mongodb::bi_connecter::bic_svc_user_home: '/var/lib/mongosql'
+mongodb::bi_connecter::log_path: '/var/lib/mongosql/logs/mongosql.log'
