@@ -1,0 +1,23 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "Create a new Project within Ops Mananger for a specific Organisation",
+  "parameters": {
+    "ops_manager_url": {
+      "description": "The URL, including port number, for the Ops Manager. Do not include the end point.",
+      "type": "String[1]"
+    },
+    "project_name": {
+      "description": "Name of the project to create",
+      "type": "String[1]"
+    },
+    "org_id": {
+      "description": "The ID of the Organisation (Retrieve from Ops Manager)",
+      "type": "String[24]"
+    },
+    "curl_ca_cert_path": {
+      "description": "The path to the CA file if using SSL",
+      "type": "String[1]"
+    }
+  }
+}
