@@ -1,11 +1,11 @@
 #!/bin/sh
 
-OPS_MANAGER_URL=PT_ops_manager_url
-PROJECT_ID=PT_project_id
-CA_CERT_PATH=PT_curl_ca_cert_path
-JSON_DATA=PT_json_payload
-USERNAME=PT_curl_username
-TOKEN=PT_curl_token
+OPS_MANAGER_URL=$PT_ops_manager_url
+PROJECT_ID=$PT_project_id
+CA_CERT_PATH=$PT_curl_ca_cert_path
+JSON_DATA=$PT_json_payload
+USERNAME=$PT_curl_username
+TOKEN=$PT_curl_token
 
 if [ $CA_CERT_PATH ]
 then
