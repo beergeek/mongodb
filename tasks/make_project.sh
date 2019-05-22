@@ -7,7 +7,8 @@ CA_CERT_PATH=PT_curl_ca_cert_path
 USERNAME=PT_curl_username
 TOKEN=PT_curl_token
 
-if [ $CA_CERT_PATH ]:
+if [ $CA_CERT_PATH ]
+then
   CA_OPTION="--cacert ${CA_CERT_PATH}"
 fi
 
