@@ -11,5 +11,5 @@ if [ $CA_CERT_PATH ]
 then
   CA_OPTION="--cacert ${CA_CERT_PATH}"
 fi
-
-curl -u ${USERNAME}:${TOKEN} $CA_OPTION -X POST  -H "Content-Type: application/json" "${OPS_MANAGER_URL}/api/public/v1.0/groups/?pretty=true"--digest  -d \'{"name": "${PROJECT_NAME}", "orgId": "${ORG_ID}"}\'
+PAYLOAD="'{\"name\": \"${PROJECT_NAME}\", \"orgId\": \"${ORG_ID}\"}'"
+curl -u $USERNAME:$TOKEN $CA_OPTION -X POST  -H "Content-Type: application/json" "${OPS_MANAGER_URL}/api/public/v1.0/groups/?pretty=true"--digest  -d $PAYLOAD
