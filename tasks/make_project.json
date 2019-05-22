@@ -15,9 +15,17 @@
       "description": "The ID of the Organisation (Retrieve from Ops Manager)",
       "type": "String[24]"
     },
+    "curl_username": {
+      "description": "The username for API call",
+      "type": "String[1]"
+    },
+    "curl_token": {
+      "description": "Token associated with username for API call",
+      "type": "String[1]"
+    },
     "curl_ca_cert_path": {
       "description": "The path to the CA file if using SSL",
-      "type": "String[1]"
+      "type": "Optional[String[1]]"
     }
   }
 }
