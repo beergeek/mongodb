@@ -1,5 +1,5 @@
-#!/bin/sh
-
+#!/bin/bash
+set -e
 OPS_MANAGER_URL=$PT_ops_manager_url
 PROJECT_NAME=$PT_project_name
 ORG_ID=$PT_org_id
@@ -11,5 +11,6 @@ if [ $CA_CERT_PATH ]
 then
   CA_OPTION="--cacert ${CA_CERT_PATH}"
 fi
-PAYLOAD="'{\"name\": \"${PROJECT_NAME}\", \"orgId\": \"${ORG_ID}\"}'"
-curl -u $USERNAME:$TOKEN $CA_OPTION -X POST  -H "Content-Type: application/json" "${OPS_MANAGER_URL}/api/public/v1.0/groups/?pretty=true"--digest  -d $PAYLOAD
+
+PAYLOAD="'{\"name\": \"${PROJECT_NAME}\",\"orgId\": \"${ORG_ID}\"}'"
+curl -u $USERNAME:$TOKEN $CA_OPTION -X POST -H "Content-Type: application/json" "${OPS_MANAGER_URL}/api/public/v1.0/groups/?pretty=true" -v --digest  -d "{\"name\": \"${PROJECT_NAME}\", \"orgId\": \"${ORG_ID}\"}"

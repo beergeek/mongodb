@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 OPS_MANAGER_URL=$PT_ops_manager_url
 PROJECT_ID=$PT_project_id
