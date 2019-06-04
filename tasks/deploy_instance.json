@@ -3,5 +3,29 @@
   "supports_noop": false,
   "description": "A short description of this task",
   "parameters": {
+    "ops_manager_url": {
+      "description": "URL, including port, of the Ops Manager applciation server",
+      "type": "String[1]"
+    },
+    "project_id": {
+      "description": "The ID of the Project to build the instance within",
+      "type": "String[1]"
+    },
+    "curl_ca_cert_path": {
+      "description": "The absolute path on the node performing the API call for the CA cert, if required",
+      "type": "Optional[String[1]]"
+    },
+    "json_payload": {
+      "description": "The JSON payload for the build",
+      "type": "String[1]"
+    },
+    "curl_username": {
+      "description": "The username for the API call",
+      "type": "String[1]"
+    },
+    "curl_token": {
+      "description": "The token for the API user",
+      "type": "String[1]"
+    }
   }
 }

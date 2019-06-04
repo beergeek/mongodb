@@ -1,0 +1,191 @@
+{
+  "auth" : {
+    "authoritativeSet" : false,
+    "autoAuthMechanism" : <% if $mongodb_compat_version == '3.6' {%>"MONGODB-CR"<%} else {%>"SCRAM-SHA-256"<% }%>,
+    "autoAuthMechanisms" : [ <% if $mongodb_compat_version == '3.6' {%>"MONGODB-CR"<%} else {%>"SCRAM-SHA-256"<% }%> ],
+    "autoAuthRestrictions" : [ ],
+    "autoLdapGroupDN" : "",
+    "autoPwd" : "<%= $inital_auto_agent_pwd %>",
+    "autoUser" : "mms-automation",
+    "deploymentAuthMechanisms" : [ <% if $mongodb_compat_version == '3.6' {%>"MONGODB-CR"<%} else {%>"SCRAM-SHA-256"<% }%><% if $enable_kerberos { %>, "GSSAPI" <% } %> ],
+    "disabled" : false,
+    "key" : "n4sNUDtl7mDM8lqImQLKXowQMeBNNKxGXXm9usBMZ7HtqnTumuLPAWF7fstSf5R7mCOuVJ8zjKCceWtANrikybFQzoreblEsR85MU5yYeSEZX23upotlu44gFKrPIAS2TIdLBCGNDh8zZJYXdbmR1CxBakxa1RNgwtGWToWqPS9R0h6fHrRwVC3zFkJAfdzaVsvQUyh0t6CJBJXOjEz0v8NMMsifQmG31Q1pVdX4fGt4AyUDzEUX43dF04WUWVzYewT7GlIqhny0Onhs5gL04i5EH5SOdu9157Sq1euTRqbWwK21j1swS2qloPnAdkLQDkAhqugc24yqbBTe2Mlwl2vkFwSC84MuoSJ8xBiu0RxqBU7M4L9CsoOnPPCWpxh32QN4sNWYyvjdZqAHznj1ahyU0KoXny8ZFWqg3ktdMHrbBClHKCIvUV75BnzJNdwc2OMLAC5dSmULd0MGrnVBDW7pIV68A2fVUo1wRTz1Et3s1z91Ev0Jdl97moAvuWjbNDIcppSPolqhd6XxRc5DCgxQR3c1frMKv6Vx8swx06AWcjKWrDIUEvvBdXIHBhTuonsxOEEAvBJ3WsytodWwuzJJydqdjYrQY7D4sOaBSFlcpblkBCoKxGJoJms2Pq4TB9CTzIxwvM9iVNGW17k0iiG7hoW6DWilObKv0Aw8VcQ3MvBiVtlBM1eTWhTGhv3Or27lPrLVBbP7gKjlzskzaAizbHlpWSycOYCppoIlFaPeVEXBzL9YU3MEGWaTp13JP1ixq9FMM62SbJrGikWftGTD1YxxRuocpTvFiKQZmMtV1BbUe43oFrcVLXzkqVs3nxY2NJu7M7xOWz8ANc33sZbMnVHwGKnuzChHNAA56GxZKckscNHzwedAPiY78XPVrxR99OVL3QTUMgrShK3DYG62Ts4bLbVE1Xm3quzMR3ZDvVyzbS9zdDPCQXyLB2y9w9lHfBUixgVjh5TDsmgxGe3ANXOhqWGPnXxL968JWswZ3iba5rPBrfBy3yqDYE5h",
+    "keyfile" : "/var/lib/mongodb-mms-automation/keyfile",
+    "keyfileWindows" : "%SystemDrive%\\MMSAutomation\\versions\\keyfile",
+    "usersDeleted" : [ ],
+    "usersWanted" : [ {
+      "authenticationRestrictions" : [ ],
+      "db" : "admin",
+      "initPwd": "<%= $inital_monitoring_agent_pwd %>",
+      "roles" : [ {
+        "db" : "admin",
+        "role" : "clusterMonitor"
+      } ],
+      "scramSha1Creds" : {
+        "iterationCount" : 10000,
+        "salt" : "cF+Qs/5dfKlU3rQXeMVW5Q==",
+        "serverKey" : "t/Xb/DALQVPA6bRIRjYEKTg4MqY=",
+        "storedKey" : "m+h3w2Q6Jva4dp/6SX+OA7QBH1E="
+      },
+      "scramSha256Creds" : {
+        "iterationCount" : 15000,
+        "salt" : "+7Z5+2G5qwVyQW0+q/CaVCUqFEJv0e2+GhUK/w==",
+        "serverKey" : "mxK5/6JBfrG5deUGyFItqKPPn3gUhW9wNEBFTxTzNcY=",
+        "storedKey" : "dl1H0SaBPxV/K/sf7wj9QqDZr5kpMhXe+UIZ75LWBz4="
+      },
+      "user" : "mms-monitoring-agent"
+    }, {
+      "authenticationRestrictions" : [ ],
+      "db" : "admin",
+      "initPwd": "<%= $inital_backup_agent_pwd %>",
+      "roles" : [ {
+        "db" : "admin",
+        "role" : "clusterAdmin"
+      }, {
+        "db" : "admin",
+        "role" : "readAnyDatabase"
+      }, {
+        "db" : "admin",
+        "role" : "userAdminAnyDatabase"
+      }, {
+        "db" : "local",
+        "role" : "readWrite"
+      }, {
+        "db" : "admin",
+        "role" : "readWrite"
+      } ],
+      "scramSha1Creds" : {
+        "iterationCount" : 10000,
+        "salt" : "7V8T+HeMzkzx6/dnfbXjqw==",
+        "serverKey" : "cDofCT75+U29hRxoNKKpT24wGNA=",
+        "storedKey" : "eQhcIEx09UYjotbTtbwChwvHzfQ="
+      },
+      "scramSha256Creds" : {
+        "iterationCount" : 15000,
+        "salt" : "f+8BEiBJNYBoK7NFiO+QXq9DGmZUhCuGep0VyA==",
+        "serverKey" : "WaggcKkvAGDsoUA65+X1TMjbL4HtLxkLxCax75CLkYI=",
+        "storedKey" : "jyO20Srbk53Tfpu0bi22FPJ1GFotBEzUHHchYnSXUuQ="
+      },
+      "user" : "mms-backup-agent"
+    } ]
+  },
+  "backupVersions" : [
+    <%- $replica_set_members.each |String $member_fqdn, Hash $member_fqdn_data| { -%>
+    {
+      "baseUrl": null,
+      "hostname": "<%= $member_fqdn %>"
+    }<% if $member_fqdn != $last_member { %>,<% } %>
+    <%- } -%>
+  ],
+  "balancer" : { },
+  "indexConfigs" : [ ],
+  "kerberos" : {
+    "serviceName" : "mongodb"
+  },
+  "ldap" : { },
+  "mongoDbVersions" : [ {
+    "name" : "<%= $mongodb_version %>"
+  } ],
+  "mongosqlds" : [ ],
+  "monitoringVersions" : [
+    <%- $replica_set_members.each |String $member_fqdn, Hash $member_fqdn_data| { -%>
+    {
+      "baseUrl": null,
+      "hostname": "<%= $member_fqdn %>"
+    }<% if $member_fqdn != $last_member { %>,<% } %>
+    <%- } -%>
+  ],
+  "options" : {
+    "downloadBase" : "/var/lib/mongodb-mms-automation",
+    "downloadBaseWindows" : "%SystemDrive%\\MMSAutomation\\versions"
+  },
+  "processes" : [ {
+    <%- $replica_set_members.each |String $member_fqdn, Hash $member_data| { -%>
+    "args2_6" : {
+      "net" : {
+        <%- if $ssl_mode != 'none' { -%>
+        "ssl" : {
+          "PEMKeyFile" : "<%= $member_data['pem_file_path'] %>",
+          "mode" : "<%= $ssl_mode %>"
+        },
+        <%- } -%>
+        "bindIpAll" : true,
+        "port" : <%= $member_data['port'] %>
+      },
+      "replication" : {
+        "replSetName" : "<%= $replica_set_name %>"
+      },
+      "security" : {
+        "clusterAuth": "<%= $cluster_auth_type %>",
+        <%- if $cluster_auth_type == 'keyFile' {-%>
+        "keyFile": "<%= $auth_keyfile_path %>",
+        <%- } -%>
+        "enableEncryption" : <%= $enable_encryption %>,
+        "encryptionKeyFile" : "<%= $encryption_keyfile_path %>"
+      },
+      "storage" : {
+        "dbPath" : "<%= $db_path %>",
+        "directoryPerDB" : true,
+        "wiredTiger" : {
+          "collectionConfig" : { },
+          "engineConfig" : {
+            "directoryForIndexes" : true
+          },
+          "indexConfig" : { }
+        }
+      },
+      "systemLog" : {
+        "destination" : "file",
+        "path" : "<%= $log_file_path %>"
+      }
+    },
+    "authSchemaVersion" : 5,
+    "disabled" : false,
+    "featureCompatibilityVersion" : "<%= $mongodb_compat_version %>",
+    "hostname" : "<%= $member_fqdn %>",
+    <%- if $enable_kerberos { -%>
+    "kerberos" : {
+      "keytab" : "<%= $keytab_file_path %>"
+    },
+    <%- } -%>
+    "logRotate" : {
+      "sizeThresholdMB" : 1000.0,
+      "timeThresholdHrs" : 24
+    },
+    "manualMode" : false,
+    "name" : "<%= $member_fqdn %>",
+    "processType" : "mongod",
+    "version" : "<%= $mongodb_version %>"
+  }<% if $member_fqdn != $last_member { %>,<% } %>
+  <%- } -%>
+  ],
+  "replicaSets" : [ {
+    "_id" : "<%= $replica_set_name %>",
+    "members" : [
+    <%- $replica_set_members.each |String $member_fqdn, Hash $member_data| { -%>
+    {
+      "_id" : <%= $member_data['id'] %>,
+      "arbiterOnly" : <%= $member_data['arbitor'] %>,
+      "buildIndexes" : <%= $member_data['build_indexes'] %>,
+      "hidden" : <%= $member_data['hidden'] %>,
+      "host" : "<%= $member_fqdn %>",
+      "priority" : <%= $member_data['priority'] %>,
+      "slaveDelay" : <%= $member_data['slave_delay'] %>,
+      "votes" : <%= $member_data['vote'] %>
+    }<% if $member_fqdn != $last_member { %>,<% } %>
+    <%- } -%>
+    ],
+    "protocolVersion" : "1",
+    "settings" : { }
+  } ],
+  "roles" : [ ],
+  "sharding" : [ ],
+  <%- if $ssl_mode != 'none' { -%>
+  "ssl" : {
+    "CAFilePath" : "<%= $ca_file_path %>",
+    "autoPEMKeyFilePath" : "<%= $aa_pem_file_path %>",
+    "clientCertificateMode" : "<%= $client_cert_weak_mode %>"
+  },
+  <%- } -%>
+  "uiBaseUrl" : null
+}

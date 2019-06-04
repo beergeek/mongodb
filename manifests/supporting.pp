@@ -12,7 +12,6 @@
 # @param pem_file_path Absolute path of the PEM file, required if managing the PEM file.
 # @param server_keytab_path Absolute path of the keytab file, required if managing keytab file.
 # @param ca_cert_pem_content Content of the CA cert file, if management is desired.
-# @param svc_user User for the service and file ownership.
 # @param base_path Absolute path of the base directory where database, logs and PKI reside.
 # @param db_base_path The absolute path where the database will reside.
 #   SELinux will be modified on Linux to accommodate this directory.
@@ -20,6 +19,8 @@
 #   SELinux will be modified on Linux to accommodate this directory.
 # @param pki_path The absolute oath where the PKI, keyfiles and keytab will reside.
 #   SELinux will be modified on Linux to accommodate this directory.
+# @param svc_user The name of the user and group to create and manage.
+# @param home_dir The absolute path of the home directory for the serivce user.
 #
 # @example
 #   include mongodb::supporting
@@ -36,6 +37,7 @@ class mongodb::supporting (
   Optional[String[1]]            $ca_cert_pem_content,
   Stdlib::Absolutepath           $base_path,
   Stdlib::Absolutepath           $db_base_path,
+  Stdlib::Absolutepath           $home_dir,
   Stdlib::Absolutepath           $log_path,
   Stdlib::Absolutepath           $pki_path,
   String[1]                      $svc_user,
@@ -44,6 +46,29 @@ class mongodb::supporting (
   File {
     owner => $svc_user,
     group => $svc_user,
+  }
+
+  if $facts['kernel'] == 'windows' {
+    $_gid = undef
+  } else {
+    $_gid = $svc_user
+  }
+
+  user { $svc_user:
+    ensure     => present,
+    gid        => $_gid,
+    home       => $home_dir,
+    managehome => true,
+    system     => true,
+  }
+
+  group { $svc_user:
+    ensure => present,
+  }
+
+  file { $home_dir:
+    ensure => directory,
+    mode   => '0750',
   }
 
   if $facts['os']['family'] == 'RedHat' {

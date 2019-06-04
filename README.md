@@ -169,7 +169,6 @@ instance of mongodb.
 * [`mongodb::os`](#mongodbos): Modifies kernel parameters for database work loads
 * [`mongodb::repos`](#mongodbrepos): A class to manage the MongoDB YUM repo.
 * [`mongodb::supporting`](#mongodbsupporting): Class that manage ancillary resources, such as certs and keytab files.
-* [`mongodb::user`](#mongodbuser): Manage the mongodb instance service user
 
 _Private Classes_
 
@@ -770,33 +769,12 @@ Data type: `String[1]`
 
 User for the service and file ownership.
 
-### mongodb::user
-
-Manage the mongodb instance service user
-
-#### Examples
-
-#####
-
-```puppet
-include mongodb::user
-```
-
-#### Parameters
-
-The following parameters are available in the `mongodb::user` class.
-
-##### `svc_user`
-
-Data type: `String[1]`
-
-The name of the user and group to create and manage.
-
 ##### `home_dir`
 
 Data type: `Stdlib::Absolutepath`
 
 The absolute path of the home directory for the serivce user.
+
 
 ## Defined types
 

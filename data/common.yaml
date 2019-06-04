@@ -55,6 +55,8 @@ mongodb::ops_manager::pem_file_content: ~
 mongodb::ops_manager::manage_ca: false
 mongodb::ops_manager::manage_pem: false
 mongodb::ops_manager::client_cert_mode: 'agents_only'
+mongodb::ops_manager::installer_source: 'host'
+mongodb::ops_manager::binary_source: 'internet'
 
 # BIC
 mongodb::bi_connecter::bic_schema_user_passwd: ~

@@ -21,6 +21,31 @@ describe 'mongodb::supporting' do
     it { is_expected.to compile }
 
     it {
+      is_expected.to contain_user('mongod').with(
+        'ensure'     => 'present',
+        'gid'        => 'mongod',
+        'home'       => '/var/lib/mongodb',
+        'managehome' => true,
+        'system'     => true,
+      )
+    }
+
+    it {
+      is_expected.to contain_group('mongod').with(
+        'ensure' => 'present',
+      )
+    }
+
+    it {
+      is_expected.to contain_file('/var/lib/mongodb').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+        'mode'    => '0750',
+      )
+    }
+
+    it {
       is_expected.to contain_file('/data/pki/cluser_auth.pem').with(
         'ensure'  => 'file',
         'owner'   => 'mongod',

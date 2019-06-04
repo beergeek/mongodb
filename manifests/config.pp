@@ -5,6 +5,8 @@
 # @note As this is a defined type we are not using in-module Hiera for defaults (although we
 #   do use a `lookup` for some per operating system defaults).
 #
+# @param enable_kerberos Boolean to determine if Kerberos is enabled.
+# @param keytab_file_path The absolute path of the Kerberos keytab file.
 # @param keyfile The absolute path of the member authentication keyfile, if using keyfile for cluster authentication.
 # @param wiredtiger_cache_gb The size of the WiredTiger Cache in Gigabytes.
 # @param member_auth What, if any, cluster authentication is selected. Possible options: `x509`, `keyfile`, or `none`.
@@ -15,7 +17,7 @@
 # @param bindip The FQDN to use in addition to use with localhost for the service to listen.
 # @param port The port number for the service.
 # @param log_filename Name of the log file.
-# @param auth_list The authentication mechanisms.
+# @param auth_list The authentication mechanisms. If `enable_kerberos` is true 'GSSAPI' will also be applied.
 # @param base_path The base path of where database, logs and certs will be stored.
 #   These can be changed individually if desired.
 # @param db_base_path Absolute path of where database directory will be located.
@@ -29,7 +31,9 @@
 # @param ca_file The absolute path for the CA cert file.
 #
 define mongodb::config (
+  Boolean                               $enable_kerberos     = false,
   Optional[Stdlib::Absolutepath]        $keyfile             = undef,
+  Optional[Stdlib::Absolutepath]        $keytab_file_path    = undef,
   Optional[String]                      $wiredtiger_cache_gb = undef,
   String[1]                             $repsetname          = $title,
   String[1]                             $svc_user            = 'mongod',
@@ -106,6 +110,7 @@ define mongodb::config (
       'ca_file'             => $ca_file,
       'cluster_pem_file'    => $cluster_pem_file,
       'dbpath'              => $db_data_path,
+      'enable_kerberos'     => $enable_kerberos,
       'keyfile'             => $keyfile,
       'log_filename'        => $log_filename,
       'logpath'             => $log_path,

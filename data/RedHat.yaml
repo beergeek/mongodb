@@ -22,6 +22,7 @@ mongodb::supporting::keyfile_path: *keyfile_path
 mongodb::supporting::base_path: *base_path
 mongodb::supporting::db_base_path: *db_base_path
 mongodb::supporting::log_path: *log_path
+mongodb::supporting::home_dir: '/var/lib/mongodb'
 
 # mongodb::install
 
@@ -32,9 +33,6 @@ mongodb::config::log_path: *log_path
 mongodb::config::pki_path: *pki_path
 mongodb::config::conf_path: '/etc'
 mongodb::config::pid_path: '/var/run/mongodb'
-
-# mongodb::user
-mongodb::user::home_dir: '/var/lib/mongodb'
 
 # MMS
 mongodb::ops_manager::mms_source: 'https://s3.amazonaws.com/mongodb-mms-build-onprem/a5c31a2a2d4e09272160cde18be2516dd17b43db/mongodb-mms-4.0.11.50485.20190502T1847Z-1.x86_64.rpm'

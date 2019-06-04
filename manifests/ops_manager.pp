@@ -37,6 +37,9 @@
 # @param https_pem_file_path The absolute path for the PEM file for the HTTPS service.
 # @param https_ca_cert_content The content of the CA cert for the HTTPS service, if managed.
 # @param https_pem_file_content The content of the PEM file for the HTTPS service, if managed.
+# @param installer_source Where the agents will get the install packages from. Use `direct` for MongoDB or `host` for
+#   Ops Manager.
+# @param binary_source Where Ops Manager will get the binaries for the various products.
 #
 # @example
 #   include mongodb::ops_manager
@@ -61,6 +64,8 @@ class mongodb::ops_manager (
   Boolean                                         $manage_group,
   Boolean                                         $manage_user,
   Boolean                                         $ops_manager_ssl,
+  Enum['direct','host']                           $installer_source,
+  Enum['internet','local']                        $binary_source,
   Stdlib::Absolutepath                            $config_file_path,
   Stdlib::Absolutepath                            $gen_key_file_path,
   Stdlib::Filesource                              $mms_source,
@@ -173,6 +178,7 @@ class mongodb::ops_manager (
       from_email_addr     => $from_email_addr,
       https_ca_cert_path  => $https_ca_cert_path,
       https_pem_file_path => $https_pem_file_path,
+      installer_source    => $installer_source,
       ops_manager_ssl     => $ops_manager_ssl,
       pem_file_passwd     => $pem_file_passwd,
       pem_file_path       => $pem_file_path,
@@ -183,11 +189,14 @@ class mongodb::ops_manager (
 
   if $manage_ca {
     if $ca_cert_content and $ca_cert_path  {
-      file { $ca_cert_path:
-        ensure  => file,
-        mode    => '0644',
-        content => $ca_cert_content,
-      }
+      # ensure_resources as this might be shared
+      ensure_resources(
+        file { $ca_cert_path:
+          ensure  => file,
+          mode    => '0644',
+          content => $ca_cert_content,
+        }
+      )
     } else {
       fail('Content of CA cert file must be supplied if being managed')
     }
@@ -202,11 +211,14 @@ class mongodb::ops_manager (
 
   if $manage_pem {
     if $pem_file_content and $pem_file_path {
-      file { $pem_file_path:
-        ensure  => file,
-        mode    => '0600',
-        content => $pem_file_content,
-      }
+      # ensure_resources as this might be shared
+      ensure_resources(
+        file { $pem_file_path:
+          ensure  => file,
+          mode    => '0600',
+          content => $pem_file_content,
+        }
+      )
     } else {
       fail('Content of CA cert file must be supplied if being managed')
     }

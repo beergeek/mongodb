@@ -40,4 +40,4 @@ storage:
       cacheSizeGB: <%= $wiredtiger_cache_gb %>
 <% } -%>
 setParameter:
-  authenticationMechanisms: <%= $auth_list %>
+  authenticationMechanisms: <%= $auth_list %><% if $enable_kerberos { %>,GSSAPI<% } %>
