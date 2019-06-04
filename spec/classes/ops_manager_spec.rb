@@ -1,18 +1,20 @@
 require 'spec_helper'
 
 describe 'mongodb::ops_manager' do
-  context 'default on RHEL 7' do
+  context 'SSL on RHEL 7' do
     let :facts do
       {
-        os: { 'family' => 'RedHat', 'release' => { 'major' => '7', 'minor' => '0' } },
-        osfamily: 'RedHat',
+        os:              { 'family' => 'RedHat', 'release' => { 'major' => '7', 'minor' => '0' } },
+        osfamily:        'RedHat',
         operatingsystem: 'RedHat',
-        kernel: 'Linux',
+        kernel:          'Linux',
       }
     end
 
     let :params do
       {
+        ca_cert_path:         '/etc/mongodb-mms/ca.cert',
+        pem_file_path:        '/etc/mongodb-mms/om.pem',
         mms_source:           'https://downloads.mongodb.local/mongodb-mms-latest.rpm',
         pem_file_content:     RSpec::Puppet::RawString.new("Sensitive('vftybeisudvfkyj rtysaerfvacjtyDMZHfvfgty')"),
         central_url:          'https://ops-manager.mongodb.local:8443',
@@ -80,6 +82,56 @@ describe 'mongodb::ops_manager' do
 
     it {
       is_expected.to contain_service('mongodb-mms').with(
+        'ensure' => 'running',
+        'enable' => true,
+      ).that_subscribes_to('File[mms_config_file]').that_subscribes_to('File[gen_key_file]')
+    }
+
+    it {
+      is_expected.to_not contain_service('mongodb-mms-backup-daemon')
+    }
+  end
+
+  context 'disabling mms service and enableing backup daemon on RHEL 7' do
+    let :facts do
+      {
+        os:              { 'family' => 'RedHat', 'release' => { 'major' => '7', 'minor' => '0' } },
+        osfamily:        'RedHat',
+        operatingsystem: 'RedHat',
+        kernel:          'Linux',
+      }
+    end
+
+    let :params do
+      {
+        enable_http_service:  false,
+        enable_backup_daemon: true,
+        ca_cert_path:         '/etc/mongodb-mms/ca.cert',
+        pem_file_path:        '/etc/mongodb-mms/om.pem',
+        ca_cert_path:         '/etc/mongodb-mms/ca.pem',
+        pem_file_path:        '/etc/mongodb-mms/om.pem',
+        mms_source:           'https://downloads.mongodb.local/mongodb-mms-latest.rpm',
+        pem_file_content:     RSpec::Puppet::RawString.new("Sensitive('vftybeisudvfkyj rtysaerfvacjtyDMZHfvfgty')"),
+        central_url:          'https://ops-manager.mongodb.local:8443',
+        gen_key_file_content: 'O5jXGG0M7SmoXUJObZ/zSsqtis41JTDU',
+        appsdb_uri:           'mongodb://sdfghjkl:dfcvgbhjk@mongod0.mongodb.local:27017,mongod1.mongodb.local:27017,mongod2.mongodb.local:27017',
+        email_hostname:       'emailer.mongodb.local',
+        admin_email_addr:     'admin@mongodb.local',
+        from_email_addr:      'om@mongodb.local',
+        reply_email_addr:     'om@mongodb.local',
+      }
+    end
+
+
+    it {
+      is_expected.to contain_service('mongodb-mms').with(
+        'ensure' => 'stopped',
+        'enable' => false,
+      ).that_subscribes_to('File[mms_config_file]').that_subscribes_to('File[gen_key_file]')
+    }
+
+    it {
+      is_expected.to contain_service('mongodb-mms-backup-daemon').with(
         'ensure' => 'running',
         'enable' => true,
       ).that_subscribes_to('File[mms_config_file]').that_subscribes_to('File[gen_key_file]')

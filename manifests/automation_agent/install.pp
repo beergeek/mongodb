@@ -70,4 +70,16 @@ class mongodb::automation_agent::install(
       require => Package['mongodb-mms-automation-agent-manager'],
     }
   }
+
+  if $mongodb::automation_agent::keytab_file_path and $mongodb::automation_agent::keytab_file_content {
+    file { 'aa_keytab_file':
+      ensure  => file,
+      path    => $mongodb::automation_agent::keytab_file_path,
+      owner   => $mongodb::automation_agent::svc_user,
+      group   => $mongodb::automation_agent::svc_user,
+      mode    => '0400',
+      content => $mongodb::automation_agent::keytab_file_content,
+      require => Package['mongodb-mms-automation-agent-manager'],
+    }
+  }
 }

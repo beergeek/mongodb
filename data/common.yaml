@@ -20,6 +20,8 @@ mongodb::automation_agent::enable_ssl: true
 mongodb::automation_agent::pem_file_path: ~
 mongodb::automation_agent::ca_file_path: ~
 mongodb::automation_agent::svc_user: 'mongod'
+mongodb::automation_agent::keytab_file_content: ~
+mongodb::automation_agent::keytab_file_path: ~
 
 # mongodb::install
 mongodb::install::mongodb_version: '4.0.9'
@@ -39,6 +41,8 @@ mongodb::supporting::server_keytab_content: ~
 mongodb::supporting::keyfile_content: ~
 
 # MMS
+mongodb::ops_manager::enable_http_service: true
+mongodb::ops_manager::enable_backup_daemon: true
 mongodb::ops_manager::user: *mms_user
 mongodb::ops_manager::group: *mms_group
 mongodb::ops_manager::manage_user: true

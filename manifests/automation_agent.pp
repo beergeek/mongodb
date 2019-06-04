@@ -14,6 +14,8 @@
 # @param ca_file_content The content of the CA file, if it will be managed.
 # @param pem_file_content The content of the SSL PEM file, if it will be managed.
 # @param enable_ssl Boolean to determine if SSL enabled for the automation agent communications.
+# @param keytab_file_path Absolute path to the keytab file, if required.
+# @param keytab_file_content The content of the keytab file, if Puppet will manage the content.
 #
 # @example
 #   class { 'mongodb::automation_agent':
@@ -35,9 +37,11 @@ class mongodb::automation_agent (
 
   # Other settings
   Optional[Stdlib::Absolutepath] $ca_file_path,
+  Optional[Stdlib::Absolutepath] $keytab_file_path,
   Optional[Stdlib::Absolutepath] $pem_file_path,
   Optional[String[1]]            $ca_file_content,
   Optional[Sensitive[String[1]]] $pem_file_content,
+  Optional[Sensitive[String[1]]] $keytab_file_content,
   Boolean                        $enable_ssl,
 ) {
 

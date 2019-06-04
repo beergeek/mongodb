@@ -186,6 +186,8 @@ _Private Classes_
 * [`check_el`](#check_el): Check if OS is EL flavour
 * [`create_group`](#create_group): A task to create new groups in Active Directory
 * [`create_user`](#create_user): A short description of this task
+* [`deploy_instance`](#deploy_instance): A short description of this task
+* [`make_project`](#make_project): Create a new Project within Ops Mananger for a specific Organisation
 * [`mongo_repos_linux`](#mongo_repos_linux): A short description of this task
 * [`mongo_server_install`](#mongo_server_install): A short description of this task
 * [`mongod`](#mongod): A task to implement mongod in a replica set
@@ -194,13 +196,13 @@ _Private Classes_
 * [`mongod_server_config`](#mongod_server_config): A short description of this task
 * [`mongod_server_service`](#mongod_server_service): A short description of this task
 * [`mongodb_linux_user`](#mongodb_linux_user): A short description of this task
-* [`provision_replica_set`](#provision_replica_set): A short description of this task
 
 **Plans**
 
 * [`mongodb::mongo_check`](#mongodbmongo_check): Performs a check to determine if Production Notes have been applied to a Linux node.
 * [`mongodb::mongo_cluster_linux`](#mongodbmongo_cluster_linux): Plan to build a MongoDB replica set.
 * [`mongodb::mongod_linux`](#mongodbmongod_linux): A plan to instance and configure mongo server on Linux.
+* [`mongodb::new_deployment`](#mongodbnew_deployment): A plan to deploy instances of MongoDB via Ops Manager API.
 * [`mongodb::setup_linux`](#mongodbsetup_linux): A Plan to setup various OS-level features and security for `mongod` and `mongos`.
 
 ## Classes
@@ -287,6 +289,18 @@ Data type: `Boolean`
 
 Boolean to determine if SSL enabled for the automation agent communications.
 
+##### `keytab_file_path`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+Absolute path to the keytab file, if required.
+
+##### `keytab_file_content`
+
+Data type: `Optional[Sensitive[String[1]]]`
+
+The content of the keytab file, if Puppet will manage the content.
+
 ### mongodb::bi_connecter
 
 A class to manage `mongosqld`/Business Intelligence
@@ -304,7 +318,103 @@ mongodb::bi_connecter { 'namevar': }
 
 The following parameters are available in the `mongodb::bi_connecter` class.
 
-##### `bic_source_url`
+##### `bic_schema_user_kerberos`
+
+Data type: `Boolean`
+
+
+
+##### `bic_svc_kerberos`
+
+Data type: `Boolean`
+
+
+
+##### `ssl_weak_certs`
+
+Data type: `Boolean`
+
+
+
+##### `ssl_client_weak_certs`
+
+Data type: `Boolean`
+
+
+
+##### `bic_ssl_mode`
+
+Data type: `Enum['none','allowSSL','requireSSL']`
+
+
+
+##### `bic_client_ssl_mode`
+
+Data type: `Enum['none','allowSSL','requireSSL']`
+
+
+
+##### `bic_schema_user_keytab_content`
+
+Data type: `Optional[Sensitive[String[1]]]`
+
+
+
+##### `bic_schema_user_passwd`
+
+Data type: `Optional[Sensitive[String[1]]]`
+
+
+
+##### `bic_svc_keytab_content`
+
+Data type: `Optional[Sensitive[String[1]]]`
+
+
+
+##### `bic_schema_user_keytab_path`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+
+
+##### `bic_svc_keytab_path`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+
+
+##### `ca_path`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+
+
+##### `pem_path`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+
+
+##### `pem_password`
+
+Data type: `Optional[Sensitive[String[1]]]`
+
+
+
+##### `bic_svc_user_home`
+
+Data type: `Stdlib::Absolutepath`
+
+
+
+##### `log_path`
+
+Data type: `Stdlib::Absolutepath`
+
+
+
+##### `bic_sample_database`
 
 Data type: `String[1]`
 
@@ -316,23 +426,53 @@ Data type: `String[1]`
 
 
 
-##### `bic_schema_user_passwd`
+##### `bic_source_url`
+
+Data type: `String[1]`
+
+
+
+##### `bic_svc_user`
+
+Data type: `String[1]`
+
+
+
+##### `mongodb_connection_string`
+
+Data type: `String[1]`
+
+
+
+##### `port`
+
+Data type: `String[1]`
+
+
+
+##### `client_pem_password`
 
 Data type: `Optional[Sensitive[String[1]]]`
 
 
 
-##### `client_keytab_path`
+Default value: $pem_password
+
+##### `client_ca_path`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
 
 
-##### `svc_keytab_path`
+Default value: $ca_path
+
+##### `client_pem_path`
 
 Data type: `Optional[Stdlib::Absolutepath]`
 
 
+
+Default value: $pem_path
 
 ### mongodb::install
 
@@ -355,39 +495,6 @@ The following parameters are available in the `mongodb::install` class.
 Data type: `String[1]`
 
 Version of MongoDB to install.
-
-##### `svc_user`
-
-Data type: `String[1]`
-
-User for service and file ownership.
-
-##### `base_path`
-
-Data type: `Stdlib::Absolutepath`
-
-Absolute path of the base directory where database, logs and PKI reside.
-
-##### `db_base_path`
-
-Data type: `Stdlib::Absolutepath`
-
-The absolute path where the database will reside.
-SELinux will be modified on Linux to accommodate this directory.
-
-##### `log_path`
-
-Data type: `Stdlib::Absolutepath`
-
-The absolute path where the logs will reside.
-SELinux will be modified on Linux to accommodate this directory.
-
-##### `pki_path`
-
-Data type: `Stdlib::Absolutepath`
-
-The absolute oath where the PKI, keyfiles and keytab will reside.
-SELinux will be modified on Linux to accommodate this directory.
 
 ##### `install_shell`
 
@@ -635,6 +742,32 @@ The content of the PEM file for the HTTPS service, if managed.
 
 Default value: $pem_file_content
 
+##### `installer_source`
+
+Data type: `Enum['direct','host']`
+
+Where the agents will get the install packages from. Use `direct` for MongoDB or `host` for
+Ops Manager.
+
+##### `binary_source`
+
+Data type: `Enum['internet','local']`
+
+Where Ops Manager will get the binaries for the various products.
+
+##### `enable_http_service`
+
+Data type: `Boolean`
+
+Boolean to determine if the Ops Manager service is running and enabled
+
+##### `enable_backup_daemon`
+
+Data type: `Boolean`
+
+Boolean to determine if the Ops Manager Backup Daemon is running as a separate
+process. Only valid if `enable_http_service` is `false`.
+
 ### mongodb::os
 
 Modifies kernel parameters for database work loads
@@ -745,12 +878,6 @@ Data type: `Optional[Stdlib::Absolutepath]`
 
 Absolute path of the PEM file, required if managing the PEM file.
 
-##### `pki_dir`
-
-Data type: `Optional[Stdlib::Absolutepath]`
-
-Absolute path for PKI and keytab files (if common), if management is desired.
-
 ##### `server_keytab_path`
 
 Data type: `Optional[Stdlib::Absolutepath]`
@@ -763,18 +890,44 @@ Data type: `Optional[String[1]]`
 
 Content of the CA cert file, if management is desired.
 
+##### `base_path`
+
+Data type: `Stdlib::Absolutepath`
+
+Absolute path of the base directory where database, logs and PKI reside.
+
+##### `db_base_path`
+
+Data type: `Stdlib::Absolutepath`
+
+The absolute path where the database will reside.
+SELinux will be modified on Linux to accommodate this directory.
+
+##### `log_path`
+
+Data type: `Stdlib::Absolutepath`
+
+The absolute path where the logs will reside.
+SELinux will be modified on Linux to accommodate this directory.
+
+##### `pki_path`
+
+Data type: `Stdlib::Absolutepath`
+
+The absolute oath where the PKI, keyfiles and keytab will reside.
+SELinux will be modified on Linux to accommodate this directory.
+
 ##### `svc_user`
 
 Data type: `String[1]`
 
-User for the service and file ownership.
+The name of the user and group to create and manage.
 
 ##### `home_dir`
 
 Data type: `Stdlib::Absolutepath`
 
 The absolute path of the home directory for the serivce user.
-
 
 ## Defined types
 
@@ -788,6 +941,22 @@ do use a `lookup` for some per operating system defaults).
 #### Parameters
 
 The following parameters are available in the `mongodb::config` defined type.
+
+##### `enable_kerberos`
+
+Data type: `Boolean`
+
+Boolean to determine if Kerberos is enabled.
+
+Default value: `false`
+
+##### `keytab_file_path`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+The absolute path of the Kerberos keytab file.
+
+Default value: `undef`
 
 ##### `keyfile`
 
@@ -866,7 +1035,7 @@ Default value: "${title}.log"
 
 Data type: `String[1]`
 
-The authentication mechanisms.
+The authentication mechanisms. If `enable_kerberos` is true 'GSSAPI' will also be applied.
 
 Default value: 'SCRAM-SHA-1,SCRAM-SHA-256'
 
@@ -911,9 +1080,21 @@ The absolute path of the PID file. Changes in the service and config files.
 
 Default value: "${lookup('mongodb::config::pid_path')}/${title}.pid"
 
-##### `pki_pathThe`
+##### `pki_path`
 
-absolute path of the where SSL certs, keytabs and keyfiles will be stored.
+Data type: `Stdlib::Absolutepath`
+
+The absolute path of the where SSL certs, keytabs and keyfiles will be stored.
+
+Default value: "${base_path}/pki"
+
+##### `pem_file`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+The absolute path of the SSL/TLS PEM file.
+
+Default value: `undef`
 
 ##### `member_auth`
 
@@ -944,22 +1125,6 @@ Data type: `Stdlib::Absolutepath`
 The absolute path for the CA cert file.
 
 Default value: "${pki_path}/ca.cert"
-
-##### `pki_path`
-
-Data type: `Stdlib::Absolutepath`
-
-
-
-Default value: "${base_path}/pki"
-
-##### `pem_file`
-
-Data type: `Optional[Stdlib::Absolutepath]`
-
-
-
-Default value: `undef`
 
 ### mongodb::service
 
@@ -1100,6 +1265,94 @@ The Kerberos encryption types allowed. Optional
 Data type: `Optional[Array[String[1]]]`
 
 An array of groups that the user belongs to
+
+### deploy_instance
+
+A short description of this task
+
+**Supports noop?** false
+
+#### Parameters
+
+##### `ops_manager_url`
+
+Data type: `String[1]`
+
+URL, including port, of the Ops Manager applciation server
+
+##### `project_id`
+
+Data type: `String[1]`
+
+The ID of the Project to build the instance within
+
+##### `curl_ca_cert_path`
+
+Data type: `Optional[String[1]]`
+
+The absolute path on the node performing the API call for the CA cert, if required
+
+##### `json_payload`
+
+Data type: `String[1]`
+
+The JSON payload for the build
+
+##### `curl_username`
+
+Data type: `String[1]`
+
+The username for the API call
+
+##### `curl_token`
+
+Data type: `String[1]`
+
+The token for the API user
+
+### make_project
+
+Create a new Project within Ops Mananger for a specific Organisation
+
+**Supports noop?** false
+
+#### Parameters
+
+##### `ops_manager_url`
+
+Data type: `String[1]`
+
+The URL, including port number, for the Ops Manager. Do not include the end point.
+
+##### `project_name`
+
+Data type: `String[1]`
+
+Name of the project to create
+
+##### `org_id`
+
+Data type: `String[24]`
+
+The ID of the Organisation (Retrieve from Ops Manager)
+
+##### `curl_username`
+
+Data type: `String[1]`
+
+The username for API call
+
+##### `curl_token`
+
+Data type: `String[1]`
+
+Token associated with username for API call
+
+##### `curl_ca_cert_path`
+
+Data type: `Optional[String[1]]`
+
+The path to the CA file if using SSL
 
 ### mongo_repos_linux
 
@@ -1340,12 +1593,6 @@ A short description of this task
 Data type: `String[1]`
 
 Operating system user to create, if it does not exist
-
-### provision_replica_set
-
-A short description of this task
-
-**Supports noop?** false
 
 ## Plans
 
@@ -1640,6 +1887,210 @@ Data type: `String[1]`
 Name of the service user.
 
 Default value: 'mongod'
+
+### mongodb::new_deployment
+
+A plan to deploy instances of MongoDB via Ops Manager API.
+
+* **Note** REQUIRES Bolt 1.8.0
+
+#### Parameters
+
+The following parameters are available in the `mongodb::new_deployment` plan.
+
+##### `replica_set_members`
+
+Data type: `Hash`
+
+A hash of hashes describing the members of the replica set.
+The root level keys are the FQDNs of the replica set members.
+The sub-hash must contain the `id` of the host for the replica set.
+The following are the defaults for each sub-hash:
+{
+  'arbitor'       => false,
+  'build_indexes' => true,
+  'hidden'        => false,
+  'port'          => 27017,
+  'priority'      => 1,
+  'slave_delay'   => 0,
+  'vote'          => 1,
+}
+Optional keys of each sub-hash:
+* 'pem_file_path' absolute path to PEM file
+
+##### `curl_token`
+
+Data type: `String[1]`
+
+The token to be used with cURL to authenticate with Ops Manager API.
+
+##### `curl_username`
+
+Data type: `String[1]`
+
+The username to be used with cURL to authenticate with Ops Manager API.
+
+##### `ops_manager_url`
+
+Data type: `String[1]`
+
+The URL for the Ops Manager, including the port number. The end point
+is not required.
+
+##### `project_id`
+
+Data type: `String[24]`
+
+The Project ID to where to create the new replica set.
+
+##### `replica_set_name`
+
+Data type: `String[1]`
+
+The name of the new replica set.
+
+##### `node`
+
+Data type: `Targetspec`
+
+The hostname or IP address of the nodes to run the API calls from.
+
+##### `enable_encryption`
+
+Data type: `Boolean`
+
+A boolean to determine if encryption-at-rest is enabled or not.
+
+Default value: `true`
+
+##### `enable_kerberos`
+
+Data type: `Boolean`
+
+A boolean to determine if Kerberos authentication is enabled.
+
+Default value: `true`
+
+##### `ssl_mode`
+
+Data type: `Enum['none','preferSSL','requireSSL']`
+
+The mode that will be used for SSL/TLS.
+
+Default value: 'preferSSL'
+
+##### `cluster_auth_type`
+
+Data type: `Enum['none','x509','keyFile']`
+
+The type of cluster authentication to use between members of the replica set.
+
+Default value: 'x509'
+
+##### `aa_pem_file_path`
+
+Data type: `Optional[String[1]]`
+
+The absolute path for the PEM file for the automation agent, if SSL/TLS is required.
+
+Default value: `undef`
+
+##### `ca_file_path`
+
+Data type: `Optional[String[1]]`
+
+The absolute path for the CA certificate file for SSL/TLS, if required.
+
+Default value: `undef`
+
+##### `curl_ca_cert_path`
+
+Data type: `Optional[String[1]]`
+
+The absolute path of the CA certificate on the node that will execute the cURL command.
+Only required if the Ops Manager server is using SSL/TLS.
+
+Default value: `undef`
+
+##### `client_cert_weak_mode`
+
+Data type: `Enum['REQUIRED','OPTIONAL']`
+
+
+
+Default value: 'OPTIONAL'
+
+##### `encryption_keyfile_path`
+
+Data type: `Optional[String[1]]`
+
+
+
+Default value: `undef`
+
+##### `keytab_file_path`
+
+Data type: `Optional[String[1]]`
+
+
+
+Default value: `undef`
+
+##### `db_path`
+
+Data type: `String[1]`
+
+
+
+Default value: '/data/db'
+
+##### `inital_auto_agent_pwd`
+
+Data type: `String[1]`
+
+
+
+Default value: generate('/bin/openssl rand -base64 32')
+
+##### `inital_backup_agent_pwd`
+
+Data type: `String[1]`
+
+
+
+Default value: generate('/bin/openssl rand -base64 32')
+
+##### `inital_monitoring_agent_pwd`
+
+Data type: `String[1]`
+
+
+
+Default value: generate('/bin/openssl rand -base64 32')
+
+##### `log_file_path`
+
+Data type: `String[1]`
+
+
+
+Default value: '/data/logs/mongodb.log'
+
+##### `mongodb_version`
+
+Data type: `String[1]`
+
+
+
+Default value: '4.0.9-ent'
+
+##### `mongodb_compat_version`
+
+Data type: `String[1]`
+
+
+
+Default value: '4.0'
 
 ### mongodb::setup_linux
 

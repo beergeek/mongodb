@@ -24,7 +24,8 @@
 # @param db_data_path The absolute path for the database files.
 # @param log_path The absolute path of the where log files will be stored.
 # @param pid_file The absolute path of the PID file. Changes in the service and config files.
-# @param pki_pathThe absolute path of the where SSL certs, keytabs and keyfiles will be stored.
+# @param pki_path The absolute path of the where SSL certs, keytabs and keyfiles will be stored.
+# @param pem_file The absolute path of the SSL/TLS PEM file.
 # @param member_auth The cluster auth type. Options are `none`, keyFile`, or `x509`.
 # @param ssl_mode The SSL mode. Options are `requireSSL`, `preferSSL`, or `none`.
 # @param cluster_pem_file The absolute path of the cluster auth file, if different to PEM file.

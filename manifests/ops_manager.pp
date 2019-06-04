@@ -40,6 +40,9 @@
 # @param installer_source Where the agents will get the install packages from. Use `direct` for MongoDB or `host` for
 #   Ops Manager.
 # @param binary_source Where Ops Manager will get the binaries for the various products.
+# @param enable_http_service Boolean to determine if the Ops Manager service is running and enabled
+# @param enable_backup_daemon Boolean to determine if the Ops Manager Backup Daemon is running as a separate
+#   process. Only valid if `enable_http_service` is `false`.
 #
 # @example
 #   include mongodb::ops_manager
@@ -61,6 +64,8 @@ class mongodb::ops_manager (
   String[1]                                       $email_port,
 
   # Using Hiera in-module
+  Boolean                                         $enable_http_service,
+  Boolean                                         $enable_backup_daemon,
   Boolean                                         $manage_group,
   Boolean                                         $manage_user,
   Boolean                                         $ops_manager_ssl,
@@ -99,6 +104,18 @@ class mongodb::ops_manager (
 
   unless is_email_address($reply_email_addr) {
     fail('`reply_email_addr` must be a valid email address!')
+  }
+
+  if $ops_manager_ssl and !($ca_cert_path and $pem_file_path) {
+    fail('`ca_cert_path` and `pem_file_path` are required if `ops_manager_ssl` is true.')
+  }
+
+  if $enable_http_service {
+    $_enable = true
+    $_ensure = running
+  } else {
+    $_enable = false
+    $_ensure = stopped
   }
 
   File {
@@ -168,6 +185,7 @@ class mongodb::ops_manager (
     content => epp('mongodb/mms_config_file.epp', {
       admin_email_addr    => $admin_email_addr,
       appsdb_uri          => $appsdb_uri,
+      binary_source       => $binary_source,
       ca_cert_path        => $ca_cert_path,
       central_url         => $central_url,
       client_cert_mode    => $client_cert_mode,
@@ -240,9 +258,16 @@ class mongodb::ops_manager (
   }
 
   service { 'mongodb-mms':
-    ensure    => running,
-    enable    => true,
+    ensure    => $_ensure,
+    enable    => $_enable,
     subscribe => File['mms_config_file','gen_key_file'],
   }
 
+  if $enable_http_service == false and $enable_backup_daemon {
+    service { 'mongodb-mms-backup-daemon':
+      ensure    => running,
+      enable    => true,
+      subscribe => File['mms_config_file','gen_key_file'],
+    }
+  }
 }

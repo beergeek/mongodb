@@ -4,9 +4,9 @@ describe 'mongodb::automation_agent' do
   context 'Default on RHEL7' do
     let :facts do
       {
-        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
+        os:              { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
         operatingsystem: 'RedHat',
-        osfamily: 'RedHat',
+        osfamily:        'RedHat',
       }
     end
 
@@ -167,6 +167,37 @@ describe 'mongodb::automation_agent' do
 
     it {
       is_expected.not_to contain_file_line('aa_pem_file')
+    }
+  end
+
+  context 'On RHEL7 with SSL and Kerberos selected' do
+    let :facts do
+      {
+        os: { 'family' => 'RedHat', 'release' => { 'major' => '7' } },
+      }
+    end
+
+    let :params do
+      {
+        ops_manager_fqdn:    'ops-manager.mongodb.local:8080',
+        mms_group_id:        'abcdefghijklmnopqrstuvwxyz',
+        mms_api_key:         RSpec::Puppet::RawString.new("Sensitive('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ')"),
+        keytab_file_path:    '/etc/mongodb-mms/aa_keytab',
+        keytab_file_content: RSpec::Puppet::RawString.new("Sensitive('ersdtcfvyubinomguyvhjbkiougyftcghvjbiugyftghvj345')"),
+        pem_file_path:       '/etc/mongodb-mms/aa.pem',
+        ca_file_path:        '/etc/mongodb-mms/ca.cert',
+      }
+    end
+
+    it {
+      is_expected.to contain_file('aa_keytab_file').with(
+        'ensure'  => 'file',
+        'path'    => '/etc/mongodb-mms/aa_keytab',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+        'mode'    => '0400',
+        'content' => 'ersdtcfvyubinomguyvhjbkiougyftcghvjbiugyftghvj345',
+      )
     }
   end
 end
