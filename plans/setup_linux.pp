@@ -6,30 +6,35 @@
 # @param replicaset_name The name of the application the server certificate will be used for. The certificate
 #   will be rename to `${replicaset_name}.pem` under the '/var/mongodb/pki' directory.
 # @param ca_path Full path and file name of the CA cert on the remote node for x509 auth.
-# @param ca_filename File name of CA cert on local node within the the `$certs_dir`.
-# @param certs_dir Full path of the directory where all the x509 certificates reside for the nodes.
+# @param ca_filename File name of CA cert on local node within the the `$node_certs_dir`.
+# @param node_certs_dir Full path of the directory where all the x509 certificates reside for the nodes.
 #   Certs are placed in '/var/mongodb/pki'.
 # @param node_common_name The common name for each node that a number will be appended to, e.g. 'server'
 #   will become server0, server1... etc etc
 # @param node_domain_node The domain for each server, e.g. 'mongodb.local'.
 # @param use_keyfile Boolean to determine if keyfile is used. Is overriden by `use_x509`.
-#   The keyfile is common to all nodes and in the format `${certs_dir}/${node_common_name}.key`.
+#   The keyfile is common to all nodes and in the format `${node_certs_dir}/${node_common_name}.key`.
 # @param use_x509 Boolean to determine if x509 certs are used. Overrides `use_keyfile`.
-#   Format of certificate path and name is `${certs_dir}/${node_common_name}${index}.pem`.
+#   Format of certificate path and name is `${node_certs_dir}/${node_common_name}${index}.pem`.
 # @param host_file Optional file path of the host file to uploaed.
 # @param mongodb_service_user Name of the system user to create, with home directory, for the `mongod` or mongos` service.
+# @param use_tuned Boolean to determine if 'tuned' or explict commands are used to manage certain Production Nodes.
+# @param tuned_config_file The absolute path on the local machine to a 'tuned' configuration file. Must be provided if
+#   `use_tuned` is 'true'.
+# @param local_certs_dir The local directory where certificates are stored.
 #
 plan mongodb::setup_linux (
   Array[String[1]]    $nodes,
   String[1]           $replicaset_name,
   String[1]           $node_domain_node,
-  String[1]           $tuned_config_file,
   Boolean             $use_keyfile          = false,
+  Boolean             $use_tuned            = false,
   Boolean             $use_x509             = true,
   Integer             $server_count_offset  = 0,
   Optional[String[1]] $ca_path              = '/data/pki/ca.pem',
   Optional[String[1]] $ca_filename          = undef,
   Optional[String[1]] $host_file            = undef,
+  Optional[String[1]] $tuned_config_file    = undef,
   String[1]           $node_certs_dir       = '/certs',
   String[1]           $local_certs_dir      = '/data/pki',
   String[1]           $mongodb_service_user = 'mongod',
@@ -39,13 +44,26 @@ plan mongodb::setup_linux (
   # Check we are on the right operating system
   run_task('mongodb::check_el', $nodes)
 
-  # Install tuned
-  run_command('yum install -y tuned', $nodes, _run_as => 'root')
-  run_command('mkdir -p /etc/tuned/mongodb', $nodes, _run_as => 'root')
-  run_command('systemctl start tuned', $nodes, _run_as => 'root')
-  run_command('systemctl enable tuned', $nodes, _run_as => 'root')
-  upload_file($tuned_config_file, '/etc/tuned/mongodb/tuned.conf', $nodes, _run_as => 'root')
-  run_command('tuned-adm profile mongodb', $nodes, _run_as => 'root')
+  if $use_tuned {
+    # Install tuned
+    run_command('yum install -y tuned', $nodes, _run_as => 'root')
+    run_command('mkdir -p /etc/tuned/mongodb', $nodes, _run_as => 'root')
+    run_command('systemctl start tuned', $nodes, _run_as => 'root')
+    run_command('systemctl enable tuned', $nodes, _run_as => 'root')
+    upload_file($tuned_config_file, '/etc/tuned/mongodb/tuned.conf', $nodes, _run_as => 'root')
+    run_command('tuned-adm profile mongodb', $nodes, _run_as => 'root')
+  } else {
+    run_command('sysctl -w  vm.zone_reclaim_mode=0', $nodes, _run_as => 'root')
+    run_command("grep -q 'vm.zone_reclaim_mode' /etc/sysctl.conf || echo 'vm.zone_reclaim_mode=0' | sudo tee --append /etc/sysctl.conf",
+      $nodes,
+      _run_as => 'root'
+    )
+  }
+  run_command('sysctl -w  vm.swappiness=1', $nodes, _run_as => 'root')
+  run_command("grep -q 'vm.swappiness' /etc/sysctl.conf || echo 'vm.swappiness=1' | sudo tee --append /etc/sysctl.conf",
+    $nodes,
+    _run_as => 'root'
+  )
 
   # Setup MongoDB user to run service
   run_task('mongodb::mongodb_linux_user', $nodes, username => $mongodb_service_user, _run_as => 'root')

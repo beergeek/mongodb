@@ -184,11 +184,10 @@ _Private Classes_
 **Tasks**
 
 * [`check_el`](#check_el): Check if OS is EL flavour
-* [`deploy_instance`](#deploy_instance): A short description of this task
+* [`deploy_instance`](#deploy_instance): A task to deploy a mongodb instance via Ops Manager API
 * [`make_project`](#make_project): Create a new Project within Ops Mananger for a specific Organisation
 * [`mongo_repos_linux`](#mongo_repos_linux): A task to perform a yum update
 * [`mongo_server_install`](#mongo_server_install): A task to install the mongodb enterprise server, tools and shell
-* [`mongod`](#mongod): A task to implement mongod in a replica set
 * [`mongod_admin_user`](#mongod_admin_user): Create the root user for the replica set
 * [`mongod_rs_initiate`](#mongod_rs_initiate): A task to initiate a replica set.
 * [`mongod_server_config`](#mongod_server_config): A task to configure mongodb instance.
@@ -1164,7 +1163,6 @@ Check if OS is EL flavour
 
 **Supports noop?** false
 
-
 ### deploy_instance
 
 A task to deploy a mongodb instance via Ops Manager API
@@ -1264,32 +1262,6 @@ A task to perform a yum update
 A task to install the mongodb enterprise server, tools and shell
 
 **Supports noop?** false
-
-### mongod
-
-A task to implement mongod in a replica set
-
-**Supports noop?** false
-
-#### Parameters
-
-##### `primary`
-
-Data type: `String[1]`
-
-Which node is primary
-
-##### `username`
-
-Data type: `String[1]`
-
-Operating system user to create, if it does not exist
-
-##### `password`
-
-Data type: `String[1]`
-
-Operating system user password to set
 
 ### mongod_admin_user
 
@@ -1911,19 +1883,12 @@ Only required if the Ops Manager server is using SSL/TLS.
 
 Default value: `undef`
 
-##### `client_cert_weak_mode`
-
-Data type: `Enum['REQUIRED','OPTIONAL']`
-
-
-
-Default value: 'OPTIONAL'
-
 ##### `encryption_keyfile_path`
 
 Data type: `Optional[String[1]]`
 
-
+The absolute path on the replica set nodes where the encryption-at-rest keyfile is located.
+This is a common path for all nodes. Only required if `enable_encryption` is `true`.
 
 Default value: `undef`
 
@@ -1931,7 +1896,8 @@ Default value: `undef`
 
 Data type: `Optional[String[1]]`
 
-
+The absolute path on the replica set nodes where the Kerberos keytab is located for the mongod service.
+Only required if `enable_kerberos` is `true`.
 
 Default value: `undef`
 
@@ -1939,7 +1905,7 @@ Default value: `undef`
 
 Data type: `String[1]`
 
-
+The absolute path where the database files will be located. This path MUST exist prior to execution.
 
 Default value: '/data/db'
 
@@ -1947,7 +1913,7 @@ Default value: '/data/db'
 
 Data type: `String[1]`
 
-
+An automatically generated password used as the initial password for the automation agent.
 
 Default value: generate('/bin/openssl rand -base64 32')
 
@@ -1955,7 +1921,7 @@ Default value: generate('/bin/openssl rand -base64 32')
 
 Data type: `String[1]`
 
-
+An automatically generated password used as the initial password for the backup agent.
 
 Default value: generate('/bin/openssl rand -base64 32')
 
@@ -1963,7 +1929,7 @@ Default value: generate('/bin/openssl rand -base64 32')
 
 Data type: `String[1]`
 
-
+An automatically generated password used as the initial password for the monitoring agent.
 
 Default value: generate('/bin/openssl rand -base64 32')
 
@@ -1971,7 +1937,7 @@ Default value: generate('/bin/openssl rand -base64 32')
 
 Data type: `String[1]`
 
-
+The absolute path and filename of the log file. This path MUST exist prior to execution.
 
 Default value: '/data/logs/mongodb.log'
 
@@ -1979,9 +1945,17 @@ Default value: '/data/logs/mongodb.log'
 
 Data type: `String[1]`
 
-
+The MongoDB version to deploy, such as `4.0.9-ent` or `3.6.12-ent`.
 
 Default value: '4.0.9-ent'
+
+##### `client_cert_weak_mode`
+
+Data type: `Enum['REQUIRED','OPTIONAL']`
+
+How client certificates are enforced for SSL/TLS.
+
+Default value: 'OPTIONAL'
 
 ##### `mongodb_compat_version`
 
@@ -2024,14 +1998,18 @@ Default value: '/data/pki/ca.pem'
 
 Data type: `Optional[String[1]]`
 
-File name of CA cert on local node within the the `$certs_dir`.
+File name of CA cert on local node within the the `$node_certs_dir`.
 
 Default value: `undef`
 
-##### `certs_dir`
+##### `node_certs_dir`
+
+Data type: `String[1]`
 
 Full path of the directory where all the x509 certificates reside for the nodes.
 Certs are placed in '/var/mongodb/pki'.
+
+Default value: '/certs'
 
 ##### `node_common_name`
 
@@ -2053,7 +2031,7 @@ The domain for each server, e.g. 'mongodb.local'.
 Data type: `Boolean`
 
 Boolean to determine if keyfile is used. Is overriden by `use_x509`.
-The keyfile is common to all nodes and in the format `${certs_dir}/${node_common_name}.key`.
+The keyfile is common to all nodes and in the format `${node_certs_dir}/${node_common_name}.key`.
 
 Default value: `false`
 
@@ -2062,7 +2040,7 @@ Default value: `false`
 Data type: `Boolean`
 
 Boolean to determine if x509 certs are used. Overrides `use_keyfile`.
-Format of certificate path and name is `${certs_dir}/${node_common_name}${index}.pem`.
+Format of certificate path and name is `${node_certs_dir}/${node_common_name}${index}.pem`.
 
 Default value: `true`
 
@@ -2082,11 +2060,30 @@ Name of the system user to create, with home directory, for the `mongod` or mong
 
 Default value: 'mongod'
 
+##### `use_tuned`
+
+Data type: `Boolean`
+
+Boolean to determine if 'tuned' or explict commands are used to manage certain Production Nodes.
+
+Default value: `false`
+
 ##### `tuned_config_file`
+
+Data type: `Optional[String[1]]`
+
+The absolute path on the local machine to a 'tuned' configuration file. Must be provided if
+`use_tuned` is 'true'.
+
+Default value: `undef`
+
+##### `local_certs_dir`
 
 Data type: `String[1]`
 
+The local directory where certificates are stored.
 
+Default value: '/data/pki'
 
 ##### `server_count_offset`
 
@@ -2095,22 +2092,6 @@ Data type: `Integer`
 
 
 Default value: 0
-
-##### `node_certs_dir`
-
-Data type: `String[1]`
-
-
-
-Default value: '/certs'
-
-##### `local_certs_dir`
-
-Data type: `String[1]`
-
-
-
-Default value: '/data/pki'
 
 ## Limitations
 
