@@ -1,7 +1,7 @@
 {
   "puppet_task_version": 1,
   "supports_noop": false,
-  "description": "A short description of this task",
+  "description": "A task to configure mongodb instance.",
   "parameters": {
     "mongodb_service_user": {
       "description": "User that the mongodb service will run as",

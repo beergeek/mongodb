@@ -1,7 +1,7 @@
 {
   "puppet_task_version": 1,
   "supports_noop": false,
-  "description": "A short description of this task",
+  "description": "Create the root user for the replica set",
   "parameters": {
     "user": {
       "description": "Admin user for the replication set",

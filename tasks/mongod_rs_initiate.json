@@ -1,7 +1,7 @@
 {
   "puppet_task_version": 1,
   "supports_noop": false,
-  "description": "A short description of this task",
+  "description": "A task to initiate a replica set.",
   "parameters": {
     "rs_nodes": {
       "description": "Nodes in replica set, in order, as a single string",

@@ -1,7 +1,7 @@
 {
   "puppet_task_version": 1,
   "supports_noop": false,
-  "description": "A short description of this task",
+  "description": "A task to deploy a mongodb instance via Ops Manager API",
   "parameters": {
     "ops_manager_url": {
       "description": "URL, including port, of the Ops Manager applciation server",

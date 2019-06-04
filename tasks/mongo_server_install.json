@@ -1,7 +1,7 @@
 {
   "puppet_task_version": 1,
   "supports_noop": false,
-  "description": "A short description of this task",
+  "description": "A task to install the mongodb enterprise server, tools and shell",
   "parameters": {
   }
 }

@@ -184,18 +184,16 @@ _Private Classes_
 **Tasks**
 
 * [`check_el`](#check_el): Check if OS is EL flavour
-* [`create_group`](#create_group): A task to create new groups in Active Directory
-* [`create_user`](#create_user): A short description of this task
 * [`deploy_instance`](#deploy_instance): A short description of this task
 * [`make_project`](#make_project): Create a new Project within Ops Mananger for a specific Organisation
-* [`mongo_repos_linux`](#mongo_repos_linux): A short description of this task
-* [`mongo_server_install`](#mongo_server_install): A short description of this task
+* [`mongo_repos_linux`](#mongo_repos_linux): A task to perform a yum update
+* [`mongo_server_install`](#mongo_server_install): A task to install the mongodb enterprise server, tools and shell
 * [`mongod`](#mongod): A task to implement mongod in a replica set
-* [`mongod_admin_user`](#mongod_admin_user): A short description of this task
-* [`mongod_rs_initiate`](#mongod_rs_initiate): A short description of this task
-* [`mongod_server_config`](#mongod_server_config): A short description of this task
-* [`mongod_server_service`](#mongod_server_service): A short description of this task
-* [`mongodb_linux_user`](#mongodb_linux_user): A short description of this task
+* [`mongod_admin_user`](#mongod_admin_user): Create the root user for the replica set
+* [`mongod_rs_initiate`](#mongod_rs_initiate): A task to initiate a replica set.
+* [`mongod_server_config`](#mongod_server_config): A task to configure mongodb instance.
+* [`mongod_server_service`](#mongod_server_service): A task to start the mongod service
+* [`mongodb_linux_user`](#mongodb_linux_user): A task to create the mongod service user.
 
 **Plans**
 
@@ -1166,109 +1164,10 @@ Check if OS is EL flavour
 
 **Supports noop?** false
 
-### create_group
-
-A task to create new groups in Active Directory
-
-**Supports noop?** false
-
-#### Parameters
-
-##### `group_name`
-
-Data type: `String[1]`
-
-Name of new group
-
-##### `sam_name`
-
-Data type: `String[1]`
-
-SamAccountName of the group
-
-##### `path`
-
-Data type: `String[1]`
-
-The LDAP path the group will belong within, e.g. CN=Users,DC=mongodb,DC=local
-
-##### `display_name`
-
-Data type: `String[1]`
-
-The display name of the group
-
-##### `description`
-
-Data type: `Optional[String[1]]`
-
-The description of the group
-
-### create_user
-
-A short description of this task
-
-**Supports noop?** false
-
-#### Parameters
-
-##### `name`
-
-Data type: `String[1]`
-
-Name of new user
-
-##### `password`
-
-Data type: `String[1]`
-
-Password of user
-
-##### `path`
-
-Data type: `String[1]`
-
-The LDAP path the user will belong within, e.g. CN=Users,DC=MONGODB,DC=LOCAL
-
-##### `given_name`
-
-Data type: `Optional[String[1]`
-
-Optional given name for user, defaults to 'name' value
-
-##### `password_never_expires`
-
-Data type: `Boolean[false]`
-
-Boolean value to determine if password expires, defaults to `false`
-
-##### `change_password_at_logon`
-
-Data type: `Boolean[true]`
-
-Determines if the user must change the password at initial logon, defaults to `true`
-
-##### `cannot_change_password`
-
-Data type: `Boolean[true]`
-
-Determines if the user can change the password, defaults to `true`
-
-##### `kerberos_encryption`
-
-Data type: `Optional[String[1]]`
-
-The Kerberos encryption types allowed. Optional
-
-##### `groups`
-
-Data type: `Optional[Array[String[1]]]`
-
-An array of groups that the user belongs to
 
 ### deploy_instance
 
-A short description of this task
+A task to deploy a mongodb instance via Ops Manager API
 
 **Supports noop?** false
 
@@ -1356,13 +1255,13 @@ The path to the CA file if using SSL
 
 ### mongo_repos_linux
 
-A short description of this task
+A task to perform a yum update
 
 **Supports noop?** false
 
 ### mongo_server_install
 
-A short description of this task
+A task to install the mongodb enterprise server, tools and shell
 
 **Supports noop?** false
 
@@ -1394,7 +1293,7 @@ Operating system user password to set
 
 ### mongod_admin_user
 
-A short description of this task
+Create the root user for the replica set
 
 **Supports noop?** false
 
@@ -1432,7 +1331,7 @@ Path and name of CA PEM file
 
 ### mongod_rs_initiate
 
-A short description of this task
+A task to initiate a replica set.
 
 **Supports noop?** false
 
@@ -1470,7 +1369,7 @@ Path and name of CA PEM file
 
 ### mongod_server_config
 
-A short description of this task
+A task to configure mongodb instance.
 
 **Supports noop?** false
 
@@ -1562,7 +1461,7 @@ Extra config required
 
 ### mongod_server_service
 
-A short description of this task
+A task to start the mongod service
 
 **Supports noop?** false
 
@@ -1582,7 +1481,7 @@ If to use service or run as command
 
 ### mongodb_linux_user
 
-A short description of this task
+A task to create the mongod service user.
 
 **Supports noop?** false
 
