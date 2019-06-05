@@ -44,6 +44,10 @@ plan mongodb::setup_linux (
   # Check we are on the right operating system
   run_task('mongodb::check_el', $nodes)
 
+  if $use_tuned and !$tuned_config_file {
+    fail('When `use_tuned` is true the `tuned_config_file` parameter must be provided.')
+  }
+
   if $use_tuned {
     # Install tuned
     run_command('yum install -y tuned', $nodes, _run_as => 'root')
@@ -58,6 +62,16 @@ plan mongodb::setup_linux (
       $nodes,
       _run_as => 'root'
     )
+    run_command("awk '{if (\$0 ~ /^GRUB_CMDLINE_LINUX=/) {gsub(\"transparent_hugepage=[[:alnum:]]*[[:space:]]\?\",
+       \"\", \$0) ; gsub(\"[[:space:]]?\\\"\$\", \" transparent_hugepage=never\\\"\"); print \$0 > \"/etc/default/grub\" }}'
+       < /etc/default/grub",
+      $nodes,
+      _run_as => 'root')
+    run_command('[ -d /sys/firmware/efi ] && sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg ||
+    sudo grub2-mkconfig -o /boot/grub2/grub.cfg', $nodes, _run_as => 'root')
+    run_command("sh -c \"echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled\"", $nodes, _run_as => 'root')
+    run_command("sh -c \"echo 'never' > /sys/kernel/mm/transparent_hugepage/defrag\"", $nodes, _run_as => 'root')
+    run_command("sh -c \"echo '0' > /sys/kernel/mm/transparent_hugepage/khugepaged/defrag\"", $nodes, _run_as => 'root')
   }
   run_command('sysctl -w  vm.swappiness=1', $nodes, _run_as => 'root')
   run_command("grep -q 'vm.swappiness' /etc/sysctl.conf || echo 'vm.swappiness=1' | sudo tee --append /etc/sysctl.conf",

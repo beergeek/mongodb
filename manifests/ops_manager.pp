@@ -78,7 +78,7 @@ class mongodb::ops_manager (
   String[1]                                       $mms_package_name,
   String[1]                                       $user,
 
-  # For SSL no default
+  # For SSL no default and is optional
   Optional[Sensitive[String[1]]]                  $pem_file_passwd,
   # For SSL in Hiera in-module
   Boolean                                         $manage_ca,
