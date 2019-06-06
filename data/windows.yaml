@@ -22,7 +22,7 @@ mongodb::supporting::keyfile_path: *keyfile_path
 mongodb::supporting::base_path: *base_path
 mongodb::supporting::db_base_path: *db_base_path
 mongodb::supporting::log_path: *log_path
-mongodb::supporting::home_dir: 'C:\ProgramData'
+mongodb::supporting::home_dir: 'C:\ProgramData\MongoDB'
 
 # mongodb::install
 

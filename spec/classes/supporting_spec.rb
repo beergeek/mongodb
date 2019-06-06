@@ -225,6 +225,31 @@ describe 'mongodb::supporting' do
     it { is_expected.to compile }
 
     it {
+      is_expected.to contain_user('mongod').with(
+        'ensure'     => 'present',
+        'gid'        => 'mongod',
+        'home'       => 'C:\ProgramData\MongoDB',
+        'managehome' => true,
+        'system'     => true,
+      )
+    }
+
+    it {
+      is_expected.to contain_group('mongod').with(
+        'ensure' => 'present',
+      )
+    }
+
+    it {
+      is_expected.to contain_file('C:\ProgramData\MongoDB').with(
+        'ensure'  => 'directory',
+        'owner'   => 'mongod',
+        'group'   => 'mongod',
+        'mode'    => '0750',
+      )
+    }
+
+    it {
       is_expected.to contain_file('C:\data').with(
         'ensure'  => 'directory',
         'owner'   => 'mongod',
