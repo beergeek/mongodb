@@ -197,7 +197,6 @@ _Private Classes_
 **Plans**
 
 * [`mongodb::mongo_check`](#mongodbmongo_check): Performs a check to determine if Production Notes have been applied to a Linux node.
-* [`mongodb::mongo_cluster_linux`](#mongodbmongo_cluster_linux): Plan to build a MongoDB replica set.
 * [`mongodb::mongod_linux`](#mongodbmongod_linux): A plan to instance and configure mongo server on Linux.
 * [`mongodb::new_deployment`](#mongodbnew_deployment): A plan to deploy instances of MongoDB via Ops Manager API.
 * [`mongodb::setup_linux`](#mongodbsetup_linux): A Plan to setup various OS-level features and security for `mongod` and `mongos`.
@@ -1495,104 +1494,6 @@ Data type: `String`
 
 The disk to check for NUMA, e.g. `/dev/sda2`.
 
-### mongodb::mongo_cluster_linux
-
-Plan to build a MongoDB replica set.
-
-#### Parameters
-
-The following parameters are available in the `mongodb::mongo_cluster_linux` plan.
-
-##### `mongos_nodes`
-
-An array of hostnames or IP address for the mongos instances.
-
-##### `mongod_replica_sets`
-
-A Hash of mongod replica sets with associated data.
-
-##### `mongod_replica_sets_hash`
-
-Data type: `Hash`
-
-
-
-##### `nodes`
-
-An array of hostnames or IP addresses used to SSH to the nodes. The first node is used
-to perform `rs.initiate()`.
-
-##### `local_certs_dir`
-
-Data type: `Optional[String[1]]`
-
-The absolute path of the local directory containing all the x509 certificates.
-
-##### `repo_file_path`
-
-Data type: `String[1]`
-
-The local absolute path of the repo file to upload.
-
-##### `replicaset_name`
-
-Data type: `String[1]`
-
-The name of the replica set to create.
-
-##### `tuned_config_file`
-
-Data type: `String[1]`
-
-The local absolute path of a tuned configuration file.
-
-##### `use_keyfile`
-
-Data type: `Boolean`
-
-Boolean to determine if keyfile is used for clusterAuth.
-
-Default value: `false`
-
-##### `use_x509`
-
-Data type: `Boolean`
-
-Boolean to determine if x509 is used for clusterAuth.
-
-Default value: `true`
-
-##### `ca_path`
-
-Data type: `Optional[String[1]]`
-
-The local absolute path to the CA cert.
-
-Default value: '/var/mongodb/pki/ca.pem'
-
-##### `ca_filename`
-
-Data type: `Optional[String[1]]`
-
-The name for the CA cert.
-
-Default value: `undef`
-
-##### `x509_path`
-
-Data type: `Optional[String[1]]`
-
-The path where to store x509 certificates on the node.
-
-Default value: `undef`
-
-##### `host_file`
-
-Data type: `Optional[String[1]]`
-
-The local absolute path to a hosts file, if required (e.g. use DNS!).
-
-Default value: `undef`
 
 ### mongodb::mongod_linux
 
