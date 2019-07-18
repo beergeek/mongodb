@@ -8,6 +8,7 @@
 #   The sub-hash must contain the `id` of the host for the replica set.
 #   The following are the defaults for each sub-hash:
 #   {
+#     'id'            => 0,
 #     'arbitor'       => false,
 #     'build_indexes' => true,
 #     'hidden'        => false,
@@ -46,7 +47,19 @@
 # @param client_cert_weak_mode How client certificates are enforced for SSL/TLS.
 #
 plan mongodb::new_deployment (
-  Hash                                  $replica_set_members,
+  Hash[
+    String[1],
+    Struct[{
+      id                      => Integer[0],
+      Optional[arbitor]       => Boolean,
+      Optional[build_indexes] => Boolean,
+      Optional[hidden]        => Boolean,
+      Optional[port]          => Integer[1,65535],
+      Optional[priority]      => Integer[0,1000],
+      Optional[slave_delay]   => Integer[0],
+      Optional[vote]          => Integer[0],
+    }]
+  ]                                     $replica_set_members,
   String[1]                             $curl_token,
   String[1]                             $curl_username,
   String[1]                             $ops_manager_url,

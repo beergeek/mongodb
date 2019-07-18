@@ -88,7 +88,7 @@ describe 'mongodb::ops_manager' do
     }
 
     it {
-      is_expected.to_not contain_service('mongodb-mms-backup-daemon')
+      is_expected.not_to contain_service('mongodb-mms-backup-daemon')
     }
   end
 
@@ -108,8 +108,6 @@ describe 'mongodb::ops_manager' do
         enable_backup_daemon: true,
         ca_cert_path:         '/etc/mongodb-mms/ca.cert',
         pem_file_path:        '/etc/mongodb-mms/om.pem',
-        ca_cert_path:         '/etc/mongodb-mms/ca.pem',
-        pem_file_path:        '/etc/mongodb-mms/om.pem',
         mms_source:           'https://downloads.mongodb.local/mongodb-mms-latest.rpm',
         pem_file_content:     RSpec::Puppet::RawString.new("Sensitive('vftybeisudvfkyj rtysaerfvacjtyDMZHfvfgty')"),
         central_url:          'https://ops-manager.mongodb.local:8443',
@@ -121,7 +119,6 @@ describe 'mongodb::ops_manager' do
         reply_email_addr:     'om@mongodb.local',
       }
     end
-
 
     it {
       is_expected.to contain_service('mongodb-mms').with(

@@ -35,7 +35,7 @@ define mongodb::config (
   Boolean                               $enable_kerberos     = false,
   Optional[Stdlib::Absolutepath]        $keyfile             = undef,
   Optional[Stdlib::Absolutepath]        $keytab_file_path    = undef,
-  Optional[String]                      $wiredtiger_cache_gb = undef,
+  Optional[String[1]]                   $wiredtiger_cache_gb = undef,
   String[1]                             $repsetname          = $title,
   String[1]                             $svc_user            = 'mongod',
   Stdlib::Absolutepath                  $conf_file           = "${lookup('mongodb::config::conf_path')}/mongod_${title}.conf",
