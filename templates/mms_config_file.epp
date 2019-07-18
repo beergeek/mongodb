@@ -18,4 +18,5 @@ mms.mail.transport=<%= $email_transport %>
 mms.mail.hostname=<%= $email_hostname %>
 mms.mail.port=<%= $email_port %>
 automation.versions.source=<%= $installer_source %>
-automation.versions.hostDownloadSource=<%= $binary_source %>
+mongodb.release.autoDownload=<%= $installer_autodownload %>
+mongodb.release.autoDownload.enterprise=<%= $installer_autodownload_ent %>
