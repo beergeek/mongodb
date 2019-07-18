@@ -230,11 +230,12 @@ class mongodb::ops_manager (
   if $manage_pem {
     if $pem_file_content and $pem_file_path {
       # ensure_resources as this might be shared
-      ensure_resources(
-        file { $pem_file_path:
-          ensure  => file,
-          mode    => '0600',
-          content => $pem_file_content,
+      ensure_resources('file',
+        { $pem_file_path => {
+            ensure  => file,
+            mode    => '0600',
+            content => $pem_file_content,
+          }
         }
       )
     } else {
