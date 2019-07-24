@@ -1,12 +1,19 @@
 [Unit]
-Description=High-performance, schema-free document-oriented database
-After=network.target
+Description=MongoDB Database Server
+After=multi-user.target
 Documentation=https://docs.mongodb.org/manual
 
 [Service]
 User=<%= $svc_user %>
 Group=<%= $svc_user %>
+<% if $enable_kerberos {-%>
+Environment="KRB5_KTNAME=<%= $kerberos_keytab_path %>"
+<% } -%>
+<% if $enable_kerberos and $debug_kerberos {-%>
+Environment="KRB5_TRACE=<%= $kerberos_trace_path %>"
+<% } -%>
 Environment="OPTIONS=-f <%= $conf_file %>"
+EnvironmentFile=-/etc/sysconfig/mongod
 ExecStart=/usr/bin/mongod $OPTIONS
 ExecStartPre=/usr/bin/mkdir -p <%= $pid_path %>
 ExecStartPre=/usr/bin/chown <%= $svc_user %>:<%= $svc_user %> <%= $pid_path %>
@@ -31,3 +38,6 @@ TasksMax=infinity
 TasksAccounting=false
 # Recommended limits for for mongod as specified in
 # http://docs.mongodb.org/manual/reference/ulimit/#recommended-settings
+
+[Install]
+WantedBy=multi-user.target
