@@ -5,7 +5,10 @@
 # @note As this is a defined type we are not using in-module Hiera for defaults (although we
 #   do use a `lookup` for some per operating system defaults).
 #
+# @param debug_kerberos Debug Kerberos sessions, if Kerberos is enabled (via `enabled_kerberos`).
+#   The `kerberos_trace_path` must be provided.
 # @param enable_kerberos Boolean to determine if Kerberos is enabled.
+# @param kerberos_trace_path Absolute path of the trace file for Kerberos. 
 # @param keytab_file_path The absolute path of the Kerberos keytab file.
 # @param keyfile The absolute path of the member authentication keyfile, if using keyfile for cluster authentication.
 # @param wiredtiger_cache_gb The size of the WiredTiger Cache in Gigabytes.
@@ -32,7 +35,9 @@
 # @param ca_file The absolute path for the CA cert file.
 #
 define mongodb::config (
+  Boolean                               $debug_kerberos      = false,
   Boolean                               $enable_kerberos     = false,
+  Optional[Stdlib::Absolutepath]        $kerberos_trace_path = undef,
   Optional[Stdlib::Absolutepath]        $keyfile             = undef,
   Optional[Stdlib::Absolutepath]        $keytab_file_path    = undef,
   Optional[String[1]]                   $wiredtiger_cache_gb = undef,
@@ -131,10 +136,14 @@ define mongodb::config (
       mode    => '0644',
       seltype => 'mongod_unit_file_t',
       content => epp('mongodb/service_file.epp', {
-        'svc_user'  => $svc_user,
-        'pid_file'  => $pid_file,
-        'pid_path'  => dirname($pid_file),
-        'conf_file' => $conf_file,
+        conf_file           => $conf_file,
+        debug_kerberos      => $debug_kerberos,
+        enable_kerberos     => $enable_kerberos,
+        kerberos_trace_path => $kerberos_trace_path,
+        keytab_file_path    => $keytab_file_path,
+        pid_file            => $pid_file,
+        pid_path            => dirname($pid_file),
+        svc_user            => $svc_user,
       }),
       notify  => Exec["restart_systemd_daemon-${repsetname}"],
     }
