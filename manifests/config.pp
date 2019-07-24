@@ -8,6 +8,15 @@
 # @param debug_kerberos Debug Kerberos sessions, if Kerberos is enabled (via `enabled_kerberos`).
 #   The `kerberos_trace_path` must be provided.
 # @param enable_kerberos Boolean to determine if Kerberos is enabled.
+# @param enable_ldap_authn Boolean to determine if LDAP authentication is enabled.
+# @param enable_ldap_authz Boolean to determine if LDAP authorisation is enabled.
+#   `enable_ldap_authn` must be 'true' to use the authorisation.
+# @param ldap_authz_query The LDAP authorisation query template to determine the user's groups
+#   from the user's logon name.
+# @param ldap_bind_password The password for the LDAP Bind User.
+# @param ldap_bind_username The username of the LDAP Bind User.
+# @param ldap_servers A comma-delimited (no spaces) of LDAP server addresses/hostnames.     
+# @param ldap_user_mapping The LDAP user mapping statement.
 # @param kerberos_trace_path Absolute path of the trace file for Kerberos. 
 # @param keytab_file_path The absolute path of the Kerberos keytab file.
 # @param keyfile The absolute path of the member authentication keyfile, if using keyfile for cluster authentication.
@@ -37,9 +46,17 @@
 define mongodb::config (
   Boolean                               $debug_kerberos      = false,
   Boolean                               $enable_kerberos     = false,
+  Boolean                               $enable_ldap_authn   = false,
+  Boolean                               $enable_ldap_authz   = false,
+  Enum['none','tls']                    $ldap_security       = 'tls',
   Optional[Stdlib::Absolutepath]        $kerberos_trace_path = undef,
   Optional[Stdlib::Absolutepath]        $keyfile             = undef,
   Optional[Stdlib::Absolutepath]        $keytab_file_path    = undef,
+  Optional[String[1]]                   $ldap_authz_query    = undef,
+  Optional[Sensitive[String[1]]]        $ldap_bind_password  = undef,
+  Optional[String[1]]                   $ldap_bind_username  = undef,
+  Optional[String[1]]                   $ldap_servers        = undef,
+  Optional[String[1]]                   $ldap_user_mapping   = undef,
   Optional[String[1]]                   $wiredtiger_cache_gb = undef,
   String[1]                             $repsetname          = $title,
   String[1]                             $svc_user            = 'mongod',
@@ -72,6 +89,28 @@ define mongodb::config (
 
   if ($member_auth == 'x509' or $ssl_mode != 'none') and !($pem_file) {
     fail('The selection of `x509` for $member_auth or enabling SSL/TLS (via $ssl_mode) requires a value for `pem_file`')
+  }
+
+  if $debug_kerberos and !($kerberos_trace_path) {
+    fail("Of `debug_kerberos` is 'true' a path for `kerberos_trace_path` must be provided")
+  }
+
+  if $enable_kerberos and !($keytab_file_path) {
+    fail("Of `enable_kerberos` is 'true' a path for `keytab_file_path` must be provided")
+  }
+
+  if $enable_ldap_authz and !($enable_ldap_authn) {
+    fail("When `enable_ldap_authz` is 'true', `enable_ldap_authn` must also be 'true'")
+  }
+
+  if $enable_ldap_authn and (!($ldap_security) or !($ldap_user_mapping) or !($ldap_bind_password) and !($ldap_bind_username)
+  and !($ldap_servers)) {
+    fail("When `enable_ldap_authn` is 'true' the following must be provided:\n\t- `ldap_security`\n\t- `ldap_user_mapping`\n\t
+    - `ldap_bind_password`\n\t- `ldap_bind_username`\n\t- `ldap_servers`")
+  }
+
+  if $enable_ldap_authz and !($ldap_authz_query) {
+    fail("If `enable_ldap_authz` is 'true' then `ldap_authz_query` must be provided")
   }
 
   if $facts['os']['family'] == 'RedHat' {
@@ -111,22 +150,30 @@ define mongodb::config (
     mode    => '0400',
     seltype => 'etc_t',
     content => epp('mongodb/config.epp', {
-      'auth_list'           => $auth_list,
-      'bindip'              => "localhost,${bindip}",
-      'ca_file'             => $ca_file,
-      'cluster_pem_file'    => $cluster_pem_file,
-      'dbpath'              => $db_data_path,
-      'enable_kerberos'     => $enable_kerberos,
-      'keyfile'             => $keyfile,
-      'log_filename'        => $log_filename,
-      'logpath'             => $log_path,
-      'member_auth'         => $member_auth,
-      'pem_file'            => $pem_file,
-      'pid_file'            => $pid_file,
-      'port'                => $port,
-      'repset'              => $repsetname,
-      'ssl_mode'            => $ssl_mode,
-      'wiredtiger_cache_gb' => $wiredtiger_cache_gb,
+      auth_list           => $auth_list,
+      bindip              => "localhost,${bindip}",
+      ca_file             => $ca_file,
+      cluster_pem_file    => $cluster_pem_file,
+      dbpath              => $db_data_path,
+      enable_kerberos     => $enable_kerberos,
+      enable_ldap_authn   => $enable_ldap_authn,
+      enable_ldap_authz   => $enable_ldap_authz,
+      keyfile             => $keyfile,
+      ldap_authz_query    => $ldap_authz_query,
+      ldap_bind_password  => $ldap_bind_password,
+      ldap_bind_username  => $ldap_bind_username,
+      ldap_servers        => $ldap_servers,
+      ldap_security       => $ldap_security,
+      ldap_user_mapping   => $ldap_user_mapping,
+      log_filename        => $log_filename,
+      logpath             => $log_path,
+      member_auth         => $member_auth,
+      pem_file            => $pem_file,
+      pid_file            => $pid_file,
+      port                => $port,
+      repset              => $repsetname,
+      ssl_mode            => $ssl_mode,
+      wiredtiger_cache_gb => $wiredtiger_cache_gb,
     })
   }
 

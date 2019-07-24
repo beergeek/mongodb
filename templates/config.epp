@@ -8,6 +8,21 @@ security:
 <% if $member_auth != 'none' { -%>
   clusterAuthMode: <%= $member_auth %>
 <% } -%>
+<% if $enable_ldap_authn or $enable_ldap_authz { -%>
+  ldap:
+    bind:
+      method: simple
+      queryPassword: <%= $ldap_bind_password %>
+      queryUser: <%= $ldap_bind_username %>
+    servers: <%= $ldap_servers %>
+    transportSecurity: <%= $ldap_security %>
+    userToDNMapping: |-
+      <%= $ldap_user_mapping %>
+<% if $enable_ldap_authz { -%>
+    authz:
+      queryTemplate: "<%= $ldap_authz_query %>"
+<% } -%>
+<% } -%>
 net:
   bindIp: <%= $bindip %>
   port: <%= $port %>
