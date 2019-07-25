@@ -43,6 +43,8 @@
 # @param enable_http_service Boolean to determine if the Ops Manager service is running and enabled
 # @param enable_backup_daemon Boolean to determine if the Ops Manager Backup Daemon is running as a separate
 #   process. Only valid if `enable_http_service` is `false`.
+# @param installer_autodownload_ent Boolean to determine if enterprise binaries are automatically downloaded.
+# @param installer_autodownload Boolean to determine if community binaries are automatically downloaded.
 #
 # @example
 #   include mongodb::ops_manager

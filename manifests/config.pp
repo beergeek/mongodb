@@ -17,6 +17,7 @@
 # @param ldap_bind_username The username of the LDAP Bind User.
 # @param ldap_servers A comma-delimited (no spaces) of LDAP server addresses/hostnames.     
 # @param ldap_user_mapping The LDAP user mapping statement.
+# @param ldap_security The type of transport security for LDAP communications.
 # @param kerberos_trace_path Absolute path of the trace file for Kerberos. 
 # @param keytab_file_path The absolute path of the Kerberos keytab file.
 # @param keyfile The absolute path of the member authentication keyfile, if using keyfile for cluster authentication.
