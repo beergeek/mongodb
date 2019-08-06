@@ -92,7 +92,7 @@ class mongodb::ops_manager (
   Optional[String[1]]                             $ca_cert_content,
   Sensitive[Optional[String[1]]]                  $pem_file_content,
   Optional[Stdlib::Absolutepath]                  $https_ca_cert_path     = $ca_cert_path,
-  Optional[Stdlib::Absolutepath]                  $https_pem_file_path    = $pem_file_path,
+  Optional[Sensitive[Stdlib::Absolutepath]]       $https_pem_file_path    = $pem_file_path,
   Optional[String[1]]                             $https_ca_cert_content  = $ca_cert_content,
   Sensitive[Optional[String[1]]]                  $https_pem_file_content = $pem_file_content,
 ) {
