@@ -35,7 +35,7 @@ mongodb::config::conf_path: '/etc'
 mongodb::config::pid_path: '/var/run/mongodb'
 
 # MMS
-mongodb::ops_manager::mms_source: 'https://s3.amazonaws.com/mongodb-mms-build-onprem/a5c31a2a2d4e09272160cde18be2516dd17b43db/mongodb-mms-4.0.11.50485.20190502T1847Z-1.x86_64.rpm'
+mongodb::ops_manager::mms_source: 'https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.0.14.50550.20190730T1612Z-1.x86_64.rpm'
 mongodb::ops_manager::config_file_path: '/opt/mongodb/mms/conf/conf-mms.properties'
 mongodb::ops_manager::gen_key_file_path: '/etc/mongodb-mms/gen.key' 
 mongodb::ops_manager::mms_provider: 'rpm'
