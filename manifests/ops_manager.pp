@@ -3,7 +3,7 @@
 # @summary Class to manage the ancillary supporting resources for an
 #   instance of mongodb.
 #
-# @param gen_key_file_content Content of the `keyFile` for encryption-at-rest.
+# @param gen_key_file_content Content of the `keyFile` for encryption-at-rest, this needs to be in Base64.
 # @param appsdb_uri Connection string for the application backing database for
 #   Ops Manager.
 # @param central_url URL that will be used by agents to connect to Ops Manager.
