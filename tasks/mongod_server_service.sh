@@ -2,15 +2,20 @@
 
 config_file=$PT_config_file
 run_as_service=$PT_run_as_service
+service_name=$PT_service_name
 
 if [ $run_as_service == true ]; then
-  systemctl status mongod.service
+  systemctl status $service_name
   output=$?
   if [ $output -ne 0 ]; then
-    systemctl start mongod.service
+    systemctl start $service_name
     result=$?
     if [ $result -eq 0 ] || [ $result -eq 2 ]; then
+      echo "Mongod instance started"
       exit 0
+    else
+      echo "Mongod instance failed"
+      exit $result
     fi
   else
     echo "Mongod instance is already running, we are too scared to restart!"

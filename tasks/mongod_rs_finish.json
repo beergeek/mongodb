@@ -1,7 +1,7 @@
 {
   "puppet_task_version": 1,
   "supports_noop": false,
-  "description": "A task to initiate a replica set.",
+  "description": "A task to add remaining instances to a replica set.",
   "parameters": {
     "repset": {
       "description": "Name for replication set",
@@ -39,6 +39,10 @@
       "description": "Delay if the node will be a delayed secondary",
       "type": "Integer[0]"
     },
+    "count": {
+      "description": "id of the member",
+      "type": "Integer"
+    },
     "tags": {
       "description": "A hash of tags",
       "type": "Hash"
@@ -46,6 +50,22 @@
     "votes": {
       "description": "The number of votes the instances has for elections",
       "type": "Integer[0]"
+    },
+    "user": {
+      "description": "Username for admin user of replcia set",
+      "type": "String[1]"
+    },
+    "password": {
+      "description": "Password for admin user of replcia set",
+      "type": "String[1]"
+    },
+    "primary": {
+      "description": "Primary node FQDN",
+      "type": "String[1]"
+    },
+    "primary_pt": {
+      "description": "Port of primary node",
+      "type": "Integer[1024,65536]"
     }
   }
 }

@@ -2,11 +2,10 @@ replication:
   replSetName: <%= $repset %>
 security:
   authorization: enabled
-<% if $keyfile { -%>
-  keyFile: <%= $keyfile %>
-<% } -%>
-<% if $member_auth != 'none' { -%>
-  clusterAuthMode: <%= $member_auth %>
+<% if $member_auth == 'keyFile' { -%>
+  keyFile: <%= $keyfile_path %>
+<% } elsif $member_auth == 'x509' { -%>
+  clusterAuthMode: x509
 <% } -%>
 <% if $enable_ldap_authn or $enable_ldap_authz { -%>
   ldap:

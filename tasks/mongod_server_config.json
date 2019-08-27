@@ -23,41 +23,9 @@
       "description": "Base path to MongoDB",
       "type": "String[1]"
     },
-    "repset": {
-      "description": "Name for replication set",
+    "config_file_data": {
+      "description": "string of config file content",
       "type": "String[1]"
-    },
-    "x509_path": {
-      "description": "Path and name of x509 PEM file",
-      "type": "Optional[String[1]]"
-    },
-    "ca_path": {
-      "description": "Path and name of CA PEM file",
-      "type": "Optional[String[1]]"
-    },
-    "keyfile_path": {
-      "description": "File path and name to keyfile",
-      "type": "Optional[String[1]]"
-    },
-    "bindnic": {
-      "description": "NIC for listening",
-      "type": "Optional[String[1]]"
-    },
-    "port": {
-      "description": "Port to bind to",
-      "type": "String[1]"
-    },
-    "use_keyfile": {
-      "description": "Boolean to determine if keyfile is used for auth. Overriden by `use_x509` parameter",
-      "type": "Boolean"
-    },
-    "use_x509": {
-      "description": "Boolean to determine if x509 certs are used for auth. Overrides `use_keyfile` parameter",
-      "type": "Boolean"
-    },
-    "extra_config": {
-      "description": "Extra config required",
-      "type": "Optional[String[1]]"
     }
   }
 }

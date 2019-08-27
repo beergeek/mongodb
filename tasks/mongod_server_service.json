@@ -10,6 +10,10 @@
     "run_as_service": {
       "description": "If to use service or run as command",
       "type": "Boolean"
+    },
+    "service_name": {
+      "description": "The service name, if using",
+      "type": "Optional[String[1]]"
     }
   }
 }

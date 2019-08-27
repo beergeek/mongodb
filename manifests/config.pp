@@ -20,9 +20,9 @@
 # @param ldap_security The type of transport security for LDAP communications.
 # @param kerberos_trace_path Absolute path of the trace file for Kerberos. 
 # @param keytab_file_path The absolute path of the Kerberos keytab file.
-# @param keyfile The absolute path of the member authentication keyfile, if using keyfile for cluster authentication.
+# @param keyfile_path The absolute path of the member authentication keyfile, if using keyfile for cluster authentication.
 # @param wiredtiger_cache_gb The size of the WiredTiger Cache in Gigabytes.
-# @param member_auth What, if any, cluster authentication is selected. Possible options: `x509`, `keyfile`, or `none`.
+# @param member_auth What, if any, cluster authentication is selected. Possible options: `x509`, `keyfile_path`, or `none`.
 # @param repsetname Name of the replica set. Defaults to `$title` of resource.
 # @param svc_user The name of the user the mongod instance will run as. Used to modify the 
 #   unit file for the service if using SystemD.
@@ -51,7 +51,7 @@ define mongodb::config (
   Boolean                               $enable_ldap_authz   = false,
   Enum['none','tls']                    $ldap_security       = 'tls',
   Optional[Stdlib::Absolutepath]        $kerberos_trace_path = undef,
-  Optional[Stdlib::Absolutepath]        $keyfile             = undef,
+  Optional[Stdlib::Absolutepath]        $keyfile_path        = undef,
   Optional[Stdlib::Absolutepath]        $keytab_file_path    = undef,
   Optional[String[1]]                   $ldap_authz_query    = undef,
   Optional[Sensitive[String[1]]]        $ldap_bind_password  = undef,
@@ -84,7 +84,7 @@ define mongodb::config (
   Stdlib::Absolutepath                  $ca_file             = "${pki_path}/ca.cert",
 ) {
 
-  if $member_auth == 'keyFile' and !($keyfile) {
+  if $member_auth == 'keyFile' and !($keyfile_path) {
     fail('If `keyFile` is selected for the $member_auth a keyfile location must be provided')
   }
 
@@ -159,7 +159,7 @@ define mongodb::config (
       enable_kerberos     => $enable_kerberos,
       enable_ldap_authn   => $enable_ldap_authn,
       enable_ldap_authz   => $enable_ldap_authz,
-      keyfile             => $keyfile,
+      keyfile_path        => $keyfile_path,
       ldap_authz_query    => $ldap_authz_query,
       ldap_bind_password  => $ldap_bind_password,
       ldap_bind_username  => $ldap_bind_username,
