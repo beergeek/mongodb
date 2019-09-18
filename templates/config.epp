@@ -15,11 +15,10 @@ security:
       queryUser: <%= $ldap_bind_username %>
     servers: <%= $ldap_servers %>
     transportSecurity: <%= $ldap_security %>
-    userToDNMapping: |-
-      <%= $ldap_user_mapping %>
+    userToDNMapping: '<%= $ldap_user_mapping %>'
 <% if $enable_ldap_authz { -%>
     authz:
-      queryTemplate: "<%= $ldap_authz_query %>"
+      queryTemplate: '<%= $ldap_authz_query %>'
 <% } -%>
 <% } -%>
 net:
