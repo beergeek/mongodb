@@ -100,10 +100,6 @@ define mongodb::config (
     fail("Of `enable_kerberos` is 'true' a path for `keytab_file_path` must be provided")
   }
 
-  if $enable_ldap_authz and !($enable_ldap_authn) {
-    fail("When `enable_ldap_authz` is 'true', `enable_ldap_authn` must also be 'true'")
-  }
-
   if $enable_ldap_authn and (!($ldap_security) or !($ldap_user_mapping) or !($ldap_bind_password) and !($ldap_bind_username)
   and !($ldap_servers)) {
     fail("When `enable_ldap_authn` is 'true' the following must be provided:\n\t- `ldap_security`\n\t- `ldap_user_mapping`\n\t
