@@ -157,7 +157,7 @@ define mongodb::config (
       enable_ldap_authz   => $enable_ldap_authz,
       keyfile_path        => $keyfile_path,
       ldap_authz_query    => $ldap_authz_query,
-      ldap_bind_password  => $ldap_bind_password,
+      ldap_bind_password  => unwrap($ldap_bind_password),
       ldap_bind_username  => $ldap_bind_username,
       ldap_servers        => $ldap_servers,
       ldap_security       => $ldap_security,
