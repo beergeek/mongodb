@@ -156,11 +156,12 @@ class mongodb::supporting (
     unless $server_keytab_path {
       fail('When manage the keytab you require `server_keytab_path`')
     }
-    file { $server_keytab_path:
-      ensure  => file,
-      mode    => '0400',
-      content => Binary(unwrap($server_keytab_content)),
-    }
+    notify { unwrap($server_keytab_content): }
+    #file { $server_keytab_path:
+    #  ensure  => file,
+    #  mode    => '0400',
+    #  content => Binary(unwrap($server_keytab_content)),
+    #}
   }
 
   if $ca_cert_pem_content {
