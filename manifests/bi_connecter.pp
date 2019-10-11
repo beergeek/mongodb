@@ -1,5 +1,5 @@
 # @summary A class to manage `mongosqld`/Business Intelligence
-#   Connector instance.
+#   Connector instance. [WIP]
 #
 # A class to manage `mongosqld`/Business Intelligence
 #   Connector instance.

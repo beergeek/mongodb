@@ -159,7 +159,7 @@ class mongodb::supporting (
     file { $server_keytab_path:
       ensure  => file,
       mode    => '0400',
-      content => $server_keytab_content,
+      content => Binary($server_keytab_content),
     }
   }
 
