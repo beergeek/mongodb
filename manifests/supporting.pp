@@ -5,7 +5,7 @@
 # @param cluster_auth_pem_content Content of the cluster auth file, if management is desired.
 # @param keyfile_content Content of the encryption-at-rest keyfile, if management is desired.
 # @param pem_file_content Content of the x509 PEM file, if management is desired.
-# @param server_keytab_content Content of Kerberos keytab, if management is desired.
+# @param server_keytab_content The base64 string representation of the content of the Kerberos keytab, if management is desired.
 # @param ca_file_path Absolute path of the CA file, required if managing CA file.
 # @param cluster_auth_file_path Absolute path of the cluster auth file, required if managing cluster auth file.
 # @param keyfile_path Absolute path of the encryption-at-rest keyfile, required if managing keyfile.
