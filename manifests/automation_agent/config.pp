@@ -23,52 +23,30 @@ class mongodb::automation_agent::config (
   }
 
   file { 'aa_config':
-    ensure => file,
-    path   => $conf_file,
-    owner  => 'mongod',
-    group  => 'mongod',
-    mode   => '0600',
-  }
-
-  file_line { 'aa_group_id':
-    ensure             => present,
-    path               => $conf_file,
-    match              => '^mmsGroupId.*',
-    line               => "mmsGroupId=${mongodb::automation_agent::mms_group_id}",
-    append_on_no_match => true,
-  }
-
-  file_line { 'aa_api_key':
-    ensure             => present,
-    path               => $conf_file,
-    match              => '^mmsApiKey.*',
-    line               => Sensitive("mmsApiKey=${unwrap($mongodb::automation_agent::mms_api_key)}"),
-    append_on_no_match => true,
-  }
-
-  file_line { 'aa_om_url':
-    ensure             => present,
-    path               => $conf_file,
-    match              => '^mmsBaseUrl.*',
-    line               => "mmsBaseUrl=${mongodb::automation_agent::url_svc_type}://${mongodb::automation_agent::ops_manager_fqdn}",
-    append_on_no_match => true,
-  }
-
-  if $mongodb::automation_agent::enable_ssl {
-    file_line { 'aa_pem_file':
-      ensure             => present,
-      path               => $conf_file,
-      match              => '^sslMMSServerClientCertificate.*',
-      line               => "sslMMSServerClientCertificate=${mongodb::automation_agent::pem_file_path}",
-      append_on_no_match => true,
-    }
-
-    file_line { 'ca_cert_file':
-      ensure             => present,
-      path               => $conf_file,
-      match              => '^sslTrustedMMSServerCertificate.*',
-      line               => "sslTrustedMMSServerCertificate=${mongodb::automation_agent::ca_file_path}",
-      append_on_no_match => true,
-    }
+    ensure                        => file,
+    path                          => $conf_file,
+    owner                         => 'mongod',
+    group                         => 'mongod',
+    mode                          => '0600',
+    content => epp('mongodb/aa_config.epp', {
+      aa_loglevel                 => $mongodb::automation_agent::aa_loglevel,
+      backup_agent_krb5_path      => $mongodb::automation_agent::backup_agent_krb5_path,
+      ca_file_path                => $mongodb::automation_agent::ca_file_path,
+      http_proxy                  => $mongodb::automation_agent::http_proxy,
+      krb5_conf_path              => $mongodb::automation_agent::krb5_conf_path,
+      log_file_duration           => $mongodb::automation_agent::log_file_duration,
+      log_file_path               => $mongodb::automation_agent::log_file_path,
+      max_log_files               => $mongodb::automation_agent::max_log_files,
+      max_log_size                => $mongodb::automation_agent::max_log_size,
+      mms_api_key                 => $mongodb::automation_agent::mms_api_key,
+      mms_config_backup_file_path => $mongodb::automation_agent::mms_config_backup_file_path,
+      mms_group_id                => $mongodb::automation_agent::mms_group_id,
+      monitor_agent_krb5_path     => $mongodb::automation_agent::monitor_agent_krb5_path,
+      om_timeout                  => $mongodb::automation_agent::om_timeout,
+      ops_manager_fqdn            => $mongodb::automation_agent::ops_manager_fqdn,
+      pem_file_path               => $mongodb::automation_agent::pem_file_path,
+      pem_password                => $mongodb::automation_agent::pem_password,
+      validate_ssl_certs          => $mongodb::automation_agent::validate_ssl_certs,
+    })
   }
 }

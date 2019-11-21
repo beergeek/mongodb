@@ -27,22 +27,39 @@
 #
 class mongodb::automation_agent (
   # Required
-  Sensitive[String[1]]           $mms_api_key,
-  String                         $mms_group_id,
+  Sensitive[String[1]]                        $mms_api_key,
+  String                                      $mms_group_id,
 
   # When automation agent is built from the Ops Manager FQDN
-  String                         $ops_manager_fqdn,
-  Enum['http','https']           $url_svc_type,
-  String                         $svc_user,
+  String                                      $ops_manager_fqdn,
+  Enum['http','https']                        $url_svc_type,
+  String                                      $svc_user,
+
+  # SSL/TLS
+  Boolean                                     $enable_ssl,
+  Boolean                                     $validate_ssl_certs,
+  Optional[Sensitive[String[1]]]              $pem_file_content,
+  Optional[Sensitive[String[1]]]              $pem_password,
+  Optional[Stdlib::Absolutepath]              $ca_file_path,
+  Optional[Stdlib::Absolutepath]              $pem_file_path,
+  Optional[String[1]]                         $ca_file_content,
+
+  # Kerberos
+  Optional[Sensitive[String[1]]]              $keytab_file_content,
+  Optional[Stdlib::Absolutepath]              $backup_agent_krb5_path,
+  Optional[Stdlib::Absolutepath]              $keytab_file_path,
+  Optional[Stdlib::Absolutepath]              $krb5_conf_path,
+  Optional[Stdlib::Absolutepath]              $monitor_agent_krb5_path,
 
   # Other settings
-  Optional[Stdlib::Absolutepath] $ca_file_path,
-  Optional[Stdlib::Absolutepath] $keytab_file_path,
-  Optional[Stdlib::Absolutepath] $pem_file_path,
-  Optional[String[1]]            $ca_file_content,
-  Optional[Sensitive[String[1]]] $pem_file_content,
-  Optional[Sensitive[String[1]]] $keytab_file_content,
-  Boolean                        $enable_ssl,
+  Enum['DEBUG','INFO','WARN','ERROR','FATAL'] $aa_loglevel,
+  Integer                                     $log_file_duration,
+  Integer                                     $max_log_files,
+  Integer                                     $max_log_size,
+  Integer                                     $om_timeout,
+  Optional[Stdlib::HTTPUrl]                   $http_proxy,
+  Stdlib::Absolutepath                        $log_file_path,
+  Stdlib::Absolutepath                        $mms_config_backup_file_path,
 ) {
 
   if $mongodb::automation_agent::enable_ssl and !($pem_file_path or $ca_file_path)  {

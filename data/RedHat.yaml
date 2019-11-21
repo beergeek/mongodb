@@ -13,38 +13,42 @@ variables:
 
 # mongodb::supporting
 mongodb::supporting::base_path: *base_path
-mongodb::supporting::cluster_auth_file_path: *cluster_pem_path
-mongodb::supporting::pki_path: *pki_path
-mongodb::supporting::ca_file_path: *ca_path
-mongodb::supporting::pem_file_path: *pem_path
-mongodb::supporting::server_keytab_path: *svc_keytab_path
-mongodb::supporting::keyfile_path: *keyfile_path
 mongodb::supporting::base_path: *base_path
+mongodb::supporting::ca_file_path: *ca_path
+mongodb::supporting::cluster_auth_file_path: *cluster_pem_path
 mongodb::supporting::db_base_path: *db_base_path
-mongodb::supporting::log_path: *log_path
 mongodb::supporting::home_dir: '/var/lib/mongodb'
+mongodb::supporting::keyfile_path: *keyfile_path
+mongodb::supporting::log_path: *log_path
+mongodb::supporting::pem_file_path: *pem_path
+mongodb::supporting::pki_path: *pki_path
+mongodb::supporting::server_keytab_path: *svc_keytab_path
 
 # mongodb::install
 
 # mongodb::config
 mongodb::config::base_path: *base_path
+mongodb::config::conf_path: '/etc'
 mongodb::config::db_base_path: *db_base_path
 mongodb::config::log_path: *log_path
-mongodb::config::pki_path: *pki_path
-mongodb::config::conf_path: '/etc'
 mongodb::config::pid_path: '/var/run/mongodb'
+mongodb::config::pki_path: *pki_path
 
 # MMS
-mongodb::ops_manager::mms_source: 'https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.0.14.50550.20190730T1612Z-1.x86_64.rpm'
 mongodb::ops_manager::config_file_path: '/opt/mongodb/mms/conf/conf-mms.properties'
 mongodb::ops_manager::gen_key_file_path: '/etc/mongodb-mms/gen.key' 
-mongodb::ops_manager::mms_provider: 'rpm'
 mongodb::ops_manager::mms_package_name: 'mongodb-mms'
+mongodb::ops_manager::mms_provider: 'rpm'
+mongodb::ops_manager::mms_source: 'https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.0.14.50550.20190730T1612Z-1.x86_64.rpm'
 
 # BIC
 mongodb::bi_connecter::bic_schema_user_keytab_path: '/var/lib/mongosql/client.keytab'
-mongodb::bi_connecter::bic_svc_keytab_path: '/var/lib/mongosql/svc.keytab'
 mongodb::bi_connecter::bic_source_url: 'https://info-mongodb-com.s3.amazonaws.com/mongodb-bi/v2/mongodb-bi-linux-x86_64-rhel70-v2.10.0.tgz'
-mongodb::bi_connecter::bic_svc_user: 'mongosql'
+mongodb::bi_connecter::bic_svc_keytab_path: '/var/lib/mongosql/svc.keytab'
 mongodb::bi_connecter::bic_svc_user_home: '/var/lib/mongosql'
+mongodb::bi_connecter::bic_svc_user: 'mongosql'
 mongodb::bi_connecter::log_path: '/var/lib/mongosql/logs/mongosql.log'
+
+# Automation Agent
+mongodb::automation_agent::mms_config_backup_file_path: '/var/lib/mongodb-mms-automation/mms-cluster-config-backup.json'
+mongodb::automation_agent::log_file_path: '/var/log/mongodb-mms-automation/automation-agent.log'

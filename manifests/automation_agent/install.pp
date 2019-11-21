@@ -23,7 +23,7 @@ class mongodb::automation_agent::install(
       $_auto_agent_pkg_source_uri = "${mongodb::automation_agent::url_svc_type}://${mongodb::automation_agent::ops_manager_fqdn}/download/agent/automation/mongodb-mms-automation-agent-manager-latest.x86_64.rhel${facts['os']['release']['major']}.rpm"
     }
     'windows': {
-      $_pkg_file = "mongodb-mms-automation-agent-manager-latest.x86_64.rhel${facts['os']['release']['major']}.rpm"
+      $_pkg_file = "mongodb-mms-automation-agent-manager-latest.x86_64.rhel${facts['os']['release']['major']}.msi"
       $_provider = 'msi'
       $_auto_agent_pkg_source_uri = "${mongodb::automation_agent::url_svc_type}://${mongodb::automation_agent::ops_manager_fqdn}/download/agent/automation/mongodb-mms-automation-agent-manager-latest.x86_64.rhel${facts['os']['release']['major']}.msi"
     }

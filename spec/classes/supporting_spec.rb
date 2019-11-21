@@ -13,8 +13,8 @@ describe 'mongodb::supporting' do
         cluster_auth_pem_content: RSpec::Puppet::RawString.new("Sensitive('tvydcu=@#$%^&*(hsvghGHVG1')"),
         pem_file_content:         RSpec::Puppet::RawString.new("Sensitive('tvydcu=@#$%^&*(hsvghGHVGq')"),
         ca_cert_pem_content:      'tvydcu=@#$%^&*(hsvghGHVGa',
-        server_keytab_content:    RSpec::Puppet::RawString.new("Sensitive('tvydcu=@#$%^&*(hsvghGHVGz')"),
-        keyfile_content:          RSpec::Puppet::RawString.new("Sensitive('tvydcu=@#$%^&*(hsvghGHVGs')"),
+        server_keytab_content:    RSpec::Puppet::RawString.new("Sensitive('YmkvvlX6MiPzOLvmrBxbw/2mWcw=')"),
+        keyfile_content:          RSpec::Puppet::RawString.new("Sensitive('VKwF4ei+1GkjlPVvZWJ5A5uaglQ=')"),
       }
     end
 

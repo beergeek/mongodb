@@ -14,7 +14,7 @@ describe 'mongodb::automation_agent' do
       {
         ops_manager_fqdn: 'ops-manager.mongodb.local:8080',
         mms_group_id:     'abcdefghijklmnopqrstuvwxyz',
-        mms_api_key:      RSpec::Puppet::RawString.new("Sensitive('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ')"),
+        mms_api_key:      RSpec::Puppet::RawString.new("Sensitive('iXOGNQ409Ng0gnroSVROfg==')"),
         pem_file_content: RSpec::Puppet::RawString.new("Sensitive('vftybeisudvfkyj rtysaerfvacjtyDMZHfvfgty')"),
         ca_file_content:  'fueorybvurfdyubxytcibuknliu',
         pem_file_path:    '/etc/mongodb-mms/aa.pem',
@@ -66,59 +66,9 @@ describe 'mongodb::automation_agent' do
     }
 
     it {
-      is_expected.to contain_file_line('aa_group_id').with(
-        'ensure'             => 'present',
-        'path'               => '/etc/mongodb-mms/automation-agent.config',
-        'match'              => '^mmsGroupId.*',
-        'line'               => 'mmsGroupId=abcdefghijklmnopqrstuvwxyz',
-        'append_on_no_match' => true,
-      )
-    }
-
-    it {
-      is_expected.to contain_file_line('aa_api_key').with(
-        'ensure'             => 'present',
-        'path'               => '/etc/mongodb-mms/automation-agent.config',
-        'match'              => '^mmsApiKey.*',
-        'line'               => 'mmsApiKey=1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        'append_on_no_match' => true,
-      )
-    }
-
-    it {
-      is_expected.to contain_file_line('aa_om_url').with(
-        'ensure'             => 'present',
-        'path'               => '/etc/mongodb-mms/automation-agent.config',
-        'match'              => '^mmsBaseUrl.*',
-        'line'               => 'mmsBaseUrl=https://ops-manager.mongodb.local:8080',
-        'append_on_no_match' => true,
-      )
-    }
-
-    it {
       is_expected.to contain_service('mongodb-mms-automation-agent').with(
         'ensure'  => 'running',
         'enable'  => true,
-      )
-    }
-
-    it {
-      is_expected.to contain_file_line('ca_cert_file').with(
-        'ensure'             => 'present',
-        'path'               => '/etc/mongodb-mms/automation-agent.config',
-        'match'              => '^sslTrustedMMSServerCertificate.*',
-        'line'               => 'sslTrustedMMSServerCertificate=/etc/mongodb-mms/ca.cert',
-        'append_on_no_match' => true,
-      )
-    }
-
-    it {
-      is_expected.to contain_file_line('aa_pem_file').with(
-        'ensure'             => 'present',
-        'path'               => '/etc/mongodb-mms/automation-agent.config',
-        'match'              => '^sslMMSServerClientCertificate.*',
-        'line'               => 'sslMMSServerClientCertificate=/etc/mongodb-mms/aa.pem',
-        'append_on_no_match' => true,
       )
     }
 
@@ -160,14 +110,6 @@ describe 'mongodb::automation_agent' do
         enable_ssl:       false,
       }
     end
-
-    it {
-      is_expected.not_to contain_file_line('aa_ca_cert_file')
-    }
-
-    it {
-      is_expected.not_to contain_file_line('aa_pem_file')
-    }
   end
 
   context 'On RHEL7 with SSL and Kerberos selected' do
