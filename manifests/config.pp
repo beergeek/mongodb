@@ -44,7 +44,7 @@
 # @param cluster_pem_file The absolute path of the cluster auth file, if different to PEM file.
 # @param ca_file The absolute path for the CA cert file.
 # @param enable_ear Boolean to determine if encryption at rest is enabled
-# @param ear_key_file Keyfile for encryption at rest, overrides KMIP settings
+# @param ear_keyfile Keyfile for encryption at rest, overrides KMIP settings
 # @param ear_kmip_port KMIP server port    
 # @param ear_kmip_ca_cert CA certificate for KMIP server
 # @param ear_kmip_client_cert Client certificate to interact with KMIP server
@@ -93,7 +93,7 @@ define mongodb::config (
   # Encryption At Rest (EAR)
   Boolean                               $enable_ear           = false,
   Optional[Stdlib::Host]                $ear_kmip_server      = undef,
-  Optional[Stdlib::Absolutepath]        $ear_key_file         = undef,
+  Optional[Stdlib::Absolutepath]        $ear_keyfile          = undef,
   Optional[Stdlib::Port]                $ear_kmip_port        = undef,
   Optional[Stdlib::Absolutepath]        $ear_kmip_ca_cert     = undef,
   Optional[Stdlib::Absolutepath]        $ear_kmip_client_cert = undef,
@@ -180,7 +180,7 @@ define mongodb::config (
       keyfile_path         => $keyfile_path,
       ear_kmip_server      => $ear_kmip_server,
       enable_ear           => $enable_ear,
-      ear_key_file         => $ear_key_file,
+      ear_keyfile          => $ear_keyfile,
       ear_kmip_port        => $ear_kmip_port,
       ear_kmip_ca_cert     => $ear_kmip_ca_cert,
       ear_kmip_client_cert => $ear_kmip_client_cert,
