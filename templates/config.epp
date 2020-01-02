@@ -10,7 +10,7 @@ security:
 <% if $enable_ear { -%>
   enableEncryption: true
 <% if $ear_keyfile { -%>
-encryptionKeyFile: <%= $ear_keyfile %>
+  encryptionKeyFile: <%= $ear_keyfile %>
 <% } elsif $ear_kmip_server and $ear_kmip_port and $ear_kmip_ca_cert and $ear_kmip_client_cert { -%>
   kmip:
     serverName: <%= $ear_kmip_server %>
