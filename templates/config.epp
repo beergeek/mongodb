@@ -7,6 +7,21 @@ security:
 <% } elsif $member_auth == 'x509' { -%>
   clusterAuthMode: x509
 <% } -%>
+<% if $enable_ear { -%>
+  enableEncryption: true
+  <% if $ear_key_file { -%>
+  encryptionKeyFile: <%= $ear_keyfile %>
+  <% } elsif $ear_kmip_server and $ear_kmip_port and $ear_kmip_ca_cert and $ear_kmip_client_cert { -%>
+  kmip:
+    serverName: <%= $ear_kmip_server %>
+    port: <%= $ear_kmip_port %>
+    clientCertificateFile: <%= $ear_kmip_client_cert %>
+    serverCAFile: <%= $ear_kmip_ca_cert %>
+    <% if $ear_key_id { -%>
+    keyIdentifier: <%= $ear_key_id %>
+    <% } -%>
+  <% } -%>
+<% } -%>
 <% if $enable_ldap_authn or $enable_ldap_authz { -%>
   ldap:
     bind:
