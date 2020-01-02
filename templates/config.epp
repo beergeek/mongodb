@@ -44,9 +44,9 @@ net:
     mode: <%= $ssl_mode %>
     PEMKeyFile: <%= $pem_file %>
     CAFile: <%= $ca_file %>
-  <% if $cluster_pem_file { -%>
+<% if $cluster_pem_file { -%>
     clusterFile: <%= $cluster_pem_file %>
-  <% } -%>
+<% } -%>
 <% } -%>
 
 systemLog:
