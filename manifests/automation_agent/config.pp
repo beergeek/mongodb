@@ -38,7 +38,7 @@ class mongodb::automation_agent::config (
       log_file_path               => $mongodb::automation_agent::log_file_path,
       max_log_files               => $mongodb::automation_agent::max_log_files,
       max_log_size                => $mongodb::automation_agent::max_log_size,
-      mms_api_key                 => $mongodb::automation_agent::mms_api_key,
+      mms_api_key                 => chomp(unwrap($mongodb::automation_agent::mms_api_key)),
       mms_config_backup_file_path => $mongodb::automation_agent::mms_config_backup_file_path,
       mms_group_id                => $mongodb::automation_agent::mms_group_id,
       monitor_agent_krb5_path     => $mongodb::automation_agent::monitor_agent_krb5_path,
