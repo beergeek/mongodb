@@ -1,6 +1,6 @@
 mmsGroupId=<%= $mms_group_id %>
 mmsApiKey=<%= $mms_api_key %>
-mmsBaseUrl=<%= $ops_manager_fqdn %>
+mmsBaseUrl=<%= $url_svc_type %>://<%= $ops_manager_fqdn %>
 logFile=<%= $log_file_path %>
 mmsConfigBackup=<%= $mms_config_backup_file_path %>
 dialTimeoutSeconds=<%= $om_timeout %>
