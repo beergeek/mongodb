@@ -36,7 +36,7 @@ mms.ldap.bindPassword=<%= $ldap_bind_password %>
 mms.ldap.global.role.owner=<%= $ldap_global_owner %>
 mms.ldap.url=<%= $ldap_url_host %>:<%= $ldap_url_port %>
 mms.ldap.user.group=<%= $ldap_user_group %>
-mms.ldap.user.searchAttribute=<%= $ldap_user_searchAttribute %>
+mms.ldap.user.searchAttribute=<%= $ldap_user_search_attribute %>
 # Please use!
 mms.ldap.ssl.CAFile=<%= $auth_ssl_ca_file  %>
 mms.ldap.ssl.PEMKeyFile=<%= $auth_ssl_pem_key_file  %>
