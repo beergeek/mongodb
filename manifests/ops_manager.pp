@@ -168,19 +168,19 @@ class mongodb::ops_manager (
     * ldap_user_search_attribute")
   }
 
-  if type($auth_ssl_pem_key_file_passwd) == Sensitive {
+  if type($auth_ssl_pem_key_file_passwd) == Sensitive[String] {
     $_auth_ssl_pem_key_file_passwd = unwrap($auth_ssl_pem_key_file_passwd)
   } else {
     $_auth_ssl_pem_key_file_passwd = $auth_ssl_pem_key_file_passwd
   }
 
-  if type($ldap_bind_password) == Sensitive {
+  if type($ldap_bind_password) == Sensitive[String] {
     $_ldap_bind_password = unwrap($ldap_bind_password)
   } else {
     $_ldap_bind_password = $ldap_bind_password
   }
 
-  if type($pem_file_passwd) == Sensitive {
+  if type($pem_file_passwd) == Sensitive[String] {
     $_pem_file_passwd = unwrap($pem_file_passwd)
   } else {
     $_pem_file_passwd = $pem_file_passwd
