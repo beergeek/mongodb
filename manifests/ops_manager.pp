@@ -168,6 +168,24 @@ class mongodb::ops_manager (
     * ldap_user_search_attribute")
   }
 
+  if type($auth_ssl_pem_key_file_passwd) == Sensitive {
+    $_auth_ssl_pem_key_file_passwd = unwrap($auth_ssl_pem_key_file_passwd)
+  } else {
+    $_auth_ssl_pem_key_file_passwd = $auth_ssl_pem_key_file_passwd
+  }
+
+  if type($ldap_bind_password) == Sensitive {
+    $_ldap_bind_password = unwrap($ldap_bind_password)
+  } else {
+    $_ldap_bind_password = $ldap_bind_password
+  }
+
+  if type($pem_file_passwd) == Sensitive {
+    $_pem_file_passwd = unwrap($pem_file_passwd)
+  } else {
+    $_pem_file_passwd = $pem_file_passwd
+  }
+
   if $enable_http_service {
     $_enable = true
     $_ensure = running
@@ -245,7 +263,7 @@ class mongodb::ops_manager (
       appsdb_uri                                       => $appsdb_uri,
       auth_ssl_ca_file                                 => $auth_ssl_ca_file,
       auth_ssl_pem_key_file                            => $auth_ssl_pem_key_file,
-      auth_ssl_pem_key_file_passwd                     => unwrap($auth_ssl_pem_key_file_passwd),
+      auth_ssl_pem_key_file_passwd                     => $_auth_ssl_pem_key_file_passwd,
       auth_type                                        => $auth_type,
       ca_cert_path                                     => $ca_cert_path,
       central_url                                      => $central_url,
@@ -268,7 +286,7 @@ class mongodb::ops_manager (
       installer_source                                 => $installer_source,
       ldap_bind_dn                                     => $ldap_bind_dn,
       ldap_url_port                                    => $ldap_url_port,
-      ldap_bind_password                               => unwrap($ldap_bind_password),
+      ldap_bind_password                               => $_ldap_bind_password,
       ldap_global_owner                                => $ldap_global_owner,
       ldap_group_base_dn                               => $ldap_group_base_dn,
       ldap_group_member                                => $ldap_group_member,
@@ -286,7 +304,7 @@ class mongodb::ops_manager (
       password_max_days_inactive_before_account_lock   => $password_max_days_inactive_before_account_lock,
       password_max_failed_attempts_before_account_lock => $password_max_failed_attempts_before_account_lock,
       password_min_changes_before_reuse                => $password_min_changes_before_reuse,
-      pem_file_passwd                                  => unwrap($pem_file_passwd),
+      pem_file_passwd                                  => $_pem_file_passwd,
       pem_file_path                                    => $pem_file_path,
       reply_email_addr                                 => $reply_email_addr,
       user_bypass_invite_for_existing_users            => $user_bypass_invite_for_existing_users,

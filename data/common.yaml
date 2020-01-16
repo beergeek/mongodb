@@ -81,7 +81,7 @@ mongodb::ops_manager::mfa_issuer: ~
 mongodb::ops_manager::mfa_require: false
 mongodb::ops_manager::auth_type: 'com.xgen.svc.mms.svc.user.UserSvcDb'
 mongodb::ops_manager::ldap_bind_dn: ~
-mongodb::ops_manager::ldap_bind_url_port: 389
+mongodb::ops_manager::ldap_url_port: 389
 mongodb::ops_manager::ldap_bind_password: ~
 mongodb::ops_manager::ldap_global_owner: ~
 mongodb::ops_manager::ldap_url_host: ~
