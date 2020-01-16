@@ -161,11 +161,11 @@ class mongodb::ops_manager (
   ($ldap_bind_dn == undef or $ldap_url_port == undef or
   $ldap_bind_password == undef or $ldap_global_owner == undef or
   $ldap_url_host == undef or $ldap_user_group == undef or
-  $ldap_user_search_attribute == undef) {
+  $ldap_user_search_attribute == undef or $ldap_user_base_dn == undef) {
     fail("If LDAP auth is enabled for Ops Manager the following must be provided:\n\t
     * ldap_bind_dn\n\t* ldap_url_port\n\t* ldap_bind_password\n\t
     * ldap_global_owner\n\t* ldap_url_host\n\t* ldap_user_group\n\t
-    * ldap_user_search_attribute")
+    * ldap_user_search_attribute\n\t* ldap_user_base_dn")
   }
 
   if type($auth_ssl_pem_key_file_passwd) == Sensitive[String] {
