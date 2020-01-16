@@ -158,10 +158,10 @@ class mongodb::ops_manager (
   }
 
   if $auth_type == 'com.xgen.svc.mms.svc.user.UserSvcLdap' and
-  ($ldap_bind_dn_host == undef or $ldap_bind_dn_port == undef or
-  $ldap_bindPassword == undef or $ldap_global_role_owner == undef or
-  $ldap_url == undef or $ldap_user_group == undef or
-  $ldap_user_searchAttribute == undef) {
+  ($ldap_bind_dn == undef or $ldap_bind_url_port == undef or
+  $ldap_bind_password == undef or $ldap_global_role_owner == undef or
+  $ldap_url_host == undef or $ldap_user_group == undef or
+  $ldap_user_search_attribute == undef) {
     fail("If LDAP auth is enabled for Ops Manager the following must be provided:\n\t
     * ldap_bindDn_host\n\t* ldap_bindDn_port\n\t* ldap_bindPassword\n\t
     * ldap_global_role_owner\n\t* ldap_url\n\t* ldap_user_group\n\t
