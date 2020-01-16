@@ -95,6 +95,50 @@ class mongodb::ops_manager (
   Optional[Stdlib::Absolutepath]                  $https_pem_file_path    = $pem_file_path,
   Optional[String[1]]                             $https_ca_cert_content  = $ca_cert_content,
   Optional[Sensitive[String[1]]]                  $https_pem_file_content = $pem_file_content,
+
+  # Auth
+  Enum['com.xgen.svc.mms.svc.user.UserSvcDb',
+      'com.xgen.svc.mms.svc.user.UserSvcLdap',
+      'com.xgen.svc.mms.svc.user.UserSvcSaml']    $auth_type,
+  Optional[Stdlib::Host]                          $ldap_bind_dn,
+  Optional[Stdlib::Port]                          $ldap_url_port,
+  Optional[String[1]]                             $ldap_bind_password,
+  Optional[String[1]]                             $ldap_global_owner,
+  Optional[Mongodb::LDAPUrl]                      $ldap_url_host,
+  Optional[String[1]]                             $ldap_user_group,
+  Optional[String[1]]                             $ldap_user_search_attribute,
+  Optional[Integer]                               $password_max_days_before_change_required,
+  Optional[Integer]                               $password_max_days_inactive_before_account_lock,
+  Optional[Integer]                               $password_max_failed_attempts_before_account_lock,
+  Optional[Integer]                               $password_min_changes_before_reuse,
+  Optional[Boolean]                               $user_bypass_invite_for_existing_users,
+  Optional[Boolean]                               $user_invitation_only,
+  Optional[Stdlib::Absolutepath]                  $auth_ssl_ca_file,
+  Optional[Stdlib::Absolutepath]                  $auth_ssl_pem_key_file,
+  Optional[String[1]]                             $auth_ssl_pem_key_file_passwd,
+  Optional[String[1]]                             $global_automation_admin,
+  Optional[String[1]]                             $global_backup_admin,
+  Optional[String[1]]                             $global_monitoring_admin,
+  Optional[String[1]]                             $global_read_only,
+  Optional[String[1]]                             $global_user_admin,
+  Optional[String[1]]                             $ldap_group_base_dn,
+  Optional[String[1]]                             $ldap_group_member,
+  Optional[String[1]]                             $ldap_group_seperator,
+  Optional[String[1]]                             $ldap_referral,
+  Optional[String[1]]                             $ldap_user_base_dn,
+  Optional[String[1]]                             $ldap_user_email,
+  Optional[String[1]]                             $ldap_user_firstname,
+  Optional[String[1]]                             $ldap_user_lastname,
+  Optional[Boolean]                               $device_notification,
+
+  # MFA
+  Enum['OFF',
+      'OPTIONAL',
+      'REQUIRED_FOR_GLOBAL_ROLES',
+      'REQUIRED']                                 $mfa_level,
+  Boolean                                         $mfa_allow_reset,
+  Optional[String[1]]                             $mfa_issuer,
+  Boolean                                         $mfa_require,
 ) {
 
   unless is_email_address($admin_email_addr) {
@@ -111,6 +155,17 @@ class mongodb::ops_manager (
 
   if $ops_manager_ssl and !($ca_cert_path and $pem_file_path) {
     fail('`ca_cert_path` and `pem_file_path` are required if `ops_manager_ssl` is true.')
+  }
+
+  if $auth_type == 'com.xgen.svc.mms.svc.user.UserSvcLdap' and
+  ($ldap_bind_dn_host == undef or $ldap_bind_dn_port == undef or
+  $ldap_bindPassword == undef or $ldap_global_role_owner == undef or
+  $ldap_url == undef or $ldap_user_group == undef or
+  $ldap_user_searchAttribute == undef) {
+    fail("If LDAP auth is enabled for Ops Manager the following must be provided:\n\t
+    * ldap_bindDn_host\n\t* ldap_bindDn_port\n\t* ldap_bindPassword\n\t
+    * ldap_global_role_owner\n\t* ldap_url\n\t* ldap_user_group\n\t
+    * ldap_user_searchAttribute")
   }
 
   if $enable_http_service {
@@ -186,25 +241,60 @@ class mongodb::ops_manager (
     ensure  => file,
     path    => $config_file_path,
     content => epp('mongodb/mms_config_file.epp', {
-      admin_email_addr           => $admin_email_addr,
-      appsdb_uri                 => $appsdb_uri,
-      ca_cert_path               => $ca_cert_path,
-      central_url                => $central_url,
-      client_cert_mode           => $client_cert_mode,
-      email_hostname             => $email_hostname,
-      email_port                 => $email_port,
-      email_transport            => $email_transport,
-      email_type                 => $email_type,
-      from_email_addr            => $from_email_addr,
-      https_ca_cert_path         => $https_ca_cert_path,
-      https_pem_file_path        => $https_pem_file_path,
-      installer_source           => $installer_source,
-      ops_manager_ssl            => $ops_manager_ssl,
-      pem_file_passwd            => $pem_file_passwd,
-      pem_file_path              => $pem_file_path,
-      reply_email_addr           => $reply_email_addr,
-      installer_autodownload_ent => $installer_autodownload_ent,
-      installer_autodownload     => $installer_autodownload,
+      admin_email_addr                                 => $admin_email_addr,
+      appsdb_uri                                       => $appsdb_uri,
+      auth_ssl_ca_file                                 => $auth_ssl_ca_file,
+      auth_ssl_pem_key_file                            => $auth_ssl_pem_key_file,
+      auth_ssl_pem_key_file_passwd                     => $auth_ssl_pem_key_file_passwd,
+      auth_type                                        => $auth_type,
+      ca_cert_path                                     => $ca_cert_path,
+      central_url                                      => $central_url,
+      client_cert_mode                                 => $client_cert_mode,
+      device_notification                              => $device_notification,
+      email_hostname                                   => $email_hostname,
+      email_port                                       => $email_port,
+      email_transport                                  => $email_transport,
+      email_type                                       => $email_type,
+      from_email_addr                                  => $from_email_addr,
+      global_automation_admin                          => $global_automation_admin,
+      global_backup_admin                              => $global_backup_admin,
+      global_monitoring_admin                          => $global_monitoring_admin,
+      global_read_only                                 => $global_read_only,
+      global_user_admin                                => $global_user_admin,
+      https_ca_cert_path                               => $https_ca_cert_path,
+      https_pem_file_path                              => $https_pem_file_path,
+      installer_autodownload                           => $installer_autodownload,
+      installer_autodownload_ent                       => $installer_autodownload_ent,
+      installer_source                                 => $installer_source,
+      ldap_bind_dn                                     => $ldap_bind_dn,
+      ldap_url_port                                    => $ldap_url_port,
+      ldap_bind_password                               => $ldap_bind_password,
+      ldap_global_owner                                => $ldap_global_owner,
+      ldap_group_base_dn                               => $ldap_group_base_dn,
+      ldap_group_member                                => $ldap_group_member,
+      ldap_group_seperator                             => $ldap_group_seperator,
+      ldap_referral                                    => $ldap_referral,
+      ldap_url_host                                    => $ldap_url_host,
+      ldap_user_base_dn                                => $ldap_user_base_dn,
+      ldap_user_email                                  => $ldap_user_email,
+      ldap_user_firstname                              => $ldap_user_firstname,
+      ldap_user_group                                  => $ldap_user_group,
+      ldap_user_lastname                               => $ldap_user_lastname,
+      ldap_user_search_attribute                       => $ldap_user_search_attribute,
+      ops_manager_ssl                                  => $ops_manager_ssl,
+      password_max_days_before_change_required         => $password_max_days_before_change_required,
+      password_max_days_inactive_before_account_lock   => $password_max_days_inactive_before_account_lock,
+      password_max_failed_attempts_before_account_lock => $password_max_failed_attempts_before_account_lock,
+      password_min_changes_before_reuse                => $password_min_changes_before_reuse,
+      pem_file_passwd                                  => $pem_file_passwd,
+      pem_file_path                                    => $pem_file_path,
+      reply_email_addr                                 => $reply_email_addr,
+      user_bypass_invite_for_existing_users            => $user_bypass_invite_for_existing_users,
+      user_invitation_only                             => $user_invitation_only,
+      mfa_level                                        => $mfa_level,
+      mfa_allow_reset                                  => $mfa_allow_reset,
+      mfa_issuer                                       => $mfa_issuer,
+      mfa_require                                      => $mfa_require,
     }),
     require => Package['mongodb_mms_pkg'],
   }
