@@ -69,10 +69,10 @@ mms.ldap.global.role.backupAdmin=<%= $global_backup_admin  %>
 <% if $global_monitoring_admin {-%>
 mms.ldap.global.role.monitoringAdmin=<%= $global_monitoring_admin  %>
 <% }-%>
-<% if $ {-%>
+<% if $global_read_only {-%>
 mms.ldap.global.role.readOnly=<%= $global_read_only  %>
 <% }-%>
-<% if $global_read_only {-%>
+<% if $global_user_admin {-%>
 mms.ldap.global.role.userAdmin=<%= $global_user_admin  %>
 <% }-%>
 <% if $ldap_group_base_dn {-%>
