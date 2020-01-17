@@ -23,12 +23,24 @@ mongodb.release.autoDownload.enterprise=<%= $installer_autodownload_ent %>
 mms.userSvcClass=<%= $auth_type %>
 <% case $auth_type {-%>
 <% 'com.xgen.svc.mms.svc.user.UserSvcDb': {-%>
+<% if $password_max_days_before_change_required {-%>
 mms.password.maxDaysBeforeChangeRequired=<%= $password_max_days_before_change_required %>
+<% }-%>
+<% if $password_max_days_inactive_before_account_lock {-%>
 mms.password.maxDaysInactiveBeforeAccountLock=<%= $password_max_days_inactive_before_account_lock %>
+<% }-%>
+<% if $password_max_failed_attempts_before_account_lock {-%>
 mms.password.maxFailedAttemptsBeforeAccountLock=<%= $password_max_failed_attempts_before_account_lock %>
+<% }-%>
+<% if $password_min_changes_before_reuse {-%>
 mms.password.minChangesBeforeReuse=<%= $password_min_changes_before_reuse %>
+<% }-%>
+<% if $user_bypass_invite_for_existing_users {-%>
 mms.user.bypassInviteForExistingUsers=<%= $user_bypass_invite_for_existing_users %>
+<% }-%>
+<% if $user_invitation_only {-%>
 mms.user.invitationOnly=<%= $user_invitation_only %>
+<% }-%>
 <% } -%>
 <% 'com.xgen.svc.mms.svc.user.UserSvcLdap': {-%>
 mms.ldap.bindDn=<%= $ldap_bind_dn %>
@@ -38,24 +50,58 @@ mms.ldap.url=<%= $ldap_url_host %>:<%= $ldap_url_port %>
 mms.ldap.user.group=<%= $ldap_user_group %>
 mms.ldap.user.searchAttribute=<%= $ldap_user_search_attribute %>
 # Please use!
+<% if $auth_ssl_ca_file {-%>
 mms.ldap.ssl.CAFile=<%= $auth_ssl_ca_file  %>
+<% }-%>
+<% if $auth_ssl_pem_key_file {-%>
 mms.ldap.ssl.PEMKeyFile=<%= $auth_ssl_pem_key_file  %>
+<% }-%>
+<% if $auth_ssl_pem_key_file_passwd {-%>
 mms.ldap.ssl.PEMKeyFilePassword=<%= $auth_ssl_pem_key_file_passwd  %>
+<% }-%>
 # Optional
+<% if $global_automation_admin {-%>
 mms.ldap.global.role.automationAdmin=<%= $global_automation_admin  %>
+<% }-%>
+<% if $global_backup_admin {-%>
 mms.ldap.global.role.backupAdmin=<%= $global_backup_admin  %>
+<% }-%>
+<% if $global_monitoring_admin {-%>
 mms.ldap.global.role.monitoringAdmin=<%= $global_monitoring_admin  %>
+<% }-%>
+<% if $ {-%>
 mms.ldap.global.role.readOnly=<%= $global_read_only  %>
+<% }-%>
+<% if $global_read_only {-%>
 mms.ldap.global.role.userAdmin=<%= $global_user_admin  %>
+<% }-%>
+<% if $ldap_group_base_dn {-%>
 mms.ldap.group.baseDn=<%= $ldap_group_base_dn  %>
+<% }-%>
+<% if $ldap_group_member {-%>
 mms.ldap.group.member=<%= $ldap_group_member  %>
+<% }-%>
+<% if $ldap_group_seperator {-%>
 mms.ldap.group.separator=<%= $ldap_group_seperator  %>
+<% }-%>
+<% if $ldap_referral {-%>
 mms.ldap.referral=<%= $ldap_referral  %>
+<% }-%>
+<% if $ldap_user_base_dn {-%>
 mms.ldap.user.baseDn=<%= $ldap_user_base_dn  %>
+<% }-%>
+<% if $ldap_user_email {-%>
 mms.ldap.user.email=<%= $ldap_user_email  %>
+<% }-%>
+<% if $ldap_user_firstname {-%>
 mms.ldap.user.firstName=<%= $ldap_user_firstname  %>
+<% }-%>
+<% if $ldap_user_lastname {-%>
 mms.ldap.user.lastName=<%= $ldap_user_lastname  %>
+<% }-%>
+<% if $device_notification {-%>
 mms.login.newDeviceNotification.enabled=<%= $device_notification  %>
+<% }-%>
 <% }-%>
 <% 'com.xgen.svc.mms.svc.user.UserSvcSaml': {-%>
 mms.saml.idp.uri=<%= $test  %>
