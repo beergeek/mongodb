@@ -138,7 +138,6 @@ class mongodb::ops_manager (
       'REQUIRED']                                 $mfa_level,
   Boolean                                         $mfa_allow_reset,
   Optional[String[1]]                             $mfa_issuer,
-  Boolean                                         $mfa_require,
 ) {
 
   unless is_email_address($admin_email_addr) {
@@ -312,7 +311,6 @@ class mongodb::ops_manager (
       mfa_level                                        => $mfa_level,
       mfa_allow_reset                                  => $mfa_allow_reset,
       mfa_issuer                                       => $mfa_issuer,
-      mfa_require                                      => $mfa_require,
     }),
     require => Package['mongodb_mms_pkg'],
   }

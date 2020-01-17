@@ -81,5 +81,4 @@ mms.saml.group.member=<%= $test  %>
 mms.multiFactorAuth.level=<%= $mfa_level %>
 mms.multiFactorAuth.allowReset=<%= $mfa_allow_reset %>
 mms.multiFactorAuth.issuer=<%= $mfa_issuer %>
-mms.multiFactorAuth.require=<%= $mfa_require %>
 
