@@ -319,7 +319,7 @@ class mongodb::ops_manager (
     if $ca_cert_content and $ca_cert_path  {
       # ensure_resources as this might be shared
       ensure_resources(
-        file { $ca_cert_path:
+        'file', $ca_cert_path => {
           ensure  => file,
           mode    => '0644',
           content => $ca_cert_content,
