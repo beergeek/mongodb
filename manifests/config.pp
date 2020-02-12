@@ -140,7 +140,7 @@ define mongodb::config (
       seluser => 'system_u',
     }
 
-    if $enable_ldap_authn {
+    if $enable_ldap_authn or $enable_ldap_authz {
       selboolean { 'authlogin_nsswitch_use_ldap':
         persistent => true,
         value      => 1,
