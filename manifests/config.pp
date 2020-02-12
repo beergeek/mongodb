@@ -141,7 +141,7 @@ define mongodb::config (
     }
 
     if $enable_ldap_authn or $enable_ldap_authz {
-      if !declared(Selboolean['authlogin_nsswitch_use_ldap']) {
+      if !defined(Selboolean['authlogin_nsswitch_use_ldap']) {
         selboolean { 'authlogin_nsswitch_use_ldap':
           persistent => true,
           value      => 1,
