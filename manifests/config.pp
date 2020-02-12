@@ -140,6 +140,13 @@ define mongodb::config (
       seluser => 'system_u',
     }
 
+    if $enable_ldap_authn {
+      selboolean { 'authlogin_nsswitch_use_ldap':
+        persistent => true,
+        value      => 1,
+      }
+    }
+
     selinux::fcontext { "set-${db_data_path}-context":
       ensure   => present,
       seltype  => 'mongod_var_lib_t',
