@@ -17,7 +17,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Facts
     }
 
     if response = @transport.call('/api/public/v1.0')
-      result = items.first
+      result = response
     else
       Puppet.warning("Did not receive device details. REST requires token access and whitelisting.")
       return facts
