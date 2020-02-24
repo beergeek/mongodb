@@ -6,6 +6,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
   attr_reader :connection
 
   def initialize(url, _options = {})
+    Puppet.info url
     require 'faraday'
     @connection = Faraday.new(url: url, ssl: { verify: false })
   end
