@@ -7,11 +7,6 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Facts
   end
 
   def retrieve
-    facts = {}
-    facts.merge(parse_device_facts)
-  end
-
-  def parse_device_facts
     facts = {
       'operatingsystem' => 'mongodb_om'
     }
