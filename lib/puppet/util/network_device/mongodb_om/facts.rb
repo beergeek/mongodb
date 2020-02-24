@@ -14,9 +14,9 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Facts
     if response = @transport.call('/api/public/v1.0')
       Puppet.debug response
       result = response
-      if result.has_key?('error') {
+      if result.has_key?('error')
         Puppet.error result
-      }
+      end
     else
       Puppet.warning("Did not receive device details. REST requires token access and whitelisting.")
       return facts
