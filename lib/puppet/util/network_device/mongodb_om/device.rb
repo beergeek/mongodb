@@ -12,7 +12,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Device
       self,
       "puppet/util/network_device/transport"
     )
-    autoloader_params = ['f5']
+    autoloader_params = ['Mongodb_om']
     # As of Puppet 6.0, environment is a required autoloader parameter: (PUP-8696)
     if Gem::Version.new(Puppet.version) >= Gem::Version.new('6.0.0')
       autoloader_params << Puppet.lookup(:current_environment)
