@@ -18,6 +18,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Device
       autoloader_params << Puppet.lookup(:current_environment)
     end
     if @autoloader.load(*autoloader_params)
+      Puppet.debug url
       @transport = Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(url,options[:debug])
     end
   end
