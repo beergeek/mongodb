@@ -8,6 +8,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Device
   attr_accessor :url, :transport
 
   def initialize(url, options = {})
+    Puppet.info url
     @autoloader = Puppet::Util::Autoload.new(
       self,
       "puppet/util/network_device/transport"
@@ -18,7 +19,6 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Device
       autoloader_params << Puppet.lookup(:current_environment)
     end
     if @autoloader.load(*autoloader_params)
-      Puppet.debug url
       @transport = Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(url,options[:debug])
     end
   end
