@@ -16,7 +16,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Facts
       'operatingsystem' => 'mongodb_om'
     }
 
-    if response = @transport.call('/api/public/v1.0') and items = response['items']
+    if response = @transport.call('/api/public/v1.0')
       result = items.first
     else
       Puppet.warning("Did not receive device details. REST requires token access and whitelisting.")
