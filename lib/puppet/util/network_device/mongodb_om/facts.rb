@@ -23,7 +23,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Facts
       return facts
     end
 
-    facts['app_name']               = result['appName']
+    facts['app_name'] = result['appName']
     return facts
   end
 end
