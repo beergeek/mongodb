@@ -12,7 +12,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     require 'httpclient'
     @connection = HTTPClient.new
     @connection.ssl_config.set_trust_ca(config[:cacert])
-    @connection.set_auth(config[:url], config[:username], confiog[:password])
+    @connection.set_auth(config[:url], config[:username], config[:password])
   end
 
   def call(url, args={})
