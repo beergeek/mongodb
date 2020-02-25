@@ -7,9 +7,9 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
 
   def initialize(config, _options = {})
     @config = config
-    Puppet.info config[:url]
-    Puppet.info config[:username]
-    Puppet.info config[:cacert]
+    Puppet.debug "URL: #{config[:url]}"
+    Puppet.debug "Username: #{config[:username]}"
+    Puppet.debug "CA Cert: #{config[:cacert]}"
     require 'httpclient'
     @connection = HTTPClient.new
     @connection.ssl_config.set_trust_ca(config[:cacert])
