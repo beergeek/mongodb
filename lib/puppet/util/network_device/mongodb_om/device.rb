@@ -9,11 +9,11 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Device
 
   def initialize(url, options = {})
     Puppet.info url
-    if url_or_config.is_a? String
-      url = URI.parse(url_or_config)
-      raise "Unexpected url '#{url_or_config}' found. Only file:/// URLs for configuration supported at the moment." unless url.scheme == 'file'
-      raise "Trying to load config from '#{url.path}, but file does not exist." if url && !File.exist?(url.path)
-      config = self.class.deep_symbolize(Hocon.load(url.path, syntax: Hocon::ConfigSyntax::HOCON) || {})
+    if url.is_a? String
+      url_data = URI.parse(url)
+      raise "Unexpected url '#{url}' found. Only file:/// URLs for configuration supported at the moment." unless url_data.scheme == 'file'
+      raise "Trying to load config from '#{url_data.path}, but file does not exist." if url_data && !File.exist?(url_data.path)
+      config = self.class.deep_symbolize(Hocon.load(url_data.path, syntax: Hocon::ConfigSyntax::HOCON) || {})
     end
     username = File.open(config[:username])
     Puppet.info username
