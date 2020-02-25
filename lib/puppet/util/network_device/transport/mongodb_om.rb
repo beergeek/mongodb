@@ -16,7 +16,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
   end
 
   def call(url, args={})
-    result = connection.get(@config[:url] + '/' + uri, args)
+    result = connection.get(config[:url] + uri, args)
     JSON.parse(result.body)
   rescue JSON::ParserError
     # This should be better at handling errors
