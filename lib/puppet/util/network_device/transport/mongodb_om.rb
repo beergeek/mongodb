@@ -5,18 +5,18 @@ require 'puppet/util/network_device/transport/base'
 class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::NetworkDevice::Transport::Base
   attr_reader :connection
 
-  def initialize(config, _options = {})
+  def initialize(@config, _options = {})
     Puppet.info config[:url]
     Puppet.info config[:username]
     Puppet.info config[:cacert]
     require 'httpclient'
     @connection = HTTPClient.new
     @connection.ssl_config.set_trust_ca(config[:cacert])
-    @connection.set_auth(config[:url], config[:username], config[:password])
+    @connection.set_auth(@config[:url], @config[:username], @config[:password])
   end
 
   def call(url, args={})
-    result = connection.get(url, args)
+    result = connection.get(@config[:url] + '/' + uri, args)
     JSON.parse(result.body)
   rescue JSON::ParserError
     # This should be better at handling errors
