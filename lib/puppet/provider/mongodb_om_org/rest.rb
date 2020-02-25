@@ -22,6 +22,7 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
 
   def self.prefetch(resources)
     orgs = instances
+    Puppet.info instances
     resources.keys.each do |name|
       if provider = orgs.find { |org| org.name == name }
         resources[name].provider = provider

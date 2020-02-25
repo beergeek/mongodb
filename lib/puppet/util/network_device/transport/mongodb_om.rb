@@ -30,10 +30,10 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     end
   end
 
-  def post(url, json)
+  def post(uri, json)
     if valid_json?(json)
       result = connection.post do |req|
-        req.url url
+        req.url @config[:url] + uri
         req.headers['Content-Type'] = 'application/json'
         req.body = json
       end
@@ -44,7 +44,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     end
   end
 
-  def put(url, json)
+  def put(uri, json)
     if valid_json?(json)
       result = connection.put do |req|
         req.url url
@@ -58,7 +58,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     end
   end
 
-  def delete(url)
+  def delete(uri)
     result = connection.delete(url)
     failure?(result)
     return result
