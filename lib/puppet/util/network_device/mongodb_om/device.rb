@@ -1,4 +1,6 @@
 require 'puppet/util/network_device/base'
+require 'hocon'
+require 'hocon/config_syntax'
 require File.join(File.dirname(__FILE__), '../mongodb_om')
 require File.join(File.dirname(__FILE__), '../mongodb_om/facts')
 require File.join(File.dirname(__FILE__), '../transport/mongodb_om')
