@@ -1,14 +1,20 @@
 require 'puppet/util/network_device'
 require 'puppet/util/network_device/transport'
 require 'puppet/util/network_device/transport/base'
+require File.join(File.dirname(__FILE__), 'digest_auth.rb')
 
 class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::NetworkDevice::Transport::Base
   attr_reader :connection
 
   def initialize(url, _options = {})
     Puppet.info url
-    require 'faraday'
-    @connection = Faraday.new(url: url, ssl: { verify: false })
+    Puppet.info username
+    Puppet.info 
+    require 'httpclient'
+    clnt = HTTPClient.new
+    clnt.ssl_config.set_trust_ca('ca.pem')
+    clnt.set_auth('https://mongod0.mongodb.local:8443', user, password)
+    clnt.get('https://mongod0.mongodb.local:8443/api/public/v1.0').status
   end
 
   def call(url, args={})
