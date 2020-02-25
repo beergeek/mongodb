@@ -12,7 +12,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Facts
     }
 
     if response = @transport.call('/api/public/v1.0')
-      Puppet.debug "MongoDB Ops Manager Facts: #{response}"
+      Puppet.debug "MongoDB Ops Manager facts dump: #{response}"
       result = response
       if result.has_key?('error')
         Puppet.err result
@@ -23,6 +23,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Facts
     end
 
     facts['app_name'] = result['appName']
+    Puppet.debug "MongoDB Ops Manager facts: #{facts}"
     return facts
   end
 end
