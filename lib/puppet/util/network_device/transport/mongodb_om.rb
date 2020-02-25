@@ -6,15 +6,14 @@ require File.join(File.dirname(__FILE__), 'digest_auth.rb')
 class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::NetworkDevice::Transport::Base
   attr_reader :connection
 
-  def initialize(url, _options = {})
-    Puppet.info url
-    Puppet.info username
-    Puppet.info cacert
+  def initialize(config, _options = {})
+    Puppet.info config[:url]
+    Puppet.info config[:username]
+    Puppet.info config[:cacert]
     require 'httpclient'
-    @clnt = HTTPClient.new
-    @clnt.ssl_config.set_trust_ca(cacert)
-    #clnt.set_auth('https://mongod0.mongodb.local:8443', user, password)
-    #clnt.get('https://mongod0.mongodb.local:8443/api/public/v1.0').status
+    @connection = HTTPClient.new
+    @connection.ssl_config.set_trust_ca(config[:cacert])
+    @connection.set_auth('https://mongod0.mongodb.local:8443', config[:username], confiog[:password])
   end
 
   def call(url, args={})

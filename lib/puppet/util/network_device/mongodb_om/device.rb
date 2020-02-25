@@ -28,7 +28,7 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Device
       autoloader_params << Puppet.lookup(:current_environment)
     end
     if @autoloader.load(*autoloader_params)
-      @transport = Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(config[:url],options[:debug])
+      @transport = Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(config,options[:debug])
     end
   end
 
