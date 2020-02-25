@@ -17,49 +17,43 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
   end
 
   def call(uri, args={})
+    Puppet.info uri
     result = connection.get(@config[:url] + uri, args)
     JSON.parse(result.body)
   rescue JSON::ParserError
     # This should be better at handling errors
+    Puppet.err "There is a JSON error"
     return nil
   end
 
-  def failure?(result)
-    unless result.status == 200
+  def failure?(result, code_required)
+    unless result.status == code_required
       fail("REST failure: HTTP status code #{result.status} detected.  Body of failure is: #{result.body}")
     end
   end
 
-  def post(url, json)
+  def post(uri, json)
     if valid_json?(json)
-      result = connection.post do |req|
-        req.url url
-        req.headers['Content-Type'] = 'application/json'
-        req.body = json
-      end
-      failure?(result)
+      result = connection.post(@config[:url] + uri, json, {'Content-Type' => 'application/json'})
+      failure?(result, 201)
       return result
     else
       fail('Invalid JSON detected.')
     end
   end
 
-  def put(url, json)
+  def put(uri, json)
     if valid_json?(json)
-      result = connection.put do |req|
-        req.url url
-        req.headers['Content-Type'] = 'application/json'
-        req.body = json
-      end
-      failure?(result)
+      result = connection.put(@config[:url] + uri, json, {'Content-Type' => 'application/json'})
+      failure?(result, 201)
       return result
     else
       fail('Invalid JSON detected.')
     end
   end
 
-  def delete(url)
-    result = connection.delete(url)
+  def delete(uri)
+    result = connection.delete(@config[:url] + uri)
     failure?(result)
     return result
   end
