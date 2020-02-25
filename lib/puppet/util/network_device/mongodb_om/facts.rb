@@ -22,7 +22,8 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Facts
       return nil
     end
 
-    facts['app_name'] = result['appName']
+    facts['ops_manager_app_name'] = result['appName']
+    facts['ops_manager_build'] = result['build']
     Puppet.debug "MongoDB Ops Manager facts: #{facts}"
     return facts
   end
