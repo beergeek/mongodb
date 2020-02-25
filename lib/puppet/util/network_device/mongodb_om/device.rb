@@ -38,4 +38,11 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Device
     return @facts.retrieve
   end
 
+  # From https://stackoverflow.com/a/11788082/4918
+  def self.deep_symbolize(obj)
+    return obj.each_with_object({}) { |(k, v), memo| memo[k.to_sym] = deep_symbolize(v); } if obj.is_a? Hash
+    return obj.each_with_object([]) { |v, memo| memo << deep_symbolize(v); } if obj.is_a? Array
+    obj
+  end
+
 end
