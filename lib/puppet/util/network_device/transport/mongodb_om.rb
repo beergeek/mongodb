@@ -9,12 +9,12 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
   def initialize(url, _options = {})
     Puppet.info url
     Puppet.info username
-    Puppet.info 
+    Puppet.info cacert
     require 'httpclient'
-    clnt = HTTPClient.new
-    clnt.ssl_config.set_trust_ca('ca.pem')
-    clnt.set_auth('https://mongod0.mongodb.local:8443', user, password)
-    clnt.get('https://mongod0.mongodb.local:8443/api/public/v1.0').status
+    @clnt = HTTPClient.new
+    @clnt.ssl_config.set_trust_ca(cacert)
+    #clnt.set_auth('https://mongod0.mongodb.local:8443', user, password)
+    #clnt.get('https://mongod0.mongodb.local:8443/api/public/v1.0').status
   end
 
   def call(url, args={})

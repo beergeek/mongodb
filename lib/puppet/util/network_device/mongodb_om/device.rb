@@ -9,6 +9,14 @@ class Puppet::Util::NetworkDevice::Mongodb_om::Device
 
   def initialize(url, options = {})
     Puppet.info url
+    if url_or_config.is_a? String
+      url = URI.parse(url_or_config)
+      raise "Unexpected url '#{url_or_config}' found. Only file:/// URLs for configuration supported at the moment." unless url.scheme == 'file'
+      raise "Trying to load config from '#{url.path}, but file does not exist." if url && !File.exist?(url.path)
+      config = self.class.deep_symbolize(Hocon.load(url.path, syntax: Hocon::ConfigSyntax::HOCON) || {})
+    end
+    username = File.open(config[:username])
+    Puppet.info username
     @autoloader = Puppet::Util::Autoload.new(
       self,
       "puppet/util/network_device/transport"
