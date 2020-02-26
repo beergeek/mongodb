@@ -28,7 +28,7 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
 
   def self.call_items(url,args={'expandSubcollections'=>'true'})
     if call = transport.call(url,args)
-      call['items']
+      call
     else
       nil
     end
