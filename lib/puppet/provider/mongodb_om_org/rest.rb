@@ -15,7 +15,7 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
       ldap_readonly = nil
       if !org['ldapGroupMappings'].empty?
         org['ldapGroupMappings'].each do |ldap_hash|
-          case roleName
+          case ldap_hash['roleName']
           when 'ORG_OWNER'
             ldap_owners = ldap_hash['ldapGroups']
           when 'ORG_MEMBER'
