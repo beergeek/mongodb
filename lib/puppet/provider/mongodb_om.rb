@@ -14,7 +14,7 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
     else
       #we are in `puppet resource`
       # fix this!!
-      Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(config)
+      fail "Please use `puppet device --target <TARGET_NAME> --resourse <RESOURCE_TYPE>`"
     end
   end
 
