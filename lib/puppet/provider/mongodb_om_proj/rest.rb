@@ -7,14 +7,14 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
     instances = []
     projs = Puppet::Provider::Mongodb_om.call_items('/api/public/v1.0/groups')
     Puppet.debug "Data: #{projs}"
-    return [] if orgs.nil?
+    return [] if projs.nil?
 
     projs['results'].each do |proj|
       ldap_owners = nil
       ldap_member = nil
       ldap_readonly = nil
-      if !org['ldapGroupMappings'].empty?
-        org['ldapGroupMappings'].each do |ldap_hash|
+      if !proj['ldapGroupMappings'].empty?
+        proj['ldapGroupMappings'].each do |ldap_hash|
           case ldap_hash['roleName']
           when 'ORG_OWNER'
             ldap_owners = ldap_hash['ldapGroups']
@@ -89,7 +89,7 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
   end
 
   def destroy
-    # need to get the ID of the Org before we can delete!
+    # need to get the ID of the Project before we can delete!
     result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/groups/#{@property_hash[:id]}")
 
     return result
