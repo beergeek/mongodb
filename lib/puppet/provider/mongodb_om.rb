@@ -13,15 +13,8 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
       Puppet::Util::NetworkDevice.current.transport
     else
       #we are in `puppet resource`
-      require 'hocon'
-      require 'hocon/config_syntax'
-      if Facter.value(:url).is_a? String
-        url_data = URI.parse(Facter.value(:url))
-        raise "Unexpected url '#{url}' found. Only file:/// URLs for configuration supported at the moment." unless url_data.scheme == 'file'
-        raise "Trying to load config from '#{url_data.path}, but file does not exist." if url_data && !File.exist?(url_data.path)
-        config = deep_symbolize(Hocon.load(url_data.path, syntax: Hocon::ConfigSyntax::HOCON) || {})
-      end
-      Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(config)
+      Puppet::Util::NetworkDevice::Mongodb_om::Device.new(Facter.value(:url))
+      #Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(config)
     end
   end
 
@@ -87,7 +80,7 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
   end
 
   # From https://stackoverflow.com/a/11788082/4918
-  def deep_symbolize(obj)
+  def self.deep_symbolize(obj)
     return obj.each_with_object({}) { |(k, v), memo| memo[k.to_sym] = deep_symbolize(v); } if obj.is_a? Hash
     return obj.each_with_object([]) { |v, memo| memo << deep_symbolize(v); } if obj.is_a? Array
     obj
