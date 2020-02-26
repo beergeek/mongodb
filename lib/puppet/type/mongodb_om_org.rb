@@ -22,4 +22,28 @@ Puppet::Type.newtype(:mongodb_om_org) do
     end
   end 
 
+  newproperty(:ldap_owner_group, :array_matching => :all) do
+    desc "This is the LDAP group that will be owner of the Organisation"
+
+    validate do |value|
+      fail ArgumentError, "#{ldap_owner_group} must be a String" unless value.is_a?(String)
+    end
+  end 
+
+  newproperty(:ldap_member_group, :array_matching => :all) do
+    desc "This is the LDAP group that will be member of the Organisation"
+
+    validate do |value|
+      fail ArgumentError, "#{ldap_member_group} must be a String" unless value.is_a?(String)
+    end
+  end 
+
+  newproperty(:ldap_read_only, :array_matching => :all) do
+    desc "This is the LDAP group that will be read only group of the Organisation"
+
+    validate do |value|
+      fail ArgumentError, "#{ldap_read_only} must be a String" unless value.is_a?(String)
+    end
+  end 
+
 end
