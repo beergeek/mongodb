@@ -9,7 +9,7 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
     Puppet.debug "Data: #{projs}"
     return [] if projs.nil?
 
-    projs['results'].each do |proj|
+    projs.each do |proj|
       ldap_owners = nil
       ldap_member = nil
       ldap_readonly = nil
