@@ -13,7 +13,13 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
       Puppet::Util::NetworkDevice.current.transport
     else
       #we are in `puppet resource`
-      Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(Facter.value(:url))
+      if Facter.value(:url).is_a? String
+        url_data = URI.parse(Facter.value(:url))
+        raise "Unexpected url '#{url}' found. Only file:/// URLs for configuration supported at the moment." unless url_data.scheme == 'file'
+        raise "Trying to load config from '#{url_data.path}, but file does not exist." if url_data && !File.exist?(url_data.path)
+        config = self.class.deep_symbolize(Hocon.load(url_data.path, syntax: Hocon::ConfigSyntax::HOCON) || {})
+      end
+      Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(config)
     end
   end
 
