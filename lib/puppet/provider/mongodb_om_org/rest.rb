@@ -85,7 +85,6 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
   def create
     cleaned_hash = clean_hash(resource.to_hash)
     result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/orgs", make_ldap_array(cleaned_hash).to_json)
-    @property_hash.clear
 
     return result
   end
@@ -93,7 +92,6 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
   def destroy
     # need to get the ID of the Org before we can delete!
     result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/orgs/#{resource.id]}")
-    @property_hash.clear
 
     return result
   end
