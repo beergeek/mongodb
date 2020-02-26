@@ -1,15 +1,15 @@
 require File.join(File.dirname(__FILE__), '../mongodb_om')
 require 'json'
 
-Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mongodb_om) do
+Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mongodb_om) do
 
   def self.instances
     instances = []
-    orgs = Puppet::Provider::Mongodb_om.call_items('/api/public/v1.0/orgs')
-    Puppet.debug "Data: #{orgs}"
+    projs = Puppet::Provider::Mongodb_om.call_items('/api/public/v1.0/groups')
+    Puppet.debug "Data: #{projs}"
     return [] if orgs.nil?
 
-    orgs['results'].each do |org|
+    projs['results'].each do |proj|
       ldap_owners = nil
       ldap_member = nil
       ldap_readonly = nil
@@ -28,8 +28,8 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
 
       instances << new(
         ensure:              :present,
-        name:                org['name'],
-        id:                  org['id'],
+        name:                proj['name'],
+        id:                  proj['id'],
         ldap_owner_group:   ldap_owners,
         ldap_member_group:  ldap_member,
         ldap_read_only:     ldap_readonly,
@@ -40,9 +40,9 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
   end
 
   def self.prefetch(resources)
-    orgs = instances
+    projs = instances
     resources.keys.each do |name|
-      if provider = orgs.find { |org| org.name == name }
+      if provider = projs.find { |proj| proj.name == name }
         resources[name].provider = provider
         resources[name].id = name[:id]
       end
@@ -83,14 +83,14 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
 
   def create
     cleaned_hash = clean_hash(resource.to_hash)
-    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/orgs", make_ldap_array(cleaned_hash).to_json)
+    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/groups", make_ldap_array(cleaned_hash).to_json)
 
     return result
   end
 
   def destroy
     # need to get the ID of the Org before we can delete!
-    result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/orgs/#{@property_hash[:id]}")
+    result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/groups/#{@property_hash[:id]}")
 
     return result
   end
