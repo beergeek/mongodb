@@ -6,7 +6,7 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
   def self.instances
     instances = []
     orgs = Puppet::Provider::Mongodb_om.call_items('/api/public/v1.0/orgs')
-    Puppet.info "Data: #{orgs}"
+    Puppet.debug "Data: #{orgs}"
     return [] if orgs.nil?
 
     orgs['results'].each do |org|

@@ -15,7 +15,7 @@ Puppet::Type.newtype(:mongodb_om_org) do
 
   end
 
-  newparam(:id) do
+  newproperty(:id) do
     desc "The read-only ID of the Organisation"
     validate do |val|
       fail "id is read-only"

@@ -46,14 +46,6 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
     transport.delete(url)
   end
 
-  def self.find_availability(string)
-    transport.find_availability(string)
-  end
-
-  def self.find_monitors(string)
-    transport.find_monitors(string)
-  end
-
   def self.integer?(str)
     !!Integer(str)
   rescue ArgumentError, TypeError
@@ -77,12 +69,5 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
     hash.each do |k, v|
       hash[k] = Integer(v) if self.class.integer?(v)
     end
-  end
-
-  # From https://stackoverflow.com/a/11788082/4918
-  def self.deep_symbolize(obj)
-    return obj.each_with_object({}) { |(k, v), memo| memo[k.to_sym] = deep_symbolize(v); } if obj.is_a? Hash
-    return obj.each_with_object([]) { |v, memo| memo << deep_symbolize(v); } if obj.is_a? Array
-    obj
   end
 end
