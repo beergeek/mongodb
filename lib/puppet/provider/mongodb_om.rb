@@ -13,7 +13,7 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
       Puppet::Util::NetworkDevice.current.transport
     else
       #we are in `puppet resource`
-      device(Facter.value(:url))
+      # fix this!!
       Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(config)
     end
   end
