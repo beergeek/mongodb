@@ -19,7 +19,7 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
         url_data = URI.parse(Facter.value(:url))
         raise "Unexpected url '#{url}' found. Only file:/// URLs for configuration supported at the moment." unless url_data.scheme == 'file'
         raise "Trying to load config from '#{url_data.path}, but file does not exist." if url_data && !File.exist?(url_data.path)
-        config = self.class.deep_symbolize(Hocon.load(url_data.path, syntax: Hocon::ConfigSyntax::HOCON) || {})
+        config = deep_symbolize(Hocon.load(url_data.path, syntax: Hocon::ConfigSyntax::HOCON) || {})
       end
       Puppet::Util::NetworkDevice::Transport::Mongodb_om.new(config)
     end
@@ -87,7 +87,7 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
   end
 
   # From https://stackoverflow.com/a/11788082/4918
-  def self.deep_symbolize(obj)
+  def deep_symbolize(obj)
     return obj.each_with_object({}) { |(k, v), memo| memo[k.to_sym] = deep_symbolize(v); } if obj.is_a? Hash
     return obj.each_with_object([]) { |v, memo| memo << deep_symbolize(v); } if obj.is_a? Array
     obj
