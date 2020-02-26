@@ -53,7 +53,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
   end
 
   def delete(uri)
-    result = connection.delete(url)
+    result = connection.delete(@config[:url] + uri)
     failure?(result)
     return result
   end

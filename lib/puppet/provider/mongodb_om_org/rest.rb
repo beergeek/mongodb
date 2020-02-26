@@ -48,40 +48,54 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
     end
   end
 
+  def make_ldap_array(data_body)
+    ldap_array = []
+
+    if data_body.has_key?(:ldap_owner_group)
+      ldap_array << {'ldapGroups' => data_body[:ldap_owner_group], 'roleName' => 'ORG_OWNER'}
+      data_body.delete(:ldap_owner_group)
+    end
+    if data_body.has_key?(:ldap_member_group)
+      ldap_array << {'ldapGroups' => data_body[:ldap_member_group], 'roleName' => 'ORG_MEMBER'}
+      data_body.delete(:ldap_member_group)
+    end
+    if data_body.has_key?(:ldap_read_only)
+      ldap_array << {'ldapGroups' => data_body[:ldap_read_only], 'roleName' => 'ORG_READ_ONLY'}
+      data_body.delete(:ldap_read_only)
+    end
+    data_body['ldapGroupMappings'] = ldap_array
+
+    return data_body
+  end
+
+  def clean_hash(unclean_hash)
+    unclean_hash.delete(:provider)
+    unclean_hash.delete(:loglevel)
+    unclean_hash.delete(:ensure)
+    return unclean_hash
+  end
+
+
   def exists?
     @property_hash[:ensure] == :present
   end
 
+  # No flushing/updating because we cannot change things once set (except name)
+
   def create
-    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/orgs", make_ldap_group(resource).to_json)
+    cleaned_hash = clean_hash(resource.to_hash)
+    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/orgs", make_ldap_array(cleaned_hash).to_json)
+    @property_hash.clear
 
     return result
   end
 
   def destroy
-    result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/orgs/#{resource[:id]}")
+    # need to get the ID of the Org before we can delete!
+    result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/orgs/#{resource.id]}")
+    @property_hash.clear
 
     return result
-  end
-
-  def make_ldap_array(data_body)
-    ldap_array = []
-
-    if data_body.has_key?('ldap_owner_group')
-      ldap_array << {'ldapGroups' => data_body['ldap_owner_group'], 'roleName' => 'ORG_OWNER'}
-      data_body.delete('ldap_owner_group')
-    end
-    if data_body.has_key?('ldap_member_group')
-      ldap_array << {'ldapGroups' => data_body['ldap_member_group'], 'roleName' => 'ORG_MEMBER'}
-      data_body.delete('ldap_member_group')
-    end
-    if data_body.has_key?('ldap_read_only')
-      ldap_array << {'ldapGroups' => data_body['ldap_read_only'], 'roleName' => 'ORG_READ_ONLY'}
-      data_body.delete('ldap_read_only')
-    end
-    data_body['ldapGroupMappings'] = ldap_array
-
-    return data_body
   end
 
   mk_resource_methods
