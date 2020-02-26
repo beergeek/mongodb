@@ -13,6 +13,8 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
       Puppet::Util::NetworkDevice.current.transport
     else
       #we are in `puppet resource`
+      require 'hocon'
+      require 'hocon/config_syntax'
       if Facter.value(:url).is_a? String
         url_data = URI.parse(Facter.value(:url))
         raise "Unexpected url '#{url}' found. Only file:/// URLs for configuration supported at the moment." unless url_data.scheme == 'file'
