@@ -10,6 +10,7 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
     return [] if orgs.nil?
 
     orgs['results'].each do |org|
+      Puppet.info org
 
       instances << new(
         ensure:          :present,
