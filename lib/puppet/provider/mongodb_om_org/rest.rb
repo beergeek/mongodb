@@ -35,13 +35,13 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
   end
 
   def create
-    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/org", resource)
+    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/orgs", {'name' => resource.name}.to_json)
 
     return result
   end
 
   def destroy
-    result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/org/#{resource[:id]}")
+    result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/orgs/#{resource[:id]}")
 
     return result
   end

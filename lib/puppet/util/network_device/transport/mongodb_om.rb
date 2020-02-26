@@ -29,20 +29,16 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     return nil
   end
 
-  def failure?(result)
-    unless result.status == 200
+  def failure?(result, code_required)
+    unless result.status == code_required
       fail("REST failure: HTTP status code #{result.status} detected.  Body of failure is: #{result.body}")
     end
   end
 
   def post(uri, json)
     if valid_json?(json)
-      result = connection.post do |req|
-        req.url @config[:url] + uri
-        req.headers['Content-Type'] = 'application/json'
-        req.body = json
-      end
-      failure?(result)
+      result = connection.post(@config[:url] + uri, json, {'Content-Type' => 'application/json'})
+      failure?(result, 201)
       return result
     else
       fail('Invalid JSON detected.')
@@ -51,12 +47,8 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
 
   def put(uri, json)
     if valid_json?(json)
-      result = connection.put do |req|
-        req.url url
-        req.headers['Content-Type'] = 'application/json'
-        req.body = json
-      end
-      failure?(result)
+      result = connection.put(@config[:url] + uri, json, {'Content-Type' => 'application/json'})
+      failure?(result, 201)
       return result
     else
       fail('Invalid JSON detected.')
