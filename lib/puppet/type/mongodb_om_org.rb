@@ -4,7 +4,7 @@ Puppet::Type.newtype(:mongodb_om_org) do
   apply_to_device
   ensurable
 
-  newproperty(:name) do
+  newparam(:name) do
     desc "The name of the Organisation"
 
     validate do |value|
