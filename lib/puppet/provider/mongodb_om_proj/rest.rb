@@ -9,18 +9,18 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
     Puppet.debug "Data: #{projs}"
     return [] if projs.nil?
 
-    projs.each do |proj|
+    projs['results'].each do |proj|
       ldap_owners = nil
       ldap_member = nil
       ldap_readonly = nil
       if !proj['ldapGroupMappings'].empty?
         proj['ldapGroupMappings'].each do |ldap_hash|
           case ldap_hash['roleName']
-          when 'ORG_OWNER'
+          when 'GROUP_OWNER'
             ldap_owners = ldap_hash['ldapGroups']
-          when 'ORG_MEMBER'
+          when 'GROUP_MEMBER'
             ldap_member = ldap_hash['ldapGroups']
-          when 'ORG_READ_ONLY'
+          when 'GROUP_READ_ONLY'
             ldap_readonly = ldap_hash['ldapGroups']
           end
         end
@@ -53,15 +53,15 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
     ldap_array = []
 
     if data_body.has_key?(:ldap_owner_group)
-      ldap_array << {'ldapGroups' => data_body[:ldap_owner_group], 'roleName' => 'ORG_OWNER'}
+      ldap_array << {'ldapGroups' => data_body[:ldap_owner_group], 'roleName' => 'GROUP_OWNER'}
       data_body.delete(:ldap_owner_group)
     end
     if data_body.has_key?(:ldap_member_group)
-      ldap_array << {'ldapGroups' => data_body[:ldap_member_group], 'roleName' => 'ORG_MEMBER'}
+      ldap_array << {'ldapGroups' => data_body[:ldap_member_group], 'roleName' => 'GROUP_MEMBER'}
       data_body.delete(:ldap_member_group)
     end
     if data_body.has_key?(:ldap_read_only)
-      ldap_array << {'ldapGroups' => data_body[:ldap_read_only], 'roleName' => 'ORG_READ_ONLY'}
+      ldap_array << {'ldapGroups' => data_body[:ldap_read_only], 'roleName' => 'GROUP_READ_ONLY'}
       data_body.delete(:ldap_read_only)
     end
     data_body['ldapGroupMappings'] = ldap_array
