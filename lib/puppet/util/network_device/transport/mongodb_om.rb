@@ -25,6 +25,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     JSON.parse(result.body)
   rescue JSON::ParserError
     # This should be better at handling errors
+    Puppet.err "There is a JSON error"
     return nil
   end
 
