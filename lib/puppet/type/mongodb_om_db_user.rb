@@ -4,16 +4,12 @@ Puppet::Type.newtype(:mongodb_om_db_user) do
   apply_to_device
   ensurable
 
-  newparam(:name, :parent => Puppet::Parameter::F5Name, :namevar => true)
-
-  newproperty(:description, :parent => Puppet::Property::F5Description)
-
-  newproperty(:configsync_ip) do
-    desc "configsync_ip"
+  newproperty(:name) do
+    desc "name"
   end
 
-  newproperty(:mirror_ip) do
-    desc "mirror_ip"
+  newproperty(:mobile) do
+    desc "mobile"
   end
 
 end
