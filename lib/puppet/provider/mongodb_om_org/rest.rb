@@ -10,7 +10,6 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
     return [] if orgs.nil?
 
     orgs['results'].each do |org|
-      Puppet.info org['id']
 
       instances << new(
         ensure:          :present,
@@ -24,7 +23,6 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
 
   def self.prefetch(resources)
     orgs = instances
-    Puppet.info instances
     resources.keys.each do |name|
       if provider = orgs.find { |org| org.name == name }
         resources[name].provider = provider
