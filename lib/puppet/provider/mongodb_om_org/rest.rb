@@ -53,7 +53,7 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
   end
 
   def create
-    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/orgs", {'name' => resource.name}.to_json)
+    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/orgs", make_ldap_group(resource).to_json)
 
     return result
   end
@@ -62,6 +62,26 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
     result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/orgs/#{resource[:id]}")
 
     return result
+  end
+
+  def make_ldap_array(data_body)
+    ldap_array = []
+
+    if data_body.has_key?('ldap_owner_group')
+      ldap_array << {'ldapGroups' => data_body['ldap_owner_group'], 'roleName' => 'ORG_OWNER'}
+      data_body.delete('ldap_owner_group')
+    end
+    if data_body.has_key?('ldap_member_group')
+      ldap_array << {'ldapGroups' => data_body['ldap_member_group'], 'roleName' => 'ORG_MEMBER'}
+      data_body.delete('ldap_member_group')
+    end
+    if data_body.has_key?('ldap_read_only')
+      ldap_array << {'ldapGroups' => data_body['ldap_read_only'], 'roleName' => 'ORG_READ_ONLY'}
+      data_body.delete('ldap_read_only')
+    end
+    data_body['ldapGroupMappings'] = ldap_array
+
+    return data_body
   end
 
   mk_resource_methods
