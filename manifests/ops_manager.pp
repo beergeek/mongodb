@@ -248,7 +248,7 @@ class mongodb::ops_manager (
   }
 
   package { 'mongodb_mms_pkg':
-    ensure   => present,
+    ensure   => latest,
     name     => $mms_package_name,
     source   => $mms_source,
     provider => $mms_provider,
