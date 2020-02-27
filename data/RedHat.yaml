@@ -39,7 +39,7 @@ mongodb::ops_manager::config_file_path: '/opt/mongodb/mms/conf/conf-mms.properti
 mongodb::ops_manager::gen_key_file_path: '/etc/mongodb-mms/gen.key' 
 mongodb::ops_manager::mms_package_name: 'mongodb-mms'
 mongodb::ops_manager::mms_provider: 'rpm'
-mongodb::ops_manager::mms_source: 'https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.0.14.50550.20190730T1612Z-1.x86_64.rpm'
+mongodb::ops_manager::mms_source: 'https://downloads.mongodb.com/on-prem-mms/rpm/mongodb-mms-4.2.8.56801.20200203T1802Z-1.x86_64.rpm'
 
 # BIC
 mongodb::bi_connecter::bic_schema_user_keytab_path: '/var/lib/mongosql/client.keytab'
