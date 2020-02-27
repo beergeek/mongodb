@@ -70,6 +70,8 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
   end
 
   def clean_hash(unclean_hash)
+    unclean_hash[:orgId] = unclean_hash[:org_id]
+    unclean_hash.delete(:org_id)
     unclean_hash.delete(:provider)
     unclean_hash.delete(:loglevel)
     unclean_hash.delete(:ensure)
