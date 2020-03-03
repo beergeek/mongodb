@@ -13,5 +13,5 @@ plan mongodb::deploy_rs (
     project_id      => $project_id
   })
 
-  notice($current_state)
+  return $current_state.first.result
 }
