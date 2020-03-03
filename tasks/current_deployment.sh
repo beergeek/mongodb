@@ -11,8 +11,6 @@ then
   CA_OPTION="--cacert ${CA_CERT_PATH}"
 fi
 
-echo $JSON_DATA > /tmp/bolt_mongodb_deploy
-
 set -x
 output=$(curl -u ${USERNAME}:${TOKEN} $CA_OPTION -X GET  -H "Content-Type: application/json" "${OPS_MANAGER_URL}/api/public/v1.0/groups/${PROJECT_ID}/automationConfig?pretty=true" --digest
 echo $output
