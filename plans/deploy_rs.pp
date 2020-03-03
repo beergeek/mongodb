@@ -13,5 +13,5 @@ plan mongodb::deploy_rs (
     project_id      => $project_id
   })
 
-  return $current_state.first.result
+  return $current_state.first.results
 }
