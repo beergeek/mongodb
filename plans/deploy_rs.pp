@@ -6,7 +6,7 @@ plan mongodb::deploy_rs (
   Optional[String[1]] $curl_ca_file_path = undef,
 ) {
 
-  $current_status = run_task('mongodb::current_deployment','localhost',{
+  $current_state = run_task('mongodb::current_deployment','localhost',{
     curl_token      => $curl_token,
     curl_username   => $curl_username,
     ops_manager_url => $ops_manager_url,
