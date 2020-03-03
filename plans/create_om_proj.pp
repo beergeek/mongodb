@@ -117,6 +117,6 @@ plan mongodb::create_om_proj (
     json_payload      => $proj_data_hash,
   })
 
-  return "Plan run success was: ${basic_config.ok}. Project ID: ${new_proj.first['id']}. mmsApiKey: ${new_pro.first['agentApiKey']}"
+  return "Plan run success was: ${basic_config.ok}. Project ID: ${new_proj.first['id']}. mmsApiKey: ${new_proj.first['agentApiKey']}"
 
 }
