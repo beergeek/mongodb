@@ -134,7 +134,7 @@ plan mongodb::deploy_rs (
   }
 
   # Create the replicaSets hash
-  $replica_sets_data = $replica_set_members.map() |$meber_fqdn, $member_data| {
+  $replica_sets_data = $replica_set_members.map() |$member_fqdn, $member_data| {
     $k = {
       '_id'          => $member_data['id'],
       'arbiterOnly'  => $member_data['arbitor'],
