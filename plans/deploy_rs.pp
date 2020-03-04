@@ -134,16 +134,16 @@ plan mongodb::deploy_rs (
   }
 
   # Create the replicaSets hash
-  $replica_sets_data = $replica_set_members.reduce({}) |$k, $member_data| {
-    $k + {
-      '_id'          => $member_data[1]['id'],
-      'arbiterOnly'  => $member_data[1]['arbitor'],
-      'buildIndexes' => $member_data[1]['build_indexes'],
-      'hidden'       => $member_data[1]['hidden'],
-      'host'         => $member_data[0],
-      'priority'     => $member_data[1]['priority'],
-      'slaveDelay'   => $member_data[1]['slave_delay'],
-      'votes'        => $member_data[1]['vote']
+  $replica_sets_data = $replica_set_members.map() |$meber_fqdn, $member_data| {
+    $k = {
+      '_id'          => $member_data['id'],
+      'arbiterOnly'  => $member_data['arbitor'],
+      'buildIndexes' => $member_data['build_indexes'],
+      'hidden'       => $member_data['hidden'],
+      'host'         => $member_fqdn,
+      'priority'     => $member_data['priority'],
+      'slaveDelay'   => $member_data['slave_delay'],
+      'votes'        => $member_data['vote']
     }
   }
 
