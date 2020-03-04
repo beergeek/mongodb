@@ -51,8 +51,11 @@ plan mongodb::deploy_rs (
 
   # we have to merge the defaults into each hash of the array.....
   # Try not to let your brain explode!
+  $_replica_set_members_data = $replica_set_members.reduce({}) |$k, $v| {
+    $k + {$v[0] => merge($_defaults, $replica_set_members[$v[0]])}
+  }
   # Create the processes hash
-  $_replica_set_members = $replica_set_members.reduce({}) |$k, $v| {
+  $_replica_set_members = $replica_set_members_data.reduce({}) |$k, $v| {
     $member_data = merge($_defaults + $v[1])
     $net_and_rep = {
       'net' => {
