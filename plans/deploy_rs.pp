@@ -140,7 +140,7 @@ plan mongodb::deploy_rs (
       'arbiterOnly'  => $member_data[1]['arbitor'],
       'buildIndexes' => $member_data[1]['build_indexes'],
       'hidden'       => $member_data[1]['hidden'],
-      'host'         => $member_fqdn[0],
+      'host'         => $member_data[0],
       'priority'     => $member_data[1]['priority'],
       'slaveDelay'   => $member_data[1]['slave_delay'],
       'votes'        => $member_data[1]['vote']
