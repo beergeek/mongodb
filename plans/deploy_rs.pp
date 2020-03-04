@@ -1,5 +1,5 @@
 plan mongodb::deploy_rs (
-  Array[Hash[
+  Hash[
     String[1],
     Struct[{
       id                      => Integer[0],
@@ -11,7 +11,7 @@ plan mongodb::deploy_rs (
       Optional[slave_delay]   => Integer[0],
       Optional[vote]          => Integer[0],
     }]
-  ]]                  $replica_set_members,
+  ]                   $replica_set_members,
   String[24]          $project_id,
   String[1]           $curl_token,
   String[1]           $curl_username,
