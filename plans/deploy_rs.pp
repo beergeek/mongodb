@@ -25,6 +25,11 @@ plan mongodb::deploy_rs (
   Optional[String[1]]                   $curl_ca_file_path       = undef,
   Optional[String[1]]                   $encryption_keyfile_path = undef,
   Optional[String[1]]                   $keytab_file_path        = undef,
+  Optional[String[1]]                   $kmip_key_id             = undef,
+  Optional[String[1]]                   $kmip_server             = undef,
+  Optional[Integer[1,65535]]            $kmip_port               = 5696,
+  Optional[String[1]]                   $kmip_client_cert_path   = $client_certificate_path,
+  Optional[String[1]]                   $kmip_ca_cert_path       = undef,
   String[1]                             $db_path                 = '/data/db',
   String[1]                             $log_file_path           = '/data/logs/mongodb.log',
   String[1]                             $mongodb_compat_version  = '4.2',
@@ -84,16 +89,19 @@ plan mongodb::deploy_rs (
     if $enable_encryption{
       if $kmip_server {
         $ear = {
-            'enableEncryption'          => true,
-            'kmipServerName'            => $kmip_server,
-            'kmipPort'                  => $kmip_port,
-            'kmipClientCertificateFile' => $kmip_client_cert_path,
-            'kmipServerCAFile'          => $kmip_ca_cert_path,
+            'enableEncryption'        => true,
+            'kmip'  => {
+              'keyIdentifier'         => $kmip_key_id,
+              'serverName'            => $kmip_server,
+              'port'                  => $kmip_port,
+              'clientCertificateFile' => $kmip_client_cert_path,
+              'serverCAFile'          => $kmip_ca_cert_path,
+            }
         }
       } else {
         $ear = {
-              'enableEncryption'        => true,
-              'encryptionKeyFile'       => $encryption_keyfile_path
+              'enableEncryption'      => true,
+              'encryptionKeyFile'     => $encryption_keyfile_path
         }
       }
     } else {
