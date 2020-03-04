@@ -1,0 +1,81 @@
+{
+  "processes" : [ {
+    <%- $replica_set_members.each |String $member_fqdn, Hash $member_data| { -%>
+    "args2_6" : {
+      "net" : {
+        <%- if $ssl_mode != 'none' { -%>
+        "ssl" : {
+          "PEMKeyFile" : "<%= $member_data['pem_file_path'] %>",
+          "mode" : "<%= $ssl_mode %>"
+        },
+        <%- } -%>
+        "bindIpAll" : true,
+        "port" : <%= $member_data['port'] %>
+      },
+      "replication" : {
+        "replSetName" : "<%= $replica_set_name %>"
+      },
+      "security" : {
+        "clusterAuth": "<%= $cluster_auth_type %>",
+        <%- if $cluster_auth_type == 'keyFile' {-%>
+        "keyFile": "<%= $auth_keyfile_path %>",
+        <%- } -%>
+        "enableEncryption" : <%= $enable_encryption %>,
+        "encryptionKeyFile" : "<%= $encryption_keyfile_path %>"
+      },
+      "storage" : {
+        "dbPath" : "<%= $db_path %>",
+        "directoryPerDB" : true,
+        "wiredTiger" : {
+          "collectionConfig" : { },
+          "engineConfig" : {
+            "directoryForIndexes" : true
+          },
+          "indexConfig" : { }
+        }
+      },
+      "systemLog" : {
+        "destination" : "file",
+        "path" : "<%= $log_file_path %>"
+      }
+    },
+    "authSchemaVersion" : 5,
+    "disabled" : false,
+    "featureCompatibilityVersion" : "<%= $mongodb_compat_version %>",
+    "hostname" : "<%= $member_fqdn %>",
+    <%- if $enable_kerberos { -%>
+    "kerberos" : {
+      "keytab" : "<%= $keytab_file_path %>"
+    },
+    <%- } -%>
+    "logRotate" : {
+      "sizeThresholdMB" : 1000.0,
+      "timeThresholdHrs" : 24
+    },
+    "manualMode" : false,
+    "name" : "<%= $member_fqdn %>",
+    "processType" : "mongod",
+    "version" : "<%= $mongodb_version %>"
+  }<% if $member_fqdn != $last_member { %>,<% } %>
+  <%- } -%>
+  ],
+  "replicaSets" : [ {
+    "_id" : "<%= $replica_set_name %>",
+    "members" : [
+    <%- $replica_set_members.each |String $member_fqdn, Hash $member_data| { -%>
+    {
+      "_id" : <%= $member_data['id'] %>,
+      "arbiterOnly" : <%= $member_data['arbitor'] %>,
+      "buildIndexes" : <%= $member_data['build_indexes'] %>,
+      "hidden" : <%= $member_data['hidden'] %>,
+      "host" : "<%= $member_fqdn %>",
+      "priority" : <%= $member_data['priority'] %>,
+      "slaveDelay" : <%= $member_data['slave_delay'] %>,
+      "votes" : <%= $member_data['vote'] %>
+    }<% if $member_fqdn != $last_member { %>,<% } %>
+    <%- } -%>
+    ],
+    "protocolVersion" : "1",
+    "settings" : { }
+  } ]
+}
