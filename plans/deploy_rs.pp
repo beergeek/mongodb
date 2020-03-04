@@ -55,7 +55,7 @@ plan mongodb::deploy_rs (
     $k + {$v[0] => merge($_defaults, $replica_set_members[$v[0]])}
   }
   # Create the processes hash
-  $_replica_set_members = $replica_set_members_data.reduce({}) |$k, $v| {
+  $_replica_set_members = $_replica_set_members_data.reduce({}) |$k, $v| {
     $member_data = merge($_defaults + $v[1])
     $net_and_rep = {
       'net' => {
@@ -137,7 +137,7 @@ plan mongodb::deploy_rs (
   }
 
   # Create the replicaSets hash
-  $replica_sets_data = $replica_set_members.map() |$member_fqdn, $member_data| {
+  $replica_sets_data = $_replica_set_members_data.map() |$member_fqdn, $member_data| {
     $k = {
       '_id'          => $member_data['id'],
       'arbiterOnly'  => $member_data['arbitor'],
