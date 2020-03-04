@@ -1,5 +1,5 @@
 plan mongodb::deploy_rs (
-  Hash[
+  Array[Hash[
     String[1],
     Struct[{
       id                      => Integer[0],
@@ -11,15 +11,13 @@ plan mongodb::deploy_rs (
       Optional[slave_delay]   => Integer[0],
       Optional[vote]          => Integer[0],
     }]
-  ]                   $replica_set_members,
+  ]]                  $replica_set_members,
   String[24]          $project_id,
   String[1]           $curl_token,
   String[1]           $curl_username,
   String[1]           $ops_manager_url,
   String[1]           $replica_set_name,
-  Array[String[1]]    $data_bearing_nodes,
   Optional[String[1]] $curl_ca_file_path       = undef,
-  Optional[String[1]] $arbitor_nodes           = undef,
   Boolean             $enable_encryption       = true,
   Boolean             $enable_kerberos         = true,
   Optional[String[1]] $encryption_keyfile_path = undef,
@@ -56,11 +54,18 @@ plan mongodb::deploy_rs (
   #  }
   #}
 
-  $_replica_set_members = $replica_set_members.reduce({}) |$current, $v| {
-    $current + {$v[0] => $_defaults + $replica_set_members[$v[0]]}
+  # we have to merge the defaults into each hash of the array.....
+  # Try not to let your brain explode!
+  $_replica_set_members = $replica_set_members.map |$v| {
+    $new = $v.reduce({}) |$x, $y| {
+      $x + {$y[0] => $_defaults + $y[1]}
+    }
+    $new
   }
 
-  $new_config = $current_state.first.value + epp('mongodb::new_rs', {$replica_set_members => $_replica_set_members})
+  $new_config = $current_state.first.value + epp('mongodb::new_rs.epp', {
+    replica_set_members => $_replica_set_members
+  })
 
   return $new_config
 }
