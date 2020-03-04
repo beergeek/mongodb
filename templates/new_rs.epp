@@ -56,7 +56,7 @@
     "name" : "<%= $member_fqdn %>",
     "processType" : "mongod",
     "version" : "<%= $mongodb_version %>"
-  }<% if $member_fqdn != $last_member { %>,<% } %>
+  }
   <%- } -%>
   ],
   "replicaSets" : [ {
