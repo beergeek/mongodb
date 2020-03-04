@@ -21,7 +21,7 @@ plan mongodb::deploy_rs (
   Boolean                               $enable_kerberos         = true,
   Enum['none','preferSSL','requireSSL'] $ssl_mode                = 'preferSSL',
   Enum['none','x509','keyFile']         $cluster_auth_type       = 'x509',
-  Optional[String[1]]                   $client_certificate_path = undef,
+  Optional[String[1]]                   $client_certificate_path = '/data/pki/server.pem',
   Optional[String[1]]                   $curl_ca_file_path       = undef,
   Optional[String[1]]                   $encryption_keyfile_path = undef,
   Optional[String[1]]                   $keytab_file_path        = undef,
@@ -60,36 +60,41 @@ plan mongodb::deploy_rs (
     $net_and_rep = {
       'net' => {
         'ssl' => {
-          'PEMKeyFile' => "${client_certificate_path}",
-          'mode' => "${ssl_mode}"
+          'PEMKeyFile' => $client_certificate_path,
+          'mode'       => $ssl_mode
         },
-        'bindIpAll' => true,
-        'port' => $member_data['port']
+        'bindIpAll'    => true,
+        'port'         => $member_data['port']
       },
       'replication' => {
-        'replSetName' => "${replica_set_name}"
+        'replSetName'  => $replica_set_name
       },
     }
 
-    case $cluster_auth_type {
-      'none','x509': {
-        $auth = {
-          'security' => {
-            'clusterAuth' => "${cluster_auth_type}"
-          }
-        }
+    if $cluster_auth_type == 'keyfile' {
+      $auth = {
+        'clusterAuth' => $cluster_auth_type,
+        'keyFile'     => $auth_keyfile_path
       }
-      'keyfile': {
-        $auth = {
-          'clusterAuth' => "${cluster_auth_type}",
-          'keyFile' => "${auth_keyfile_path}"
-        }
+    } else {
+      $auth = {
+        'clusterAuth' => $cluster_auth_type
       }
     }
     if $enable_encryption{
-      $ear = {
-            'enableEncryption' => true,
-            'encryptionKeyFile' => "${encryption_keyfile_path}"
+      if $kmip_server {
+        $ear = {
+            'enableEncryption'          => true,
+            'kmipServerName'            => $kmip_server,
+            'kmipPort'                  => $kmip_port,
+            'kmipClientCertificateFile' => $kmip_client_cert_path,
+            'kmipServerCAFile'          => $kmip_ca_cert_path,
+        }
+      } else {
+        $ear = {
+              'enableEncryption'        => true,
+              'encryptionKeyFile'       => $encryption_keyfile_path
+        }
       }
     } else {
       $ear = {}
@@ -99,37 +104,37 @@ plan mongodb::deploy_rs (
     }
     $storage_and_log = {
       'storage' => {
-        'dbPath' => "${db_path}",
-        'directoryPerDB' => true,
+        'dbPath'                  => $db_path,
+        'directoryPerDB'          => true,
         'wiredTiger' => {
-          'collectionConfig' => { },
-          'engineConfig' => {
+          'collectionConfig'      => { },
+          'engineConfig'          => {
             'directoryForIndexes' => true
           },
-          'indexConfig' => { }
+          'indexConfig'           => { }
         }
       },
       'systemLog' => {
-        'destination' => "file",
-        'path' => "${log_file_path}"
+        'destination' => 'file',
+        'path'        => $log_file_path
       },
-      'authSchemaVersion' => 5,
-      'disabled' => false,
-      'featureCompatibilityVersion' => "${mongodb_compat_version}",
-      'hostname' => "${v[0]}",
+      'authSchemaVersion'           => 5,
+      'disabled'                    => false,
+      'featureCompatibilityVersion' => $mongodb_compat_version,
+      'hostname'                    => $v[0],
       'logRotate' => {
-        'sizeThresholdMB' => 1000.0,
-        'timeThresholdHrs' => 24
+        'sizeThresholdMB'           => 1000.0,
+        'timeThresholdHrs'          => 24
       },
-      'manualMode' => false,
-      'name' => "${v[0]}",
-      'processType' => "mongod",
-      'version' => "${mongodb_version}"
+      'manualMode'                  => false,
+      'name'                        => $v[0],
+      'processType'                 => 'mongod',
+      'version'                     => $mongodb_version
     }
     if $enable_kerberos {
       $krb5 = {
         'kerberos' => {
-          'keytab' => "${keytab_file_path}"
+          'keytab' => $keytab_file_path
         }
       }
     }
@@ -157,5 +162,16 @@ plan mongodb::deploy_rs (
     'settings'        => { },
   }
 
-  return merge($current_state.first.value, {'processes' => [$_replica_set_members]}, {'replicaSets' => [$replica_sets]})
+  $proj_data_hash = merge($current_state.first.value, {'processes' => [$_replica_set_members]}, {'replicaSets' => [$replica_sets]})
+
+  $new_deployment = run_task('mongodb::deploy_instance', 'localhost', {
+    curl_ca_cert_path => $curl_ca_file_path,
+    curl_token        => $curl_token,
+    curl_username     => $curl_username,
+    ops_manager_url   => $ops_manager_url,
+    project_id        => $project_id,
+    json_payload      => $proj_data_hash,
+  })
+
+  return $new_deployment
 }
