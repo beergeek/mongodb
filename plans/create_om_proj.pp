@@ -14,7 +14,7 @@ plan mongodb::create_om_proj (
   Optional[String[1]]                                        $aa_pem_file_path            = undef,
   Optional[String[1]]                                        $ca_file_path                = undef,
   Optional[String[1]]                                        $curl_ca_file_path           = undef,
-  Optional[String[1]]                                        $keytab_file_path            = undef,
+  Optional[String[1]]                                        $auto_keytab_path            = undef,
   Optional[String[1025]]                                     $agent_key                   = undef,
   Optional[String[1]]                                        $inital_auto_agent_pwd       = undef,
   Optional[String[1]]                                        $inital_backup_agent_pwd     = undef,
