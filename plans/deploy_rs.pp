@@ -59,23 +59,27 @@ plan mongodb::deploy_rs (
   $_replica_set_members_data = $replica_set_members.reduce({}) |$k, $v| {
     $k + {$v[0] => merge($_defaults, $replica_set_members[$v[0]])}
   }
+
   # Create the processes hash
-  $_replica_set_members = $_replica_set_members_data.reduce({}) |$k, $v| {
+  $_replica_set_members = $_replica_set_members_data.map() |$v| {
     $member_data = merge($_defaults + $v[1])
+
+    # Network and replication options
     $net_and_rep = {
       'net' => {
+        'bindIpAll'    => true,
+        'port'         => $member_data['port'],
         'ssl' => {
           'PEMKeyFile' => $client_certificate_path,
           'mode'       => $ssl_mode
-        },
-        'bindIpAll'    => true,
-        'port'         => $member_data['port']
+        }
       },
       'replication' => {
         'replSetName'  => $replica_set_name
       },
     }
 
+    # Create the security options
     if $cluster_auth_type == 'keyfile' {
       $auth = {
         'clusterAuth' => $cluster_auth_type,
@@ -107,9 +111,13 @@ plan mongodb::deploy_rs (
     } else {
       $ear = {}
     }
+
+    # Combine the security info
     $security = {
       'security' => $auth + $ear
     }
+
+    # Make the storage and log options
     $storage_and_log = {
       'storage' => {
         'dbPath'                  => $db_path,
@@ -125,7 +133,11 @@ plan mongodb::deploy_rs (
       'systemLog' => {
         'destination' => 'file',
         'path'        => $log_file_path
-      },
+      }
+    }
+
+    # All other options
+    $other = {
       'authSchemaVersion'           => 5,
       'disabled'                    => false,
       'featureCompatibilityVersion' => $mongodb_compat_version,
@@ -146,7 +158,7 @@ plan mongodb::deploy_rs (
         }
       }
     }
-    $k + {$v[0] => {'args2_6' => merge($net_and_rep, $security, $storage_and_log, $krb5)}}
+    $x = merge({'args2_6' => merge($net_and_rep, $security, $storage_and_log)}, $krb5, $other)
   }
 
   # Create the replicaSets hash
@@ -165,12 +177,12 @@ plan mongodb::deploy_rs (
 
   $replica_sets =  {
     '_id'             => $replica_set_name,
-    'members'         => [$replica_sets_data],
+    'members'         => $replica_sets_data,
     'protocolVersion' => '1',
     'settings'        => { },
   }
 
-  $proj_data_hash = merge($current_state.first.value, {'processes' => [$_replica_set_members]}, {'replicaSets' => [$replica_sets]})
+  $proj_data_hash = merge($current_state.first.value, {'processes' => $_replica_set_members}, {'replicaSets' => [$replica_sets]})
 
   # Remove the build info to make the payload smaller
   $new_hash = $current_state.first.value.reduce({}) |$current, $value| {
@@ -183,15 +195,13 @@ plan mongodb::deploy_rs (
     }
   }
 
-  $json_data = run_task('mongodb::make_json','localhost', hash_data => $new_hash)
-
   $new_deployment = run_task('mongodb::deploy_instance', 'localhost', {
     curl_ca_cert_path => $curl_ca_file_path,
     curl_token        => $curl_token,
     curl_username     => $curl_username,
     ops_manager_url   => $ops_manager_url,
     project_id        => $project_id,
-    json_payload      => $json_data.first.value,
+    json_payload      => $new_hash.first.value,
   })
 
   return $new_deployment

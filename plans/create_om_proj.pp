@@ -91,23 +91,6 @@ plan mongodb::create_om_proj (
     project_name      => $proj_name,
   })
 
-  #$proj_data_hash = epp('mongodb/new_om_proj.epp', {
-  #  agent_key                   => $_agent_key,
-  #  aa_pem_file_path            => $aa_pem_file_path,
-  #  client_cert_weak_mode       => $client_cert_weak_mode,
-  #  auto_auth_mech              => $auto_auth_mech,
-  #  auto_auth_mechs             => $auto_auth_mechs,
-  #  auto_ldap_group_dn          => $auto_ldap_group_dn,
-  #  ca_file_path                => $ca_file_path,
-  #  custom_roles                => $custom_roles,
-  #  deployment_auth_mechs       => $deployment_auth_mechs,
-  #  inital_auto_agent_pwd       => $_inital_auto_agent_pwd,
-  #  inital_backup_agent_pwd     => $_inital_backup_agent_pwd,
-  #  inital_monitoring_agent_pwd => $_inital_monitoring_agent_pwd,
-  #  ssl_mode                    => $ssl_mode,
-  #  auto_keytab_path            => $keytab_file_path,
-  #})
-
   $_auth = {
     'authoritativeSet'         => false,
     'autoAuthMechanism'        => $auto_auth_mech,
