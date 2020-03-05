@@ -201,7 +201,7 @@ plan mongodb::deploy_rs (
     curl_username     => $curl_username,
     ops_manager_url   => $ops_manager_url,
     project_id        => $project_id,
-    json_payload      => $proj_data_hash.first.value,
+    json_payload      => $proj_data_hash,
   })
 
   return $new_deployment
