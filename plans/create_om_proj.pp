@@ -24,21 +24,21 @@ plan mongodb::create_om_proj (
 
 
   Optional[Array[Struct[{
-    Optional[authentication_restrictions]                            => Optional[Array],
-    Optional[db]                                                     => Optional[String],
-    Optional[privileges]                                             => Optional[Array[Struct[{
-      actions                                                        => Array[String[1]],
-      resource                                                       => Struct[{
-        collection                                                   => String,
-        db                                                           => String,
+    Optional[authenticationRestrictions] => Optional[Array],
+    Optional[db]                         => Optional[String],
+    Optional[privileges]                 => Optional[Array[Struct[{
+      actions                            => Array[String[1]],
+      resource                           => Struct[{
+        collection                       => String,
+        db                               => String,
       }],
     }]]],
-    role                                                             => String[1],
-    Optional[roles]                                                  => Array[Struct[{
-      db                                                             => String,
-      role                                                           => String,
+    role                                 => String[1],
+    Optional[roles]                      => Array[Struct[{
+      db                                 => String,
+      role                               => String,
     }]],
-  }]]]                                   $custom_roles                = undef,
+  }]]]                                                      $custom_roles                = undef,
 ) {
   if $ssl_mode != 'none' and !$ca_file_path {
     fail("The `ca_file_path` must be provided if `ssl_mode` is not 'none'")
@@ -91,22 +91,93 @@ plan mongodb::create_om_proj (
     project_name      => $proj_name,
   })
 
-  $proj_data_hash = epp('mongodb/new_om_proj.epp', {
-    agent_key                   => $_agent_key,
-    aa_pem_file_path            => $aa_pem_file_path,
-    client_cert_weak_mode       => $client_cert_weak_mode,
-    auto_auth_mech              => $auto_auth_mech,
-    auto_auth_mechs             => $auto_auth_mechs,
-    auto_ldap_group_dn          => $auto_ldap_group_dn,
-    ca_file_path                => $ca_file_path,
-    custom_roles                => $custom_roles,
-    deployment_auth_mechs       => $deployment_auth_mechs,
-    inital_auto_agent_pwd       => $_inital_auto_agent_pwd,
-    inital_backup_agent_pwd     => $_inital_backup_agent_pwd,
-    inital_monitoring_agent_pwd => $_inital_monitoring_agent_pwd,
-    ssl_mode                    => $ssl_mode,
-    auto_keytab_path            => $keytab_file_path,
-  })
+  #$proj_data_hash = epp('mongodb/new_om_proj.epp', {
+  #  agent_key                   => $_agent_key,
+  #  aa_pem_file_path            => $aa_pem_file_path,
+  #  client_cert_weak_mode       => $client_cert_weak_mode,
+  #  auto_auth_mech              => $auto_auth_mech,
+  #  auto_auth_mechs             => $auto_auth_mechs,
+  #  auto_ldap_group_dn          => $auto_ldap_group_dn,
+  #  ca_file_path                => $ca_file_path,
+  #  custom_roles                => $custom_roles,
+  #  deployment_auth_mechs       => $deployment_auth_mechs,
+  #  inital_auto_agent_pwd       => $_inital_auto_agent_pwd,
+  #  inital_backup_agent_pwd     => $_inital_backup_agent_pwd,
+  #  inital_monitoring_agent_pwd => $_inital_monitoring_agent_pwd,
+  #  ssl_mode                    => $ssl_mode,
+  #  auto_keytab_path            => $keytab_file_path,
+  #})
+
+  $_auth = {
+    'authoritativeSet'         => false,
+    'autoAuthMechanism'        => $auto_auth_mech,
+    'autoAuthMechanisms'       => [ $auto_auth_mechs.map |$s|{"\"${s}\""}.join(', ') ],
+    'autoKerberosKeytabPath'   => $auto_keytab_path,
+    'autoAuthRestrictions'     => [ ],
+    'autoLdapGroupDN'          => $auto_ldap_group_dn,
+    'autoPwd'                  => $inital_auto_agent_pwd,
+    'autoUser'                 => 'mms-automation',
+    'deploymentAuthMechanisms' => [ $deployment_auth_mechs.map |$t|{"\"${t}\""}.join(', ') ],
+    'disabled'                 => false,
+    'key'                      => $agent_key,
+    'keyfile'                  => '/var/lib/mongodb-mms-automation/keyfile',
+    'keyfileWindows'           => '%SystemDrive%\\MMSAutomation\\versions\\keyfile',
+    'usersDeleted'             => [ ],
+    'usersWanted'              => [
+      {
+        'authenticationRestrictions' => [ ],
+        'db'                         => 'admin',
+        'initPwd'                    => $inital_monitoring_agent_pwd,
+        'roles' => [ {
+          'db'   => 'admin',
+          'role' => 'clusterMonitor',
+        } ],
+        'user' => 'mms-monitoring-agent',
+      }, {
+        'authenticationRestrictions' => [ ],
+        'db'                         => 'admin',
+        'initPwd'                    => $inital_backup_agent_pwd,
+        'roles'                      => [ {
+          'db'   => 'admin',
+          'role' => 'clusterAdmin',
+        }, {
+          'db'   => 'admin',
+          'role' => 'readAnyDatabase',
+        }, {
+          'db'   => 'admin',
+          'role' => 'userAdminAnyDatabase',
+        }, {
+          'db'   => 'local',
+          'role' => 'readWrite',
+        }, {
+          'db'   => 'admin',
+          'role' => 'readWrite',
+        } ],
+        'user'                        => 'mms-backup-agent',
+      }
+    ]
+  }
+
+  $_tls = {
+    'CAFilePath'            => $ca_file_path,
+    'autoPEMKeyFilePath'    => $aa_pem_file_path,
+    'clientCertificateMode' => $client_cert_weak_mode,
+  }
+
+  $_default_data = {
+    'backupVersions'        => [],
+    'kerberos' =>    {
+      'serviceName'         => 'mongodb'
+    },
+    'ldap'               => { },
+    'monitoringVersions' => [],
+    'options' => {
+      'downloadBase'        => '/var/lib/mongodb-mms-automation',
+      'downloadBaseWindows' => '%SystemDrive%\\MMSAutomation\\versions',
+    },
+  }
+
+  $proj_data_hash = merge({'auth' => $_auth}, {'ssl' => $_tls}, {'roles' => $custom_roles}, $_default_data)
 
   $basic_config = run_task('mongodb::deploy_instance', 'localhost', {
     curl_ca_cert_path => $curl_ca_file_path,
