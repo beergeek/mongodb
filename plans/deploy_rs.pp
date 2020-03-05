@@ -182,8 +182,6 @@ plan mongodb::deploy_rs (
     'settings'        => { },
   }
 
-  $proj_data_hash = merge($current_state.first.value, {'processes' => $_replica_set_members}, {'replicaSets' => [$replica_sets]})
-
   # Remove the build info to make the payload smaller
   $new_hash = $current_state.first.value.reduce({}) |$current, $value| {
     if $value[0] != 'mongodbVersions' {
@@ -195,13 +193,15 @@ plan mongodb::deploy_rs (
     }
   }
 
+  $proj_data_hash = merge($new_hash, {'processes' => $_replica_set_members}, {'replicaSets' => [$replica_sets]})
+
   $new_deployment = run_task('mongodb::deploy_instance', 'localhost', {
     curl_ca_cert_path => $curl_ca_file_path,
     curl_token        => $curl_token,
     curl_username     => $curl_username,
     ops_manager_url   => $ops_manager_url,
     project_id        => $project_id,
-    json_payload      => $new_hash.first.value,
+    json_payload      => $proj_data_hash.first.value,
   })
 
   return $new_deployment

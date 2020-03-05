@@ -17,7 +17,7 @@
     },
     "json_payload": {
       "description": "The JSON payload for the build",
-      "type": "String[1]"
+      "type": "Hash"
     },
     "curl_username": {
       "description": "The username for the API call",
