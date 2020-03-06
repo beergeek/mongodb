@@ -162,7 +162,7 @@ plan mongodb::deploy_rs (
   }
 
   # Create the replicaSets hash
-  $replica_sets_data = $_replica_set_members_data.map() |$member_fqdn, $member_data| {
+  $_replica_sets_data = $_replica_set_members_data.map() |$member_fqdn, $member_data| {
     $k = {
       '_id'          => $member_data['id'],
       'arbiterOnly'  => $member_data['arbitor'],
@@ -175,9 +175,21 @@ plan mongodb::deploy_rs (
     }
   }
 
+  $_monitoring_agents = $_replica_set_members_data.map() |$member_fqdn, $member_data| {
+    {
+      'hostname' => $member_fqdn
+    }
+  }
+
+  $_backup_agents = $_replica_set_members_data.map() |$member_fqdn, $member_data| {
+    {
+      'hostname' => $member_fqdn
+    }
+  }
+
   $replica_sets =  {
     '_id'             => $replica_set_name,
-    'members'         => $replica_sets_data,
+    'members'         => $_replica_sets_data,
     'protocolVersion' => '1',
     'settings'        => { },
   }
@@ -193,7 +205,13 @@ plan mongodb::deploy_rs (
     }
   }
 
-  $proj_data_hash = merge($new_hash, {'processes' => $_replica_set_members}, {'replicaSets' => [$replica_sets]})
+  $proj_data_hash = merge(
+    $new_hash,
+    {'processes' => $_replica_set_members},
+    {'replicaSets' => [$replica_sets]},
+    {'monitoringVersions' => $_monitoring_agents},
+    {'backupVersions' => $_backup_agents}
+  )
 
   $new_deployment = run_task('mongodb::deploy_instance', 'localhost', {
     curl_ca_cert_path => $curl_ca_file_path,
