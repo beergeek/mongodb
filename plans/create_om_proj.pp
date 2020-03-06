@@ -98,7 +98,7 @@ plan mongodb::create_om_proj (
     'autoKerberosKeytabPath'   => $auto_keytab_path,
     'autoAuthRestrictions'     => [ ],
     'autoLdapGroupDN'          => $auto_ldap_group_dn,
-    'autoPwd'                  => $inital_auto_agent_pwd,
+    'autoPwd'                  => $_inital_auto_agent_pwd,
     'autoUser'                 => 'mms-automation',
     'deploymentAuthMechanisms' => [ $deployment_auth_mechs.map |$t|{"\"${t}\""}.join(', ') ],
     'disabled'                 => false,
@@ -110,7 +110,7 @@ plan mongodb::create_om_proj (
       {
         'authenticationRestrictions' => [ ],
         'db'                         => 'admin',
-        'initPwd'                    => $inital_monitoring_agent_pwd,
+        'initPwd'                    => $_inital_monitoring_agent_pwd,
         'roles' => [ {
           'db'   => 'admin',
           'role' => 'clusterMonitor',
@@ -119,7 +119,7 @@ plan mongodb::create_om_proj (
       }, {
         'authenticationRestrictions' => [ ],
         'db'                         => 'admin',
-        'initPwd'                    => $inital_backup_agent_pwd,
+        'initPwd'                    => $_inital_backup_agent_pwd,
         'roles'                      => [ {
           'db'   => 'admin',
           'role' => 'clusterAdmin',
