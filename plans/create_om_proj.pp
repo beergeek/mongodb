@@ -102,7 +102,7 @@ plan mongodb::create_om_proj (
     'autoUser'                 => 'mms-automation',
     'deploymentAuthMechanisms' => [ $deployment_auth_mechs.map |$t|{"\"${t}\""}.join(', ') ],
     'disabled'                 => false,
-    'key'                      => $agent_key,
+    'key'                      => $_agent_key,
     'keyfile'                  => '/var/lib/mongodb-mms-automation/keyfile',
     'keyfileWindows'           => '%SystemDrive%\\MMSAutomation\\versions\\keyfile',
     'usersDeleted'             => [ ],
