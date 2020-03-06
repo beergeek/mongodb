@@ -34,6 +34,10 @@ class Puppet::Provider::Mongodb_om < Puppet::Provider
     end
   end
 
+  def self.get(url)
+    transport.get(url)
+  end
+
   def self.post(url, message)
     transport.post(url, message)
   end

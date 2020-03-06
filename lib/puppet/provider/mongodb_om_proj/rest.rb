@@ -1,5 +1,6 @@
 require File.join(File.dirname(__FILE__), '../mongodb_om')
 require 'json'
+require 'securerandom'
 
 Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mongodb_om) do
 
@@ -10,6 +11,7 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
     return [] if projs.nil?
 
     projs['results'].each do |proj|
+      proj_settings = Puppet::Provider::Mongodb_om.call_items("/api/public/v1.0/groups/#{proj['id']}/automationConfig")
       ldap_owners = nil
       ldap_member = nil
       ldap_readonly = nil
@@ -27,12 +29,20 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       end
 
       instances << new(
-        ensure:              :present,
-        name:                proj['name'],
-        id:                  proj['id'],
-        ldap_owner_group:   ldap_owners,
-        ldap_member_group:  ldap_member,
-        ldap_read_only:     ldap_readonly,
+        ensure:                :present,
+        name:                  proj['name'],
+        id:                    proj['id'],
+        ldap_owner_group:      ldap_owners,
+        ldap_member_group:     ldap_member,
+        ldap_read_only:        ldap_readonly,
+        org_id:                proj['orgId'],
+        aa_auth_mech:          proj_settings['auth']['autoAuthMechanism'],
+        aa_auth_mechs:         proj_settings['auth']['autoAuthMechanisms'],
+        deployment_auth_mechs: proj_settings['auth']['deploymentAuthMechanisms'],
+        krb5_svc_name:         proj_settings['kerberos']['serviceName'],
+        tls_ca_cert_path:      proj_settings['ssl']['CAFilePath'],
+        aa_pem_path:           proj_settings['ssl']['autoPEMKeyFilePath'],
+        tls_client_cert_mode:  proj_settings['ssl']['clientCertificateMode'],
       )
     end
 
@@ -44,7 +54,6 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
     resources.keys.each do |name|
       if provider = projs.find { |proj| proj.name == name }
         resources[name].provider = provider
-        resources[name].id = name[:id]
       end
     end
   end
@@ -54,28 +63,115 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
 
     if data_body.has_key?(:ldap_owner_group)
       ldap_array << {'ldapGroups' => data_body[:ldap_owner_group], 'roleName' => 'GROUP_OWNER'}
-      data_body.delete(:ldap_owner_group)
     end
     if data_body.has_key?(:ldap_member_group)
       ldap_array << {'ldapGroups' => data_body[:ldap_member_group], 'roleName' => 'GROUP_MEMBER'}
-      data_body.delete(:ldap_member_group)
     end
     if data_body.has_key?(:ldap_read_only)
       ldap_array << {'ldapGroups' => data_body[:ldap_read_only], 'roleName' => 'GROUP_READ_ONLY'}
-      data_body.delete(:ldap_read_only)
     end
-    data_body['ldapGroupMappings'] = ldap_array
 
-    return data_body
+    return ldap_array
   end
 
-  def clean_hash(unclean_hash)
-    unclean_hash[:orgId] = unclean_hash[:org_id]
-    unclean_hash.delete(:org_id)
-    unclean_hash.delete(:provider)
-    unclean_hash.delete(:loglevel)
-    unclean_hash.delete(:ensure)
-    return unclean_hash
+  def make_tls(data_body)
+    if data_body.has_key?(:tls_enabled)
+      ssl = {
+        'CAFilePath'            => data_body[:tls_ca_cert_path],
+        'autoPEMKeyFilePath'    => data_body[:aa_pem_path],
+        'clientCertificateMode' => data_body[:tls_client_cert_mode]
+      }
+      return ssl
+    end
+  end
+
+  def users_wanted(data_body)
+    if data_body[:aa_auth_mech] == 'GSSAPI'
+      db = '$external'
+      passwd = ''
+    else
+      db = 'admin'
+      passwd = SecureRandom.hex(16)
+    end
+    aa_users = [    
+      {
+        'authenticationRestrictions' => [ ],
+        'db'                         => db,
+        'initPwd'                    => passwd,
+        'roles' => [ {
+          'db'   => 'admin',
+          'role' => 'clusterMonitor',
+        } ],
+        'user' => 'mms-monitoring-agent',
+      }, {
+        'authenticationRestrictions' => [ ],
+        'db'                         => 'admin',
+        'initPwd'                    => SecureRandom.hex(16),
+        'roles'                      => [ {
+          'db'   => 'admin',
+          'role' => 'clusterAdmin',
+        }, {
+          'db'   => 'admin',
+          'role' => 'readAnyDatabase',
+        }, {
+          'db'   => 'admin',
+          'role' => 'userAdminAnyDatabase',
+        }, {
+          'db'   => 'local',
+          'role' => 'readWrite',
+        }, {
+          'db'   => 'admin',
+          'role' => 'readWrite',
+        } ],
+        'user'                        => 'mms-backup-agent',
+      }
+    ]
+  end
+
+  def make_auth(data_body)
+    auth = {
+      'authoritativeSet'         => false,
+      'autoAuthMechanism'        => data_body[:aa_auth_mech],
+      'autoAuthMechanisms'       => data_body[:aa_auth_mechs],
+      'autoKerberosKeytabPath'   => '/data/pki/server.keytab',
+      'autoAuthRestrictions'     => [ ],
+      'autoLdapGroupDN'          => '',
+      'autoPwd'                  => SecureRandom.hex(512),
+      'autoUser'                 => 'mms-automation',
+      'deploymentAuthMechanisms' => data_body[:deployment_auth_mechs],
+      'disabled'                 => false,
+      'key'                      => 'PASSWORD',
+      'keyfile'                  => '/var/lib/mongodb-mms-automation/keyfile',
+      'keyfileWindows'           => '%SystemDrive%\\MMSAutomation\\versions\\keyfile',
+      'usersDeleted'             => [ ],
+      'usersWanted'              => users_wanted(data_body)
+    }
+    return auth
+  end
+
+  def make_krb5(data_body)
+    kerberos = {
+      'serviceName' => data_body[:krb5_svc_name]
+    }
+    return kerberos
+  end
+
+  def make_proj(data_body)
+    proj_payload = {
+      'name'              => data_body[:name],
+      'ldapGroupMappings' => make_ldap_array(data_body),
+      'orgId'             => data_body[:org_id],
+    }
+    return proj_payload
+  end
+
+  def config_proj(data_body)
+    proj_payload = {
+      'auth'              => make_auth(data_body),
+      'kerberos'          => make_krb5(data_body),
+      'ssl'               => make_tls(data_body),
+    }
+    return proj_payload
   end
 
 
@@ -84,10 +180,16 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
   end
 
   def create
-    cleaned_hash = clean_hash(resource.to_hash)
-    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/groups", make_ldap_array(cleaned_hash).to_json)
+    fail ArgumentError, "The `org_id` must exist" if @resource[:org_id].nil? 
+    # create the project
+    proj_data = make_proj(resource.to_hash)
+    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/groups", proj_data.to_json)
+    # make the config for the project
+    id = (JSON.parse(result.body))['id']
+    payload = config_proj(resource.to_hash)
+    config_result = Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{id}/automationConfig", payload.to_json)
 
-    return result
+    return config_result
   end
 
   def destroy

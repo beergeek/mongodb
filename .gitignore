@@ -25,6 +25,3 @@
 .project
 .envrc
 /inventory.yaml
-/tasks/mongos*
-/plans/mongos*
-/plans/mongo_cluster*

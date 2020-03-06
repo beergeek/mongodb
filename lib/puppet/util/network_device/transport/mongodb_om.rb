@@ -17,7 +17,6 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
   end
 
   def call(uri, args={})
-    Puppet.info uri
     result = connection.get(@config[:url] + uri, args)
     JSON.parse(result.body)
   rescue JSON::ParserError
@@ -30,6 +29,12 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     unless result.status == code_required
       fail("REST failure: HTTP status code #{result.status} detected.  Body of failure is: #{result.body}")
     end
+  end
+
+  def get(uri)
+    result = connection.get(@config[:url] + uri, {'Content-Type' => 'application/json'})
+    failure?(result, 200)
+    return result
   end
 
   def post(uri, json)
@@ -45,7 +50,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
   def put(uri, json)
     if valid_json?(json)
       result = connection.put(@config[:url] + uri, json, {'Content-Type' => 'application/json'})
-      failure?(result, 201)
+      failure?(result, 200)
       return result
     else
       fail('Invalid JSON detected.')
