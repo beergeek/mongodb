@@ -181,6 +181,12 @@ _Private Classes_
 * [`mongodb::config`](#mongodbconfig): Manages the configuration of a mongod instance
 * [`mongodb::service`](#mongodbservice): Defined type to manage mongod service.
 
+**Resource types**
+
+* [`mongodb_om_db_role`](#mongodb_om_db_role): Manages roles for database deployments within an Ops Manager Project
+* [`mongodb_om_org`](#mongodb_om_org): Manages Organisations within Ops Manager
+* [`mongodb_om_proj`](#mongodb_om_proj): Manages Projects within Ops Manager
+
 **Tasks**
 
 * [`check_el`](#check_el): Check if OS is EL flavour
@@ -1074,6 +1080,195 @@ Data type: `String[1]`
 Name of the service to manage.
 
 Default value: "mongod_${title}"
+## Resource types
+
+### mongodb_om_db_role
+
+Manages roles for database deployments within an Ops Manager Project
+
+#### Properties
+
+The following properties are available in the `mongodb_om_db_role` type.
+
+##### `ensure`
+
+Valid values: present, absent
+
+The basic property that the resource should be in.
+
+Default value: present
+
+##### `project_id`
+
+The Projest ID that the Role will belong to. Set only once and cannot be modified
+
+##### `authentication_restrictions`
+
+An array of authentication restrictions.
+
+Default value: []
+
+##### `db`
+
+The database to use for authentication. Default is `admin`.
+
+Default value: admin
+
+##### `privileges`
+
+An array of hashes containing `actions` and `resource`. `actions` is an array.
+
+##### `roles`
+
+An array of roles to inherit from. Each role is a hash containing `db` and `role`.
+
+Default value: []
+
+#### Parameters
+
+The following parameters are available in the `mongodb_om_db_role` type.
+
+##### `name`
+
+namevar
+
+The name of the Project
+
+### mongodb_om_org
+
+Manages Organisations within Ops Manager
+
+#### Properties
+
+The following properties are available in the `mongodb_om_org` type.
+
+##### `ensure`
+
+Valid values: present, absent
+
+The basic property that the resource should be in.
+
+Default value: present
+
+##### `id`
+
+The read-only ID of the Organisation
+
+##### `ldap_owner_group`
+
+This is the LDAP group that will be owner of the Organisation
+
+##### `ldap_member_group`
+
+This is the LDAP group that will be member of the Organisation
+
+##### `ldap_read_only`
+
+This is the LDAP group that will be read only group of the Organisation
+
+#### Parameters
+
+The following parameters are available in the `mongodb_om_org` type.
+
+##### `name`
+
+namevar
+
+The name of the Organisation
+
+### mongodb_om_proj
+
+Manages Projects within Ops Manager
+
+#### Properties
+
+The following properties are available in the `mongodb_om_proj` type.
+
+##### `ensure`
+
+Valid values: present, absent
+
+The basic property that the resource should be in.
+
+Default value: present
+
+##### `org_id`
+
+The Organisation ID that the Project will belong to. Set only once and cannot be modified
+
+##### `id`
+
+The read-only ID of the Project
+
+##### `ldap_owner_group`
+
+This is the LDAP group that will be owner of the Project
+
+##### `ldap_member_group`
+
+This is the LDAP group that will be member of the Project
+
+##### `ldap_read_only`
+
+This is the LDAP group that will be read only group of the Project
+
+##### `aa_auth_mech`
+
+The default authentication mechanism for the automation agent to the database instances
+
+Default value: SCRAM-SHA-256
+
+##### `aa_auth_mechs`
+
+The default authentication mechanism for the automation agent to the database instances
+
+Default value: ['SCRAM-SHA-256']
+
+##### `deployment_auth_mechs`
+
+The authentication mechanism for database deployments
+
+Default value: ['SCRAM-SHA-256']
+
+##### `krb5_svc_name`
+
+The Kerberos service name for the MongoDB database service
+
+Default value: mongodb
+
+##### `tls_ca_cert_path`
+
+The absolute path to the CA certificate file
+
+##### `aa_pem_path`
+
+The absolute path to PEM encoded certificate file for the automation agent
+
+##### `tls_client_cert_mode`
+
+Valid values: OPTIONAL, REQUIRE
+
+The client certificate validation mode for TLS
+
+Default value: OPTIONAL
+
+#### Parameters
+
+The following parameters are available in the `mongodb_om_proj` type.
+
+##### `name`
+
+namevar
+
+The name of the Project
+
+##### `tls_enabled`
+
+Valid values: `true`, `false`
+
+Boolean to determine if TLS is enabled within the Project
+
+Default value: `false`
 
 ## Tasks
 
