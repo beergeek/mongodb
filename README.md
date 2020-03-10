@@ -18,6 +18,7 @@ The reasoning for using Puppet is that the operating system configuration should
     * [What mongodb affects](#what-mongodb-affects)
     * [Setup requirements](#setup-requirements)
     * [Beginning with mongodb](#beginning-with-mongodb)
+    * [Managing Ops Manager](#managing-ops-manager)
 3. [Usage - Configuration options and additional functionality](#usage)
 4. [Limitations - OS compatibility, etc.](#limitations)
 5. [Development - Guide for contributing to the module](#development)
@@ -65,6 +66,121 @@ Hiera is recommended, utilising Sensitive type where required, to manage certifi
 ### Beginning with mongodb
 
 To manage an automation agent instance the MMS Group andAPI ID must be known in advance, which means having Ops Manager installed and operational. The credentials for Ops Manager backing databases can be created via the `credentialstool` with Op Manager.
+
+### Managing Ops Manager
+
+MongoDB Ops Manager uses a REST API to manage various services and features, such as Organisations, Projects, Custom Roles within Projects etc.
+
+Because this is a REST API we are using `puppet device` to manage these resources.
+
+To use this you must have a Puppet "proxy" which can be any server installed with the Puppet agent.
+
+Create the device configuration file (/etc/puppetlabs/puppet/device.conf):
+
+```shell
+[mongodb_om]
+type mongodb_om
+url file:///etc/puppetlabs/puppet/devices/om.conf
+```
+
+This contains a nominal name for your Ops Manager instance (you can have several devices for the one Ops Manager as long as they have different names). The `type` is always `mongodb_om`. The `url` is the another file that contains the majority of the configuration to interact with the MongoDB Ops Manager instance.
+
+The subsequent configuration file (/etc/puppetlabs/puppet/devices/om.conf in this case) contains the following:
+
+```shell
+{
+"username": "<USERNAME>"
+"password": "<API TOKEN>"
+"url": "URL TO OPS MANAGER"
+"cacert": "<ABSOLUTE PATH TO CA CERT FILE>"
+}
+```
+
+The username and token are generate within Ops Manager (see that documentation). The URL includes the port number as well. If using HTTPS (which you should be) then you supply the absolute path to the CA certificate file.
+
+There are currently three working types for Ops Manager:
+
+* mongodb_om_org
+* mongodb_om_proj
+* mongodb_om_db_role
+
+Documentation for each type can be found in the documentation below.
+
+To do a `puppet resource`-like operation perform the following:
+
+```shell
+puppet device --target <TARGET> --resource <RESOURCE>
+```
+
+In this case the target is `mongodb_om` (from the device.conf file) and the resource can be anyone of the above resources. Resources cannot be modified via `puppet device` unlike using `puppet resource` (did you know they could be?)
+
+Example:
+
+```shell
+puppet device --target mongodb_om --resource mongodb_om_org
+mongodb_om_org { 'EvilEmpire':
+  ensure => 'present',
+  id     => '5e6703dce976cc0acb55e16d',
+}
+mongodb_om_org { 'LoudSam':
+  ensure            => 'present',
+  id                => '5e55fb08e976cc0aafa8bdcd',
+  ldap_member_group => ['Trousers'],
+  ldap_owner_group  => ['Administrators', 'MongoAdmins'],
+  ldap_read_only    => ['Clowns'],
+}
+```
+
+If wanting to do a `puppet apply`-like operation use the following syntax:
+
+```shell
+puppet device --target <TARGET> --apply <PUPPET MANIFEST FILE>
+```
+
+The target is the same as the previous example. The manifest file points to your actual manifest to apply.
+
+Example:
+
+```shell
+puppet device --target mongodb_om --apply add_new.pp
+Notice: Compiled catalog for mongodb_om in environment production in 0.03 seconds
+Notice: /Stage[main]/Main/Mongodb_om_proj[loudSam]/ensure: created
+Notice: /Stage[main]/Main/Mongodb_om_db_role[testersGroup]/ensure: created
+Notice: /Stage[main]/Main/Mongodb_om_db_role[schemaOwner@PSP]/ensure: created
+Notice: Applied catalog in 1.32 seconds
+```
+
+Of course normal `puppet device` can be used as well:
+
+```shell
+puppet device --target <TARGET>
+```
+
+The certificate of this instance will be called whatever the TARGET is (in the above examples it is mongodb_om).
+
+A simple fact exists for the build number of the Ops Manager instance.
+
+```shell
+puppet device --target <TARGET> --facts
+```
+
+Example: 
+```shell
+puppet device --target mongodb_om --facts
+{
+  "name": "mongodb_om",
+  "values": {
+    "operatingsystem": "mongodb_om",
+    "ops_manager_app_name": "MongoDB Cloud Manager",
+    "ops_manager_build": "80473fba4805c545b906f991f36c1bbb34d84a5d",
+    "clientcert": "mongodb_om",
+    "clientversion": "6.12.0",
+    "clientnoop": false
+  },
+  "timestamp": "2020-03-10T05:55:15.349956198+00:00",
+  "expiration": "2020-03-10T06:25:15.349997927+00:00"
+}
+```
 
 ## Usage
 
