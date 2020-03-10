@@ -13,7 +13,7 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
       ldap_owners = nil
       ldap_member = nil
       ldap_readonly = nil
-      if !org['ldapGroupMappings'].empty?
+      unless org['ldapGroupMappings'].empty?
         org['ldapGroupMappings'].each do |ldap_hash|
           case ldap_hash['roleName']
           when 'ORG_OWNER'
@@ -44,7 +44,6 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
     resources.keys.each do |name|
       if provider = orgs.find { |org| org.name == name }
         resources[name].provider = provider
-        resources[name].id = name[:id]
       end
     end
   end
@@ -52,30 +51,28 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
   def make_ldap_array(data_body)
     ldap_array = []
 
-    if data_body.has_key?(:ldap_owner_group)
-      ldap_array << {'ldapGroups' => data_body[:ldap_owner_group], 'roleName' => 'ORG_OWNER'}
+    if data_body.key?(:ldap_owner_group)
+      ldap_array << { 'ldapGroups' => data_body[:ldap_owner_group], 'roleName' => 'ORG_OWNER' }
       data_body.delete(:ldap_owner_group)
     end
-    if data_body.has_key?(:ldap_member_group)
-      ldap_array << {'ldapGroups' => data_body[:ldap_member_group], 'roleName' => 'ORG_MEMBER'}
+    if data_body.key?(:ldap_member_group)
+      ldap_array << { 'ldapGroups' => data_body[:ldap_member_group], 'roleName' => 'ORG_MEMBER' }
       data_body.delete(:ldap_member_group)
     end
-    if data_body.has_key?(:ldap_read_only)
-      ldap_array << {'ldapGroups' => data_body[:ldap_read_only], 'roleName' => 'ORG_READ_ONLY'}
+    if data_body.key?(:ldap_read_only)
+      ldap_array << { 'ldapGroups' => data_body[:ldap_read_only], 'roleName' => 'ORG_READ_ONLY' }
       data_body.delete(:ldap_read_only)
     end
     data_body['ldapGroupMappings'] = ldap_array
-
-    return data_body
+    data_body
   end
 
   def clean_hash(unclean_hash)
     unclean_hash.delete(:provider)
     unclean_hash.delete(:loglevel)
     unclean_hash.delete(:ensure)
-    return unclean_hash
+    unclean_hash
   end
-
 
   def exists?
     @property_hash[:ensure] == :present
@@ -83,18 +80,13 @@ Puppet::Type.type(:mongodb_om_org).provide(:rest, parent: Puppet::Provider::Mong
 
   def create
     cleaned_hash = clean_hash(resource.to_hash)
-    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/orgs", make_ldap_array(cleaned_hash).to_json)
-
-    return result
+    Puppet::Provider::Mongodb_om.post('/api/public/v1.0/orgs', make_ldap_array(cleaned_hash).to_json)
   end
 
   def destroy
     # need to get the ID of the Org before we can delete!
-    result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/orgs/#{@property_hash[:id]}")
-
-    return result
+    Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/orgs/#{@property_hash[:id]}")
   end
 
   mk_resource_methods
-
 end

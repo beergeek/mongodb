@@ -15,7 +15,7 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       ldap_owners = nil
       ldap_member = nil
       ldap_readonly = nil
-      if !proj['ldapGroupMappings'].empty?
+      unless proj['ldapGroupMappings'].empty?
         proj['ldapGroupMappings'].each do |ldap_hash|
           case ldap_hash['roleName']
           when 'GROUP_OWNER'
@@ -61,27 +61,27 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
   def make_ldap_array(data_body)
     ldap_array = []
 
-    if data_body.has_key?(:ldap_owner_group)
-      ldap_array << {'ldapGroups' => data_body[:ldap_owner_group], 'roleName' => 'GROUP_OWNER'}
+    if data_body.key?(:ldap_owner_group)
+      ldap_array << { 'ldapGroups' => data_body[:ldap_owner_group], 'roleName' => 'GROUP_OWNER' }
     end
-    if data_body.has_key?(:ldap_member_group)
-      ldap_array << {'ldapGroups' => data_body[:ldap_member_group], 'roleName' => 'GROUP_MEMBER'}
+    if data_body.key?(:ldap_member_group)
+      ldap_array << { 'ldapGroups' => data_body[:ldap_member_group], 'roleName' => 'GROUP_MEMBER' }
     end
-    if data_body.has_key?(:ldap_read_only)
-      ldap_array << {'ldapGroups' => data_body[:ldap_read_only], 'roleName' => 'GROUP_READ_ONLY'}
+    if data_body.key?(:ldap_read_only)
+      ldap_array << { 'ldapGroups' => data_body[:ldap_read_only], 'roleName' => 'GROUP_READ_ONLY' }
     end
 
-    return ldap_array
+    ldap_array
   end
 
   def make_tls(data_body)
-    if data_body.has_key?(:tls_enabled)
+    if data_body.key?(:tls_enabled)
       ssl = {
         'CAFilePath'            => data_body[:tls_ca_cert_path],
         'autoPEMKeyFilePath'    => data_body[:aa_pem_path],
-        'clientCertificateMode' => data_body[:tls_client_cert_mode]
+        'clientCertificateMode' => data_body[:tls_client_cert_mode],
       }
-      return ssl
+      ssl
     end
   end
 
@@ -93,21 +93,21 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       db = 'admin'
       passwd = SecureRandom.hex(16)
     end
-    aa_users = [    
+    aa_users = [
       {
-        'authenticationRestrictions' => [ ],
+        'authenticationRestrictions' => [],
         'db'                         => db,
         'initPwd'                    => passwd,
-        'roles' => [ {
+        'roles' => [{
           'db'   => 'admin',
           'role' => 'clusterMonitor',
-        } ],
+        }],
         'user' => 'mms-monitoring-agent',
       }, {
-        'authenticationRestrictions' => [ ],
+        'authenticationRestrictions' => [],
         'db'                         => 'admin',
         'initPwd'                    => SecureRandom.hex(16),
-        'roles'                      => [ {
+        'roles'                      => [{
           'db'   => 'admin',
           'role' => 'clusterAdmin',
         }, {
@@ -122,10 +122,11 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
         }, {
           'db'   => 'admin',
           'role' => 'readWrite',
-        } ],
+        }],
         'user'                        => 'mms-backup-agent',
       }
     ]
+    aa_users
   end
 
   def make_auth(data_body)
@@ -134,7 +135,7 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       'autoAuthMechanism'        => data_body[:aa_auth_mech],
       'autoAuthMechanisms'       => data_body[:aa_auth_mechs],
       'autoKerberosKeytabPath'   => '/data/pki/server.keytab',
-      'autoAuthRestrictions'     => [ ],
+      'autoAuthRestrictions'     => [],
       'autoLdapGroupDN'          => '',
       'autoPwd'                  => SecureRandom.hex(512),
       'autoUser'                 => 'mms-automation',
@@ -143,17 +144,17 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       'key'                      => 'PASSWORD',
       'keyfile'                  => '/var/lib/mongodb-mms-automation/keyfile',
       'keyfileWindows'           => '%SystemDrive%\\MMSAutomation\\versions\\keyfile',
-      'usersDeleted'             => [ ],
-      'usersWanted'              => users_wanted(data_body)
+      'usersDeleted'             => [],
+      'usersWanted'              => users_wanted(data_body),
     }
-    return auth
+    auth
   end
 
   def make_krb5(data_body)
     kerberos = {
-      'serviceName' => data_body[:krb5_svc_name]
+      'serviceName' => data_body[:krb5_svc_name],
     }
-    return kerberos
+    kerberos
   end
 
   def make_proj(data_body)
@@ -162,7 +163,7 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       'ldapGroupMappings' => make_ldap_array(data_body),
       'orgId'             => data_body[:org_id],
     }
-    return proj_payload
+    proj_payload
   end
 
   def config_proj(data_body)
@@ -171,34 +172,28 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       'kerberos'          => make_krb5(data_body),
       'ssl'               => make_tls(data_body),
     }
-    return proj_payload
+    proj_payload
   end
-
 
   def exists?
     @property_hash[:ensure] == :present
   end
 
   def create
-    fail ArgumentError, "The `org_id` must exist" if @resource[:org_id].nil? 
+    raise ArgumentError, 'The `org_id` must exist' if @resource[:org_id].nil?
     # create the project
     proj_data = make_proj(resource.to_hash)
-    result = Puppet::Provider::Mongodb_om.post("/api/public/v1.0/groups", proj_data.to_json)
+    result = Puppet::Provider::Mongodb_om.post('/api/public/v1.0/groups', proj_data.to_json)
     # make the config for the project
-    id = (JSON.parse(result.body))['id']
+    id = JSON.parse(result.body)['id']
     payload = config_proj(resource.to_hash)
-    config_result = Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{id}/automationConfig", payload.to_json)
-
-    return config_result
+    Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{id}/automationConfig", payload.to_json)
   end
 
   def destroy
     # need to get the ID of the Project before we can delete!
-    result = Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/groups/#{@property_hash[:id]}")
-
-    return result
+    Puppet::Provider::Mongodb_om.delete("/api/public/v1.0/groups/#{@property_hash[:id]}")
   end
 
   mk_resource_methods
-
 end

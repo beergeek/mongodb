@@ -16,7 +16,7 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     @connection.set_auth(@config[:url], @config[:username], @config[:password])
   end
 
-  def call(uri, args={})
+  def call(uri, args = {})
     result = connection.get(@config[:url] + uri, args)
     JSON.parse(result.body)
   rescue JSON::ParserError
@@ -26,24 +26,24 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
   end
 
   def failure?(result, code_required)
-    unless result.status == code_required
-      fail("REST failure: HTTP status code #{result.status} detected.  Body of failure is: #{result.body}")
+    unless Array(code_required).include? result.status 
+      raise "REST failure: HTTP status code #{result.status} detected.  Body of failure is: #{result.body}"
     end
   end
 
   def get(uri)
     result = connection.get(@config[:url] + uri, {'Content-Type' => 'application/json'})
     failure?(result, 200)
-    return result
+    result
   end
 
   def post(uri, json)
     if valid_json?(json)
       result = connection.post(@config[:url] + uri, json, {'Content-Type' => 'application/json'})
       failure?(result, 201)
-      return result
+      result
     else
-      fail('Invalid JSON detected.')
+      raise 'Invalid JSON detected.'
     end
   end
 
@@ -51,22 +51,22 @@ class Puppet::Util::NetworkDevice::Transport::Mongodb_om < Puppet::Util::Network
     if valid_json?(json)
       result = connection.put(@config[:url] + uri, json, {'Content-Type' => 'application/json'})
       failure?(result, 200)
-      return result
+      result
     else
-      fail('Invalid JSON detected.')
+      raise 'Invalid JSON detected.'
     end
   end
 
   def delete(uri)
     result = connection.delete(@config[:url] + uri)
-    failure?(result)
-    return result
+    failure?(result, [200, 202, 404])
+    result
   end
 
   def valid_json?(json)
     JSON.parse(json)
-    return true
+    true
   rescue
-    return false
+    false
   end
 end

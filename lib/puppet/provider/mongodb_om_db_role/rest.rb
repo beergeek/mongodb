@@ -44,8 +44,8 @@ Puppet::Type.type(:mongodb_om_db_role).provide(:rest, parent: Puppet::Provider::
   end
 
   def create
-    fail ArgumentError, "The `project_id` must exist" if resource[:project_id].nil?
-    fail ArgumentError, "The `project_id` must exist" if (resource[:privileges].nil? or resource[:privileges].length == 0)
+    raise ArgumentError, 'The `project_id` must exist' if resource[:project_id].nil?
+    raise ArgumentError, 'The `project_id` must exist' if resource[:privileges].nil? || resource[:privileges].empty?
     # make config
     new_role = {
       'role'                       => resource[:name],
@@ -63,7 +63,7 @@ Puppet::Type.type(:mongodb_om_db_role).provide(:rest, parent: Puppet::Provider::
     # We clear the hash here to stop flush from triggering.
     @property_hash.clear
 
-    return config_result
+    config_result
   end
 
   def flush
@@ -78,10 +78,10 @@ Puppet::Type.type(:mongodb_om_db_role).provide(:rest, parent: Puppet::Provider::
       # current project data so we can merge
       current_config = Puppet::Provider::Mongodb_om.get("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig")
       # make the config for the project
-      update_payload = JSON.parse(current_config.body).merge({'roles' => [updated_role]})
+      update_payload = JSON.parse(current_config.body).merge('roles' => [updated_role])
       config_result = Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig", update_payload.to_json)
 
-      return config_result
+      config_result
     end
   end
 
@@ -89,15 +89,14 @@ Puppet::Type.type(:mongodb_om_db_role).provide(:rest, parent: Puppet::Provider::
     # current project data so we can merge
     current_config = Puppet::Provider::Mongodb_om.get("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig")
     update_payload = JSON.parse(current_config.body)
-    update_payload['roles'] = update_payload['roles'].delete_if {|role| role['role'] == resource[:name]}
+    update_payload['roles'] = update_payload['roles'].delete_if { |role| role['role'] == resource[:name] }
     # need to get the ID of the Project before we can delete!
     result = Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig", update_payload.to_json)
     # We clear the hash here to stop flush from triggering.
     @property_hash.clear
 
-    return result
+    result
   end
 
   mk_resource_methods
-
 end
