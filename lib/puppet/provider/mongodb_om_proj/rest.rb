@@ -86,7 +86,7 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
   end
 
   def users_wanted(data_body)
-    if data_body[:aa_auth_mech] == 'GSSAPI'
+    if resource[:aa_auth_mech] == 'GSSAPI'
       db = '$external'
       passwd = ''
     else
@@ -137,11 +137,11 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       'autoKerberosKeytabPath'   => '/data/pki/server.keytab',
       'autoAuthRestrictions'     => [],
       'autoLdapGroupDN'          => '',
-      'autoPwd'                  => SecureRandom.hex(512),
+      'autoPwd'                  => SecureRandom.hex(16),
       'autoUser'                 => 'mms-automation',
       'deploymentAuthMechanisms' => data_body[:deployment_auth_mechs],
       'disabled'                 => false,
-      'key'                      => 'PASSWORD',
+      'key'                      => SecureRandom.hex(512),
       'keyfile'                  => '/var/lib/mongodb-mms-automation/keyfile',
       'keyfileWindows'           => '%SystemDrive%\\MMSAutomation\\versions\\keyfile',
       'usersDeleted'             => [],
@@ -166,6 +166,46 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
     proj_payload
   end
 
+  def update_auth(data_body)
+    auth = {
+      'authoritativeSet'         => false,
+      'autoAuthMechanism'        => resource[:aa_auth_mech],
+      'autoAuthMechanisms'       => resource[:aa_auth_mechs],
+      'autoKerberosKeytabPath'   => '/data/pki/server.keytab',
+      'autoAuthRestrictions'     => [],
+      'autoLdapGroupDN'          => '',
+      'autoPwd'                  => data_body['auth']['autoPwd'],
+      'autoUser'                 => 'mms-automation',
+      'deploymentAuthMechanisms' => resource[:deployment_auth_mechs],
+      'disabled'                 => false,
+      'key'                      => data_body['auth']['key'],
+      'keyfile'                  => '/var/lib/mongodb-mms-automation/keyfile',
+      'keyfileWindows'           => '%SystemDrive%\\MMSAutomation\\versions\\keyfile',
+      'usersDeleted'             => [],
+      'usersWanted'              => data_body['auth']['usersWanted'], # FIX THIS!
+    }
+    auth
+  end
+
+  def update_krb5()
+    kerberos = {
+      'serviceName' => resource[:krb5_svc_name],
+    }
+    kerberos
+  end
+
+  def update_tls()
+    if resource[:tls_enabled]
+      ssl = {
+        'CAFilePath'            => resource[:tls_ca_cert_path],
+        'autoPEMKeyFilePath'    => resource[:aa_pem_path],
+        'clientCertificateMode' => resource[:tls_client_cert_mode],
+      }
+    else
+      ssl = {}
+    end
+  end
+
   def config_proj(data_body)
     proj_payload = {
       'auth'              => make_auth(data_body),
@@ -173,6 +213,13 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
       'ssl'               => make_tls(data_body),
     }
     proj_payload
+  end
+
+  def update_proj(data_body)
+    data_body['auth']     = update_auth(data_body)
+    data_body['kerberos'] = update_krb5()
+    data_body['ssl']      = update_tls()
+    data_body
   end
 
   def exists?
@@ -184,10 +231,22 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
     # create the project
     proj_data = make_proj(resource.to_hash)
     result = Puppet::Provider::Mongodb_om.post('/api/public/v1.0/groups', proj_data.to_json)
-    # make the config for the project
     id = JSON.parse(result.body)['id']
     payload = config_proj(resource.to_hash)
     Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{id}/automationConfig", payload.to_json)
+  end
+
+  def flush
+    if @property_hash != {}
+      # current project data so we can merge
+      current_config = Puppet::Provider::Mongodb_om.get("/api/public/v1.0/groups/#{@property_hash[:id]}/automationConfig")
+      # make the config for the project
+      new_config = update_proj(JSON.parse(current_config.body))
+      # make the config for the project
+      config_result = Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{@property_hash[:id]}/automationConfig", new_config.to_json)
+
+      config_result
+    end
   end
 
   def destroy
