@@ -38,6 +38,14 @@ Puppet::Type.newtype(:mongodb_om_db_role) do
     defaultto 'admin'
   end
 
+  newproperty(:passwd) do
+    desc 'The password of the User.'
+
+    validate do |value|
+      raise ArgumentError, "The value for `db` must be a String, not a #{value.class}" unless value.is_a?(String)
+    end
+  end
+
   newproperty(:privileges, :array_matching => :all) do
     desc 'An array of hashes containing `actions` and `resource`. `actions` is an array.'
 
