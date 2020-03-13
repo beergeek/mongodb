@@ -13,15 +13,16 @@ Puppet::Type.type(:mongodb_om_db_user).provide(:rest, parent: Puppet::Provider::
       Puppet.debug "Data: #{proj}"
       proj_settings = Puppet::Provider::Mongodb_om.call_items("/api/public/v1.0/groups/#{proj['id']}/automationConfig")
 
-      proj_settings['auth']['usersWanted'].each do |role|
+      proj_settings['auth']['usersWanted'].each do |user|
 
         instances << new(
           ensure:                      :present,
-          name:                        role['name'],
+          name:                        user['user'] + '@' + proj['id'],
+          username:                    user['user'],
           project_id:                  proj['id'],
-          authentication_restrictions: role['authenticationRestrictions'],
-          db:                          role['db'],
-          roles:                       role['roles'],
+          authentication_restrictions: user['authenticationRestrictions'],
+          db:                          user['db'],
+          roles:                       user['roles'],
         )
       end
     end
@@ -46,11 +47,11 @@ Puppet::Type.type(:mongodb_om_db_user).provide(:rest, parent: Puppet::Provider::
     raise ArgumentError, 'The `project_id` must exist' if resource[:project_id].nil?
     # make config
     new_user = {
-      'name'                       => resource[:name],
+      'user'                       => resource[:username],
       'authenticationRestrictions' => resource[:authentication_restrictions],
       'db'                         => resource[:db],
       'roles'                      => resource[:roles],
-      'pwd'                        => resource[:passwd],
+      'initPwd'                    => resource[:initial_passwd],
     }
     # current project data so we can merge
     current_config = Puppet::Provider::Mongodb_om.get("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig")
@@ -76,7 +77,7 @@ Puppet::Type.type(:mongodb_om_db_user).provide(:rest, parent: Puppet::Provider::
       # make the config for the project
       update_payload = JSON.parse(current_config.body)
       update_payload['auth']['usersWanted'].each_with_index do |value, index|
-        if value['name'] == resource[:name]
+        if value['user'] == resource[:username]
           update_payload['auth']['usersWanted'][index].merge!(updated_user)
         end
       end
@@ -90,7 +91,7 @@ Puppet::Type.type(:mongodb_om_db_user).provide(:rest, parent: Puppet::Provider::
     # current project data so we can merge
     current_config = Puppet::Provider::Mongodb_om.get("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig")
     update_payload = JSON.parse(current_config.body)
-    update_payload['auth']['usersWanted'] = update_payload['auth']['usersWanted'].delete_if { |user| user['name'] == resource[:name] }
+    update_payload['auth']['usersWanted'] = update_payload['auth']['usersWanted'].delete_if { |user| user['name'] == resource[:username] }
     # need to get the ID of the Project before we can delete!
     result = Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig", update_payload.to_json)
     # We clear the hash here to stop flush from triggering.

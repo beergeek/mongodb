@@ -30,8 +30,9 @@ Puppet::Type.type(:mongodb_om_proj).provide(:rest, parent: Puppet::Provider::Mon
 
       instances << new(
         ensure:                :present,
-        name:                  proj['name'],
+        name:                  proj['name'] + '@' + proj['orgId'],
         id:                    proj['id'],
+        projname:              proj['name'],
         ldap_owner_group:      ldap_owners,
         ldap_member_group:     ldap_member,
         ldap_read_only:        ldap_readonly,

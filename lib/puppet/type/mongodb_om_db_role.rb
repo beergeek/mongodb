@@ -5,16 +5,27 @@ Puppet::Type.newtype(:mongodb_om_db_role) do
   ensurable
 
   newparam(:name) do
-    desc 'The name of the Project'
+    desc 'The name of the Role and Project ID separated by an `@`. e.g. `dba@5e439798e976cc5e50a7b165'
 
     validate do |value|
       raise ArgumentError, "#{name} must be a String" unless value.is_a?(String)
+      raise ArgumentError, "Format must be <ROLE>@<PROJECT ID>, not #{value}. The Project ID is 24 characters long and only contains hexidemical characters (lowercase)." unless value.match(/[0-9a-f){24}]/)
+      resource[:project_id] = value[/.*@([0-9a-f]{24}$)/, 1]
+      resource[:rolename] = value[/^(.*)@.*/, 1]
     end
 
     isnamevar
   end
 
-  newproperty(:project_id) do
+  newproperty(:rolename) do
+    desc 'The Role name, defaults to the first porition of the resource title. Set only once and cannot be modified'
+
+    validate do |value|
+      raise ArgumentError, "#{value} must be a String" unless value.is_a?(String)
+    end
+  end
+
+  newparam(:project_id) do
     desc 'The Projest ID that the Role will belong to. Set only once and cannot be modified'
 
     validate do |value|

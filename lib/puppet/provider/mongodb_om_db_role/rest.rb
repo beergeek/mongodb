@@ -17,7 +17,8 @@ Puppet::Type.type(:mongodb_om_db_role).provide(:rest, parent: Puppet::Provider::
 
         instances << new(
           ensure:                      :present,
-          name:                        role['role'],
+          name:                        role['role'] + '@' + proj['id'],
+          rolename:                    role['role'],
           project_id:                  proj['id'],
           authentication_restrictions: role['authenticationRestrictions'],
           db:                          role['db'],
@@ -48,7 +49,7 @@ Puppet::Type.type(:mongodb_om_db_role).provide(:rest, parent: Puppet::Provider::
     raise ArgumentError, 'The `project_id` must exist' if resource[:privileges].nil? || resource[:privileges].empty?
     # make config
     new_role = {
-      'role'                       => resource[:name],
+      'role'                       => resource[:rolename],
       'authenticationRestrictions' => resource[:authentication_restrictions],
       'db'                         => resource[:db],
       'privileges'                 => resource[:privileges],
@@ -69,7 +70,7 @@ Puppet::Type.type(:mongodb_om_db_role).provide(:rest, parent: Puppet::Provider::
   def flush
     if @property_hash != {}
       updated_role = {
-        'role'                       => resource[:name],
+        'role'                       => resource[:rolename],
         'authenticationRestrictions' => resource[:authentication_restrictions],
         'db'                         => resource[:db],
         'privileges'                 => resource[:privileges],
