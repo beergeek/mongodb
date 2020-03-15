@@ -1,5 +1,14 @@
 Puppet::Type.newtype(:mongodb_om_proj) do
-  @doc = 'Manages Projects within Ops Manager'
+  @doc = "Manages Projects within Ops Manager.
+  The title of the resource is the combination of the project name and the Organisation ID (24 characters) joined by a `@` symbol, such as:
+
+  mongodb_om_db_role { 'development@5e439798e976cc5e50a7b165':
+   ensure => present,
+   ...
+  }
+ 
+  Alternatively any name can be provided as long as the `rolename` and `project_id` parameters are set.
+ "
 
   apply_to_device
   ensurable

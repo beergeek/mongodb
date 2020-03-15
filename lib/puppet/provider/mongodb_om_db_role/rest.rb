@@ -90,7 +90,7 @@ Puppet::Type.type(:mongodb_om_db_role).provide(:rest, parent: Puppet::Provider::
     # current project data so we can merge
     current_config = Puppet::Provider::Mongodb_om.get("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig")
     update_payload = JSON.parse(current_config.body)
-    update_payload['roles'] = update_payload['roles'].delete_if { |role| role['role'] == resource[:name] }
+    update_payload['roles'] = update_payload['roles'].delete_if { |role| role['role'] == resource[:rolename] }
     # need to get the ID of the Project before we can delete!
     result = Puppet::Provider::Mongodb_om.put("/api/public/v1.0/groups/#{resource[:project_id]}/automationConfig", update_payload.to_json)
     # We clear the hash here to stop flush from triggering.

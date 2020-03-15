@@ -98,13 +98,23 @@ The subsequent configuration file (/etc/puppetlabs/puppet/devices/om.conf in thi
 
 The username and token are generate within Ops Manager (see that documentation). The URL includes the port number as well. If using HTTPS (which you should be) then you supply the absolute path to the CA certificate file.
 
-There are currently three working types for Ops Manager:
+There are currently four working types for Ops Manager:
 
 * mongodb_om_org
 * mongodb_om_proj
 * mongodb_om_db_role
+* mongodb_om_db_user
 
-Documentation for each type can be found in the documentation below.
+Documentation for each type can be found in the documentation below, but the title for the Projects, Roles and Users contain the object name and the parent ID joined by a '@', e.g. :
+
+```puppet
+mongodb_om_org { 'LoudSam@5e55fb08e976cc0aafa8bdcd':
+  ensure            => 'present',
+  ldap_member_group => ['Trousers'],
+  ldap_owner_group  => ['Administrators', 'MongoAdmins'],
+  ldap_read_only    => ['Clowns'],
+}
+```
 
 To do a `puppet resource`-like operation perform the following:
 
@@ -118,13 +128,11 @@ Example:
 
 ```shell
 puppet device --target mongodb_om --resource mongodb_om_org
-mongodb_om_org { 'EvilEmpire':
+mongodb_om_org { 'EvilEmpire@5e6703dce976cc0acb55e16d':
   ensure => 'present',
-  id     => '5e6703dce976cc0acb55e16d',
 }
-mongodb_om_org { 'LoudSam':
+mongodb_om_org { 'LoudSam@5e55fb08e976cc0aafa8bdcd':
   ensure            => 'present',
-  id                => '5e55fb08e976cc0aafa8bdcd',
   ldap_member_group => ['Trousers'],
   ldap_owner_group  => ['Administrators', 'MongoAdmins'],
   ldap_read_only    => ['Clowns'],
@@ -300,6 +308,7 @@ _Private Classes_
 **Resource types**
 
 * [`mongodb_om_db_role`](#mongodb_om_db_role): Manages roles for database deployments within an Ops Manager Project
+* [`mongodb_om_db_user`](#mongodb_om_db_user): Manages users for database deployments within an Ops Manager Project
 * [`mongodb_om_org`](#mongodb_om_org): Manages Organisations within Ops Manager
 * [`mongodb_om_proj`](#mongodb_om_proj): Manages Projects within Ops Manager
 
@@ -1201,6 +1210,14 @@ Default value: "mongod_${title}"
 ### mongodb_om_db_role
 
 Manages roles for database deployments within an Ops Manager Project
+The title of the resource is the combination of the role name and the Project ID (24 characters) joined by a `@` symbol, such as:
+
+mongodb_om_db_role { 'dba@5e439798e976cc5e50a7b165':
+ ensure => present,
+ ...
+}
+
+Alternatively any name can be provided as long as the `rolename` and `project_id` parameters are set.
 
 #### Properties
 
@@ -1214,9 +1231,9 @@ The basic property that the resource should be in.
 
 Default value: present
 
-##### `project_id`
+##### `rolename`
 
-The Projest ID that the Role will belong to. Set only once and cannot be modified
+The Role name, defaults to the first porition of the resource title. Set only once and cannot be modified
 
 ##### `authentication_restrictions`
 
@@ -1229,6 +1246,10 @@ Default value: []
 The database to use for authentication. Default is `admin`.
 
 Default value: admin
+
+##### `passwd`
+
+The password of the User.
 
 ##### `privileges`
 
@@ -1248,7 +1269,75 @@ The following parameters are available in the `mongodb_om_db_role` type.
 
 namevar
 
-The name of the Project
+The name of the Role and Project ID separated by an `@`. e.g. `dba@5e439798e976cc5e50a7b165
+
+##### `project_id`
+
+The Projest ID that the Role will belong to. Set only once and cannot be modified
+
+### mongodb_om_db_user
+
+Manages users for MongoDB databases managed by Ops Manager
+The title of the resource is the combination of the username and the Project ID (24 characters) joined by a `@` symbol, such as:
+
+mongodb_om_db_user { 'brett@5e439798e976cc5e50a7b165':
+ ensure => present,
+ ...
+}
+
+Alternatively any name can be provided as long as the `username` and `project_id` parameters are set.
+
+#### Properties
+
+The following properties are available in the `mongodb_om_db_user` type.
+
+##### `ensure`
+
+Valid values: present, absent
+
+The basic property that the resource should be in.
+
+Default value: present
+
+##### `username`
+
+The User name, defaults to the first porition of the resource title. Set only once and cannot be modified
+
+##### `project_id`
+
+The Projest ID that the User will belong to. Set only once and cannot be modified
+
+##### `authentication_restrictions`
+
+An array of authentication restrictions.
+
+Default value: []
+
+##### `db`
+
+The database to use for authentication. Default is `admin`.
+
+Default value: admin
+
+##### `roles`
+
+An array of roles to inherit from. Each role is a hash containing `db` and `role`.
+
+Default value: []
+
+##### `initial_passwd`
+
+The initial cleartext password of the User
+
+#### Parameters
+
+The following parameters are available in the `mongodb_om_db_user` type.
+
+##### `name`
+
+namevar
+
+The name of the User and Project ID separated by an `@`. e.g. `dba003@5e439798e976cc5e50a7b165
 
 ### mongodb_om_org
 
@@ -1294,7 +1383,15 @@ The name of the Organisation
 
 ### mongodb_om_proj
 
-Manages Projects within Ops Manager
+Manages Projects within Ops Manager.
+The title of the resource is the combination of the project name and the Organisation ID (24 characters) joined by a `@` symbol, such as:
+
+mongodb_om_db_role { 'development@5e439798e976cc5e50a7b165':
+ ensure => present,
+ ...
+}
+
+Alternatively any name can be provided as long as the `rolename` and `project_id` parameters are set.
 
 #### Properties
 
@@ -1307,6 +1404,10 @@ Valid values: present, absent
 The basic property that the resource should be in.
 
 Default value: present
+
+##### `projname`
+
+The Project name, defaults to the first porition of the resource title. Set only once and cannot be modified
 
 ##### `org_id`
 
@@ -1376,7 +1477,7 @@ The following parameters are available in the `mongodb_om_proj` type.
 
 namevar
 
-The name of the Project
+The name of the Project and Organisation ID separated by an `@`. e.g. `dev@5e439798e976cc5e50a7b165
 
 ##### `tls_enabled`
 
