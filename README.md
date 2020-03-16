@@ -133,9 +133,9 @@ mongodb_om_org { 'EvilEmpire@5e6703dce976cc0acb55e16d':
 }
 mongodb_om_org { 'LoudSam@5e55fb08e976cc0aafa8bdcd':
   ensure            => 'present',
-  ldap_member_group => ['Trousers'],
+  ldap_member_group => ['SchemaOwners'],
   ldap_owner_group  => ['Administrators', 'MongoAdmins'],
-  ldap_read_only    => ['Clowns'],
+  ldap_read_only    => ['Viewers'],
 }
 ```
 
