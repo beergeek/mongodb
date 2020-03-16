@@ -126,7 +126,7 @@ In this case the target is `mongodb_om` (from the device.conf file) and the reso
 
 Example:
 
-```shell
+```puppet
 puppet device --target mongodb_om --resource mongodb_om_org
 mongodb_om_org { 'EvilEmpire@5e6703dce976cc0acb55e16d':
   ensure => 'present',
