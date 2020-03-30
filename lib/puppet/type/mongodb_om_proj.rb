@@ -53,8 +53,8 @@ Puppet::Type.newtype(:mongodb_om_proj) do
     desc 'This is the LDAP group that will be owner of the Project'
 
     validate do |value|
-      raise ArgumentError, "#{ldap_owner_group} must be a String" unless value.is_a?(String)
-      raise ArgumentError, "#{ldap_owner_group} must a proper x500 Distinguished Name" unless value =~ /^(?:(?<cn>CN=(?<name>[^,]*)),)?(?:(?<path>(?:(?:CN|OU)=[^,]+,?)+),)?(?<domain>(?:DC=[^,]+,?)+)$/
+      raise ArgumentError, "#{value} must be a String" unless value.is_a?(String)
+      raise ArgumentError, "#{value} must a proper x500 Distinguished Name" unless value =~ /^(?:(?<cn>CN=(?<name>[^,]*)),)?(?:(?<path>(?:(?:CN|OU)=[^,]+,?)+),)?(?<domain>(?:DC=[^,]+,?)+)$/
     end
   end
 
@@ -62,8 +62,8 @@ Puppet::Type.newtype(:mongodb_om_proj) do
     desc 'This is the LDAP group that will be member of the Project'
 
     validate do |value|
-      raise ArgumentError, "#{ldap_member_group} must be a String" unless value.is_a?(String)
-      raise ArgumentError, "#{ldap_member_group} must a proper x500 Distinguished Name" unless value =~ /^(?:(?<cn>CN=(?<name>[^,]*)),)?(?:(?<path>(?:(?:CN|OU)=[^,]+,?)+),)?(?<domain>(?:DC=[^,]+,?)+)$/
+      raise ArgumentError, "#{value} must be a String" unless value.is_a?(String)
+      raise ArgumentError, "#{value} must a proper x500 Distinguished Name" unless value =~ /^(?:(?<cn>CN=(?<name>[^,]*)),)?(?:(?<path>(?:(?:CN|OU)=[^,]+,?)+),)?(?<domain>(?:DC=[^,]+,?)+)$/
     end
   end
 
@@ -71,8 +71,8 @@ Puppet::Type.newtype(:mongodb_om_proj) do
     desc 'This is the LDAP group that will be read only group of the Project'
 
     validate do |value|
-      raise ArgumentError, "#{ldap_read_only} must be a String" unless value.is_a?(String)
-      raise ArgumentError, "#{ldap_read_only} must a proper x500 Distinguished Name" unless value =~ /^(?:(?<cn>CN=(?<name>[^,]*)),)?(?:(?<path>(?:(?:CN|OU)=[^,]+,?)+),)?(?<domain>(?:DC=[^,]+,?)+)$/
+      raise ArgumentError, "#{value} must be a String" unless value.is_a?(String)
+      raise ArgumentError, "#{value} must a proper x500 Distinguished Name" unless value =~ /^(?:(?<cn>CN=(?<name>[^,]*)),)?(?:(?<path>(?:(?:CN|OU)=[^,]+,?)+),)?(?<domain>(?:DC=[^,]+,?)+)$/
     end
   end
 
