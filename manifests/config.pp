@@ -30,6 +30,7 @@
 # @param bindip The FQDN to use in addition to use with localhost for the service to listen.
 # @param port The port number for the service.
 # @param log_filename Name of the log file.
+# @param log_append Boolean to determine if log is appended or a new log created on restart
 # @param auth_list The authentication mechanisms. If `enable_kerberos` is true 'GSSAPI' will also be applied.
 # @param base_path The base path of where database, logs and certs will be stored.
 #   These can be changed individually if desired.
@@ -56,6 +57,7 @@ define mongodb::config (
   Boolean                               $enable_kerberos      = false,
   Boolean                               $enable_ldap_authn    = false,
   Boolean                               $enable_ldap_authz    = false,
+  Boolean                               $log_append           = false,
   Enum['none','tls']                    $ldap_security        = 'tls',
   Optional[Sensitive[String[1]]]        $ldap_bind_password   = undef,
   Optional[Stdlib::Absolutepath]        $kerberos_trace_path  = undef,
@@ -201,6 +203,7 @@ define mongodb::config (
       ldap_security        => $ldap_security,
       ldap_user_mapping    => $ldap_user_mapping,
       log_filename         => $log_filename,
+      log_append           => $log_append,
       logpath              => $log_path,
       member_auth          => $member_auth,
       pem_file             => $pem_file,

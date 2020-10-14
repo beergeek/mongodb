@@ -44,7 +44,7 @@ describe 'mongodb::ops_manager' do
 
     it {
       is_expected.to contain_package('mongodb_mms_pkg').with(
-        'ensure'   => 'present',
+        'ensure'   => 'latest',
         'source'   => 'https://downloads.mongodb.local/mongodb-mms-latest.rpm',
         'provider' => 'rpm',
       )

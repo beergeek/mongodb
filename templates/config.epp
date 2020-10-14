@@ -52,7 +52,7 @@ net:
 systemLog:
   destination: file
   path: <%= $logpath %>/<%= $log_filename %>
-  logAppend: true
+  logAppend: <%= $log_append %>
 processManagement:
   fork: true
 <% if $pid_file { -%>

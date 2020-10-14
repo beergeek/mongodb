@@ -9,6 +9,7 @@
 # @param config_file The absolute path of the configuration file to manage.
 # @param db_path The absolute path to where the database will be stored (should include the `base_path`).
 # @param log_file The absolute path of the log file (should include the `base_path`).
+# @param log_append Boolean to determine if log is appended or a new log created on restart.
 # @param port Port number of the service.
 # @param repo_file_path Absolute path of the repo config file to manage.
 # @param repset Name of the replica set to create.
@@ -38,6 +39,7 @@ plan mongodb::mongod_linux (
       Optional[db_path]      => String[1],
       Optional[hidden]       => Boolean,
       Optional[log_file]     => String[1],
+      Optional[log_append]   => Boolean,
       Optional[port]         => Integer,
       Optional[priority]     => Integer,
       Optional[slavedelay]   => Integer,
@@ -139,6 +141,7 @@ plan mongodb::mongod_linux (
       enable_ldap_authz   => false,
       keyfile_path        => $instance_data['keyfile_path'],
       log_filename        => basename($_log_file),
+      log_append          => $log_append,
       logpath             => dirname($_log_file),
       pem_file            => $instance_data['x509_path'],
       pid_file            => $_pid,
