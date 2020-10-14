@@ -7,8 +7,8 @@ variables:
 
 # Repos
 mongodb::repos::gpgcheck: true
-mongodb::repos::baseurl: "https://repo.mongodb.com/yum/redhat/%{facts.os.release.major}/mongodb-enterprise/4.2/x86_64/"
-mongodb::repos::gpgkey: "https://www.mongodb.org/static/pgp/server-4.2.asc"
+mongodb::repos::baseurl: "https://repo.mongodb.com/yum/redhat/%{facts.os.release.major}/mongodb-enterprise/4.4/x86_64/"
+mongodb::repos::gpgkey: "https://www.mongodb.org/static/pgp/server-4.4.asc"
 
 # Automation Agent
 mongodb::automation_agent::auto_agent_pkg_source_uri: ~

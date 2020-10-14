@@ -14,10 +14,10 @@ describe 'mongodb::repos' do
       is_expected.to contain_yumrepo('mongodb-enterprise').with(
         'ensure'    => 'present',
         'descr'     => 'MongoDB Enterprise Repository',
-        'baseurl'   => 'https://repo.mongodb.com/yum/redhat/7/mongodb-enterprise/4.2/x86_64/',
+        'baseurl'   => 'https://repo.mongodb.com/yum/redhat/7/mongodb-enterprise/4.4/x86_64/',
         'gpgcheck'  => true,
         'enabled'   => true,
-        'gpgkey'    => 'https://www.mongodb.org/static/pgp/server-4.2.asc',
+        'gpgkey'    => 'https://www.mongodb.org/static/pgp/server-4.4.asc',
       )
     end
   end
