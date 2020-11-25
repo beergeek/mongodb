@@ -60,10 +60,10 @@ processManagement:
 <% } -%>
 storage:
   dbPath: <%= $dbpath %>
-  directoryPerDB: true
+  directoryPerDB: <%= $directory_per_db %>
   wiredTiger:
     engineConfig:
-      directoryForIndexes: true
+      directoryForIndexes: <%= directory_per_index %>
 <% if $wiredtiger_cache_gb { -%>
       cacheSizeGB: <%= $wiredtiger_cache_gb %>
 <% } -%>

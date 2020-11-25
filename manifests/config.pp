@@ -58,6 +58,9 @@ define mongodb::config (
   Boolean                               $enable_ldap_authn    = false,
   Boolean                               $enable_ldap_authz    = false,
   Boolean                               $log_append           = false,
+
+  Boolean                               $directory_per_db     = false, 
+  Boolean                               $directory_per_index  = false,
   Enum['none','tls']                    $ldap_security        = 'tls',
   Optional[Sensitive[String[1]]]        $ldap_bind_password   = undef,
   Optional[Stdlib::Absolutepath]        $kerberos_trace_path  = undef,
@@ -185,6 +188,8 @@ define mongodb::config (
       ca_file              => $ca_file,
       cluster_pem_file     => $cluster_pem_file,
       dbpath               => $db_data_path,
+      directory_per_db     => $directory_per_db,
+      directory_per_index  => $directory_per_index,
       enable_kerberos      => $enable_kerberos,
       enable_ldap_authn    => $enable_ldap_authn,
       enable_ldap_authz    => $enable_ldap_authz,
